@@ -1,0 +1,51 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<title>Example of SPiD JS SDK</title>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+</head>
+<body>
+	<div id="content"></div>
+	<script type="text/javascript" src="https://stage.payment.schibsted.no/js/spid-sdk-no-1.4.1.js"></script>
+	<script type="text/javascript">
+		try {
+			function getLoggedInUser(response) {
+				if (typeof (response.session) != 'undefined' && response.session != null && response.session != false) {
+					// logged in and connected user
+					$("#content").html('Logged in as <a href="'+VGS.getAccountURI()+'">'+response.session.displayName+'</a> | <a href="javascript:;" onclick="VGS.Auth.logout();">Logg ut</a>');
+				} else {
+					// No valid session found
+					$("#content").html('<a href="' + VGS.getLoginURI() + '">Login</a> | <a href="' + VGS.getSignupURI() + '">Sign up</a>');
+				}
+			}
+			$(document).ready(function() {
+				VGS.Event.subscribe('auth.sessionChange', getLoggedInUser);
+				VGS.init({client_id : '4d00e8d6bf92fc8648000000', prod:false, logging:true});
+			});
+		} catch (error) {
+			alert(error);
+		}
+		/*
+		About events
+		JavaScript applications are typically written with heavy use of events, and the SDK encourages this by exposing various events.
+		These are fired by the various interactions with authentication flows, such as VGS.init
+
+		auth.login
+		This event is fired when your application first notices the user (in other words, gets a session when it didn't already have a valid one).
+
+		auth.logout
+		This event is fired when your application notices that there is no longer a valid user (in other words, it had a session but can no longer validate the current user).
+
+		auth.sessionChange
+		This event is fired for any auth related change as they all affect the session: login, logout, session refresh. Sessions are refreshed over time as long as the user is active.
+
+		The VGS.Event.subscribe and VGS.Event.unsubscribe functions are used to subscribe to these events. For example:
+
+		VGS.Event.subscribe('auth.login', function(response) {
+		  // do something with response
+		});
+		*/
+	</script>
+</body>
+</html>
+
