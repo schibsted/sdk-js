@@ -14,7 +14,7 @@ module.exports = function(grunt) {
         curly: true,
         eqeqeq: true,
         immed: true,
-        latedef: false,
+        latedef: true,
         newcap: true,
         noarg: true,
         sub: true,
