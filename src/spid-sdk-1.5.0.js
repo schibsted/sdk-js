@@ -453,8 +453,9 @@ if (typeof (VGS) === 'undefined') {
 				
 				var login = (!oldSession && newSession),
 					logout = (oldSession && !newSession),
+					notLoggedin = (!oldSession && !newSession),
 					both = (oldSession && newSession && VGS._session.id !== session.id),
-					sessionChange = login || logout || (oldSession && newSession && VGS._session.sig !== session.sig) || !(!oldSession && !newSession),
+					sessionChange = login || logout || (oldSession && newSession && VGS._session.sig !== session.sig) || notLoggedin,
 					statusChange = status !== VGS._userStatus;
 				var response = {
 					session : session,
@@ -469,6 +470,14 @@ if (typeof (VGS) === 'undefined') {
 				
 				if (sessionChange && VGS.Cookie.enabled) {
 					VGS.Cookie.set(session);
+				}
+				if (notLoggedin) {
+					/**
+					 * Fired when there is no session.
+					 * 
+					 * @event auth.notLoggedin
+					 */
+					VGS.Event.fire('auth.notLoggedin', response);
 				}
 				if (statusChange) {
 					/**
