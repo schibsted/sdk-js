@@ -28,6 +28,9 @@ module.exports = function(grunt) {
       gruntfile: {
         src: 'Gruntfile.js'
       },
+      testfile: { 
+        src: 'test/test.js'
+      },
       sdk: {
         src: 'src/spid-sdk-<%= pkg.version %>.js'
       }
@@ -41,14 +44,25 @@ module.exports = function(grunt) {
         dest: 'dist/spid-sdk-<%= pkg.version %>.min.js'
       }
     },
+    mocha: {
+      all: {
+        src: [ 'test/index.html'],
+        options: {
+          mocha: {
+            ignoreLeaks: false
+          },
+          run: true
+        }
+      }
+    },
     watch: {
       gruntfile: {
         files: '<%= jshint.gruntfile.src %>',
         tasks: ['jshint:gruntfile']
       },
       sdk: {
-        files: '<%= jshint.sdk.src %>',
-        tasks: ['jshint:sdk']
+        files: ['<%= jshint.sdk.src %>', 'test/test.js'],
+        tasks: ['jshint:sdk', 'jshint:testfile', 'mocha']
       }
     }
   });
@@ -57,8 +71,9 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-mocha');
 
   // Default task.
-  grunt.registerTask('default', ['jshint:sdk', 'uglify']);
+  grunt.registerTask('default', ['jshint:sdk', 'jshint:testfile', 'uglify']);
 
 };
