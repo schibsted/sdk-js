@@ -4,7 +4,7 @@ var VGS = VGS || {
 	
 	_session : null,
 	_sessionInitiated : false,
-	_userStatus : 'unknown', // or 'notConnected' or 'connected'
+	_userStatus : 'unknown', // or 'connected'
 	
 	_logging : true,
 	_prod : true,
@@ -614,8 +614,8 @@ var VGS = VGS || {
 		// finally make the call to login status
 		VGS.Ajax.send('ajax/hassession.js?callback='+id);
 	},
-	hasProduct : function(productId, callback, force) {
-		VGS.log('VGS.hasProduct('+productId+')', 'log');
+	hasProduct : function(product_id, callback, force) {
+		VGS.log('VGS.hasProduct('+product_id+')', 'log');
 		if (!VGS.client_id) {
 			VGS.log('ERROR: VGS.hasProduct() called before calling VGS.init().','error');
 			return;
@@ -625,28 +625,28 @@ var VGS = VGS || {
 		// Check if timed out
 		var now = (new Date()).getTime();
 		if (VGS._cacheLastReset+VGS._refresh_timeout < now) {
-			VGS.log('VGS.hasProduct('+productId+'): Cache timedout, forcing request.','log');
+			VGS.log('VGS.hasProduct('+product_id+'): Cache timedout, forcing request.','log');
 			force = true;
 		}
 		
-		if (!force && typeof (VGS.cachedResponses['prd_'+productId]) === 'object' && VGS.cachedResponses['prd_'+productId] !== null) {
-			VGS.log('VGS.hasProduct('+productId+'): Product cached.','log');
-			callback( VGS.cachedResponses['prd_'+productId] );
+		if (!force && typeof (VGS.cachedResponses['prd_'+product_id]) === 'object' && VGS.cachedResponses['prd_'+product_id] !== null) {
+			VGS.log('VGS.hasProduct('+product_id+'): Product cached.','log');
+			callback( VGS.cachedResponses['prd_'+product_id] );
 			return;
 		} 
-		VGS.log('VGS.hasProduct('+productId+'): Product NOT cached.','log');
+		VGS.log('VGS.hasProduct('+product_id+'): Product NOT cached.','log');
 		var lsCb = function(response) {
-			VGS.cachedResponses['prd_'+productId] = response;
+			VGS.cachedResponses['prd_'+product_id] = response;
 			VGS._cacheLastReset = (new Date()).getTime();
 			callback(response);
 		};
 		var id = VGS.guid();
 		VGS.callbacks[id] = lsCb;
 		
-	    VGS.Ajax.send('ajax/hasproduct.js?product_id=' + productId + '&callback='+id);
+	    VGS.Ajax.send('ajax/hasproduct.js?product_id=' + product_id + '&callback='+id);
 	},
-	hasSubscription : function(productId, callback, force) {
-		VGS.log('VGS.hasSubscription('+productId+')', 'log');
+	hasSubscription : function(product_id, callback, force) {
+		VGS.log('VGS.hasSubscription('+product_id+')', 'log');
 		if (!VGS.client_id) {
 			VGS.log('ERROR: VGS.hasSubscription() called before calling VGS.init().','error');
 			return;
@@ -656,25 +656,25 @@ var VGS = VGS || {
 		// Check if timed out
 		var now = (new Date()).getTime();
 		if (VGS._cacheLastReset+VGS._refresh_timeout < now) {
-			VGS.log('VGS.hasSubscription('+productId+'): Cache timedout, forcing request.','log');
+			VGS.log('VGS.hasSubscription('+product_id+'): Cache timedout, forcing request.','log');
 			force = true;
 		}
 		
-		if (!force && typeof (VGS.cachedResponses['sub_'+productId]) === 'object' && VGS.cachedResponses['sub_'+productId] !== null) {
-			VGS.log('VGS.hasSubscription('+productId+'): Product cached.','log');
-			callback( VGS.cachedResponses['sub_'+productId] );
+		if (!force && typeof (VGS.cachedResponses['sub_'+product_id]) === 'object' && VGS.cachedResponses['sub_'+product_id] !== null) {
+			VGS.log('VGS.hasSubscription('+product_id+'): Product cached.','log');
+			callback( VGS.cachedResponses['sub_'+product_id] );
 			return;
 		} 
-		VGS.log('VGS.hasSubscription('+productId+'): Product NOT cached.','log');
+		VGS.log('VGS.hasSubscription('+product_id+'): Product NOT cached.','log');
 		var lsCb = function(response) {
-			VGS.cachedResponses['sub_'+productId] = response;
+			VGS.cachedResponses['sub_'+product_id] = response;
 			VGS._cacheLastReset = (new Date()).getTime();
 			callback(response);
 		};
 		var id = VGS.guid();
 		VGS.callbacks[id] = lsCb;
 		
-		VGS.Ajax.send('ajax/hassubscription.js?product_id=' + productId + '&callback='+id);
+		VGS.Ajax.send('ajax/hassubscription.js?product_id=' + product_id + '&callback='+id);
 	},
 	getLoginURI : function(redirect_uri, client_id) {
 		var params = {
