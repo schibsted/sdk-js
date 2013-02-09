@@ -35,12 +35,21 @@ module.exports = function(grunt) {
         src: 'src/spid-sdk-<%= pkg.version %>.js'
       }
     },
-    uglify: {
+    concat: {
       options: {
         banner: '<%= banner %>'
       },
       sdk: {
         src: ['lib/json2.js', '<%= jshint.sdk.src %>'],
+        dest: 'dist/spid-sdk-<%= pkg.version %>.js'
+      }
+    },
+    uglify: {
+      options: {
+        banner: '<%= banner %>'
+      },
+      sdk: {
+        src: '<%= concat.sdk.dest %>',
         dest: 'dist/spid-sdk-<%= pkg.version %>.min.js'
       }
     },
@@ -69,11 +78,12 @@ module.exports = function(grunt) {
 
   // These plugins provide necessary tasks.
   grunt.loadNpmTasks('grunt-contrib-uglify');
+  grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-mocha');
 
   // Default task.
-  grunt.registerTask('default', ['jshint:sdk', 'jshint:testfile', 'uglify']);
+  grunt.registerTask('default', ['jshint:sdk', 'jshint:testfile', 'concat', 'uglify']);
 
 };
