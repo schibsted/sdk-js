@@ -1,5 +1,7 @@
-Working draft of version 1.5
+# Javascript SDK, master & devel
 
-Documentation will be added later...
+Not to use in production, and it is not guaranteed to be stable. Use latest version of previous stable branch instead.
 
-Now using grunt
+## Documentation & Install
+
+See documention where other documentation is kept (you should now where it is :)
