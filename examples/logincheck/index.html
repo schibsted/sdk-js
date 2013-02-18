@@ -6,11 +6,12 @@
 </head>
 <body>
 	<div id="content"></div>
-	<script type="text/javascript" src="../../dist/spid-sdk-1.5.0.min.js"></script>
+	<script type="text/javascript" src="../../dist/spid-sdk-1.5.1.min.js"></script>
 	<script type="text/javascript">
 		try {
 			function getLoggedInUser(response) {
-				if (typeof (response.session) != 'undefined' && response.session != null && response.session != false) {
+				console.log(response);
+				if (typeof (response.session) === 'object' && response.status === 'connected') {
 					// logged in and connected user
 					$("#content").html('Logged in as <a href="'+VGS.getAccountURI()+'">'+response.session.displayName+'</a> | <a href="javascript:;" onclick="VGS.Auth.logout();">Logg ut</a>');
 				} else {
@@ -19,8 +20,14 @@
 				}
 			}
 			$(document).ready(function() {
-				VGS.Event.subscribe('auth.sessionChange', getLoggedInUser);
-				VGS.init({client_id : '4d00e8d6bf92fc8648000000', server: 'https://stage.payment.schibsted.se/', prod:false, logging:true});
+				VGS.Event.subscribe('auth.sessionChange', function(data) { console.log('sessionChange'); getLoggedInUser(data); });
+				VGS.Event.subscribe('auth.login', function(data) { console.log('login'); getLoggedInUser(data); });
+				VGS.Event.subscribe('auth.logout', function(data) { console.log('logout'); getLoggedInUser(data); });
+				VGS.Event.subscribe('auth.notLoggedin', function(data) { console.log('notLoggedin'); getLoggedInUser(data); });
+				VGS.Event.subscribe('auth.userChange', function(data) { console.log('userChange'); getLoggedInUser(data); });
+				VGS.Event.subscribe('auth.sessionInit', function(data) { console.log('sessionInit'); getLoggedInUser(data); });
+				VGS.Event.subscribe('auth.statusChange', function(data) { console.log('statusChange'); getLoggedInUser(data); });
+				VGS.init({client_id: '4d00e8d6bf92fc8648000000', server: 'https://stage.payment.schibsted.se/', prod:false, logging:true});
 			});
 		} catch (error) {
 			alert(error);
