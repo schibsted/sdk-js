@@ -37,6 +37,7 @@ module.exports = function(grunt) {
     },
     concat: {
       options: {
+        stripBanners: true,
         banner: '<%= banner %>'
       },
       sdk: {
@@ -69,6 +70,10 @@ module.exports = function(grunt) {
         files: '<%= jshint.gruntfile.src %>',
         tasks: ['jshint:gruntfile']
       },
+      sdkdev: {
+          files: '<%= jshint.sdk.src %>',
+          tasks: ['jshint:sdk', 'jshint:testfile', 'concat', 'uglify']
+        },
       sdk: {
         files: ['<%= jshint.sdk.src %>', 'test/test.js'],
         tasks: ['jshint:sdk', 'jshint:testfile', 'mocha']
