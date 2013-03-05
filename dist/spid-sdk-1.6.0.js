@@ -1,4 +1,4 @@
-/*! sdk-js - v1.6.0 - 2013-02-18
+/*! sdk-js - v1.6.0 - 2013-03-05
 * Copyright (c) 2013 Schibsted Payment AS; */
 /*jslint evil: true, regexp: true */
 
@@ -418,7 +418,8 @@ var VGS = VGS || {
 			logging : VGS._logging,
 			timeout : VGS._timeout,
 			cookie : true,
-			status : false
+			status : false,
+			https: true
 		});
 
 		// disable logging if told to do so, but only if the url doesnt have
@@ -431,9 +432,15 @@ var VGS = VGS || {
 		if (options.refresh_timeout >= 60000) { 
 			VGS._refresh_timeout = options.refresh_timeout;
 		}
-		if (options.cookie) {
-			VGS.Cookie.enabled = options.cookie;
-		}
+
+		VGS.Cookie.enabled = options.cookie;
+		VGS._prod = options.prod;
+		VGS._varnish_expiration = options.varnish_expiration;
+		VGS._cache = options.cache;
+		VGS._cache_notloggedin = options.cache_notloggedin;
+		VGS.Ajax.timeoutPeriod = options.timeout;
+		VGS.log('Default connection timeout set to ("'+ VGS.Ajax.timeoutPeriod +'")', 'log');
+
 		if (VGS._prod) {
 			VGS.Cookie.name = 'vgs_js_' + VGS.client_id;
 		} else {
@@ -450,14 +457,15 @@ var VGS = VGS || {
 		}
 		if(!valid) { return; }
 		VGS.client_id = options.client_id;
-		VGS.Ajax.serverUrl = options.server;
+		VGS.Ajax.serverUrl = (options.https ? 'https' : 'http')+'://'+options.server+'/';
+		window.console.log(VGS._prod);
+		if(VGS._prod) {
+			VGS.Ajax.sessionUrl = (options.https ? 'https' : 'http')+'://session.'+options.server+'/';
+		} else {
+			VGS.Ajax.sessionUrl = (options.https ? 'https' : 'http')+'://'+options.server+'/ajax/hassession.js';
+		}
+		window.console.log(VGS.Ajax.sessionUrl);
 		VGS.log('VGS.init("'+VGS.client_id+', '+VGS.Ajax.serverUrl+'")', 'log');
-
-		VGS._varnish_expiration = options.varnish_expiration;
-		VGS._cache = options.cache;
-		VGS._cache_notloggedin = options.cache_notloggedin;
-		VGS.Ajax.timeoutPeriod = options.timeout;
-		VGS.log('Default connection timeout set to ("'+ VGS.Ajax.timeoutPeriod +'")', 'log');
 
 		var session = null, cookie = null;
 		if (VGS.Cookie.enabled) {
@@ -529,6 +537,7 @@ var VGS = VGS || {
 		requestQueue : [],
 		scriptObject : null,
 		serverUrl : '',
+		sessionUrl : '',
 		timeoutPeriod : 5000, // if a connection goes on for longer than this many milliseconds, then timeout
 		version : '1.0',
 		
@@ -542,7 +551,7 @@ var VGS = VGS || {
 		buildConnectionUrl : function(query) {
 			VGS.log('VGS.Ajax.buildConnectionUrl("' + query + '")', 'log');
 			VGS.Ajax.connectionId = VGS.Ajax.connections.length;
-			var url = VGS.Ajax.serverUrl + query + '&connectionId='	+ VGS.Ajax.connectionId + '&client_id=' + VGS.client_id + '&redirect_uri=' + (encodeURIComponent(VGS.redirect_uri));
+			var url = ((query.substr(0,4) === 'http') ? query : VGS.Ajax.serverUrl + query) + '&connectionId='	+ VGS.Ajax.connectionId + '&client_id=' + VGS.client_id + '&redirect_uri=' + (encodeURIComponent(VGS.redirect_uri));
 			VGS.log('-- built url: [' + url + ']', 'log');
 			VGS.Ajax.requestQueue[VGS.Ajax.requestQueue.length] = new VGS.Ajax.requestQueueNode(url);
 		},
@@ -592,7 +601,7 @@ var VGS = VGS || {
 		poll : function() {
 			VGS.log('VGS.Ajax.poll()', 'log');
 			if (VGS.Ajax.pollingDebugCount === VGS.Ajax.pollingDebugThrottle) {
-				VGS.log('-- poll [' + VGS.Ajax.now() + '] (x'	+ VGS.Ajax.pollingDebugCount + ')', 'log');
+				VGS.log('-- poll [' + VGS.Ajax.now() + '] (x' + VGS.Ajax.pollingDebugCount + ')', 'log');
 				VGS.Ajax.pollingDebugCount = 0;
 			} else if (VGS.Ajax.pollingDebugFirst) {
 				VGS.log('-- poll [' + VGS.Ajax.now() + ']', 'log');
@@ -960,7 +969,7 @@ var VGS = VGS || {
 		id = VGS.guid();
 		VGS.callbacks[id] = lsCb;
 		// finally make the call to login status
-		VGS.Ajax.send('ajax/hassession.js?callback='+id);
+		VGS.Ajax.send(VGS.Ajax.sessionUrl+'?callback='+id);
 	},
 	hasProduct : function(product_id, callback, force) {
 		VGS.log('VGS.hasProduct('+product_id+')', 'log');

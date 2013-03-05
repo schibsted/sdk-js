@@ -6,7 +6,7 @@
 </head>
 <body>
 	<div id="content"></div>
-	<script type="text/javascript" src="../../dist/spid-sdk-1.6.0.min.js"></script>
+	<script type="text/javascript" src="../../dist/spid-sdk-1.6.0.js"></script>
 	<script type="text/javascript">
 		try {
 			function getLoggedInUser(response) {
@@ -27,7 +27,7 @@
 				VGS.Event.subscribe('auth.userChange', function(data) { console.log('userChange'); getLoggedInUser(data); });
 				VGS.Event.subscribe('auth.sessionInit', function(data) { console.log('sessionInit'); getLoggedInUser(data); });
 				VGS.Event.subscribe('auth.statusChange', function(data) { console.log('statusChange'); getLoggedInUser(data); });
-				VGS.init({client_id: '4d00e8d6bf92fc8648000000', server: 'https://stage.payment.schibsted.se/', prod:false, logging:true});
+				VGS.init({client_id: '4d00e8d6bf92fc8648000000', server: 'stage.payment.schibsted.se', prod:false, logging:true});
 			});
 		} catch (error) {
 			alert(error);
