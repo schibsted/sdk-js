@@ -21,12 +21,15 @@
 			}
 			$(document).ready(function() {
 				VGS.Event.subscribe('auth.sessionChange', function(data) { console.log('sessionChange'); getLoggedInUser(data); });
+				/*
 				VGS.Event.subscribe('auth.login', function(data) { console.log('login'); getLoggedInUser(data); });
 				VGS.Event.subscribe('auth.logout', function(data) { console.log('logout'); getLoggedInUser(data); });
 				VGS.Event.subscribe('auth.notLoggedin', function(data) { console.log('notLoggedin'); getLoggedInUser(data); });
 				VGS.Event.subscribe('auth.userChange', function(data) { console.log('userChange'); getLoggedInUser(data); });
 				VGS.Event.subscribe('auth.sessionInit', function(data) { console.log('sessionInit'); getLoggedInUser(data); });
 				VGS.Event.subscribe('auth.statusChange', function(data) { console.log('statusChange'); getLoggedInUser(data); });
+				*/
+				VGS.Event.subscribe('VGS.error', function(data) { console.log('VGS.error'); getLoggedInUser(data); });
 				VGS.init({client_id: '4d00e8d6bf92fc8648000000', server: 'stage.payment.schibsted.se', prod:false, logging:true});
 			});
 		} catch (error) {

@@ -118,13 +118,11 @@ var VGS = VGS || {
 		if(!valid) { return; }
 		VGS.client_id = options.client_id;
 		VGS.Ajax.serverUrl = (options.https ? 'https' : 'http')+'://'+options.server+'/';
-		window.console.log(VGS._prod);
 		if(VGS._prod) {
 			VGS.Ajax.sessionUrl = (options.https ? 'https' : 'http')+'://session.'+options.server+'/';
 		} else {
 			VGS.Ajax.sessionUrl = (options.https ? 'https' : 'http')+'://'+options.server+'/ajax/hassession.js';
 		}
-		window.console.log(VGS.Ajax.sessionUrl);
 		VGS.log('VGS.init("'+VGS.client_id+', '+VGS.Ajax.serverUrl+'")', 'log');
 
 		var session = null, cookie = null;
@@ -190,7 +188,7 @@ var VGS = VGS || {
 		connectionId : -1,
 		connections : [],
 		interval : null,
-		intervalPeriod : 100, // strongly suggested that you increase this to 1000 if debugging!!
+		intervalPeriod : 300, // strongly suggested that you increase this to 1000 if debugging!!
 		pollingDebugCount : 0,
 		pollingDebugFirst : true,
 		pollingDebugThrottle : 100, // show a debug message after every this many polling iterations
@@ -231,11 +229,12 @@ var VGS = VGS || {
 			VGS.Ajax.scriptObject = document.createElement('SCRIPT');
 			VGS.Ajax.scriptObject.src = source;
 			VGS.Ajax.scriptObject.type = 'text/javascript';
+			VGS.Ajax.scriptObject.onerror = VGS.Ajax.loadingError;
 			var head = document.getElementsByTagName('HEAD')[0];
 			head.appendChild(VGS.Ajax.scriptObject);
 		},
 		failure : function(errorMsg) {
-			VGS.log('VGS.Ajax.failure("' + errorMsg + '")', 'error');
+			VGS.log('VGS.Ajax.failure("' + errorMsg + '")', 'log');
 			if (VGS.Event) {
 				VGS.Event.fire('VGS.error', {'type': 'communication', 'code': 503, 'description':errorMsg});
 			}
@@ -314,7 +313,9 @@ var VGS = VGS || {
 			VGS.log('VGS.Ajax.startPolling()', 'log');
 			if (VGS.Ajax.interval == null) {
 				VGS.log('polling (re)started');
-				VGS.Ajax.interval = window.setInterval(function() {
+				VGS.Ajax.connections[VGS.Ajax.connectionId] = null;
+				VGS.Ajax.poll();
+				VGS.Ajax.interval = window.setInterval(function () {
 					VGS.Ajax.connections[VGS.Ajax.connectionId] = null;
 					VGS.Ajax.poll();
 				}, VGS.Ajax.intervalPeriod);
@@ -338,6 +339,11 @@ var VGS = VGS || {
 					VGS.Event.fire('VGS.error', {'type': 'response', 'code':400, 'description':response.error});
 				}
 			}
+		},
+		loadingError : function() {
+			VGS.log('VGS.Ajax.loadingError()', 'log');
+			VGS.Ajax.stopPolling();
+			VGS.Ajax.failure('Server Timed Out');
 		}
 	},
 	Cookie : {
@@ -628,6 +634,12 @@ var VGS = VGS || {
 		};
 		id = VGS.guid();
 		VGS.callbacks[id] = lsCb;
+
+		//Place a VGS.error listener to monitor failed requests
+		VGS.Event.subscribe('VGS.error', function() {
+			//VGS.Ajax.send();
+		});
+
 		// finally make the call to login status
 		VGS.Ajax.send(VGS.Ajax.sessionUrl+'?callback='+id);
 	},
