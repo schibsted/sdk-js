@@ -71,9 +71,9 @@ module.exports = function(grunt) {
         tasks: ['jshint:gruntfile']
       },
       sdkdev: {
-          files: '<%= jshint.sdk.src %>',
-          tasks: ['jshint:sdk', 'jshint:testfile', 'concat', 'uglify']
-        },
+        files: '<%= jshint.sdk.src %>',
+        tasks: ['jshint:sdk', 'jshint:testfile', 'concat', 'uglify']
+      },
       sdk: {
         files: ['<%= jshint.sdk.src %>', 'test/test.js'],
         tasks: ['jshint:sdk', 'jshint:testfile', 'mocha']

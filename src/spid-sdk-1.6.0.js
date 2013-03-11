@@ -119,9 +119,9 @@ var VGS = VGS || {
 		VGS.client_id = options.client_id;
 		VGS.Ajax.serverUrl = (options.https ? 'https' : 'http')+'://'+options.server+'/';
 		if(VGS._prod) {
-			VGS.Ajax.sessionUrl = (options.https ? 'https' : 'http')+'://session.'+options.server+'/';
+			VGS.Ajax.sessionUrl = (options.https ? 'https' : 'http')+'://session.'+options.server+'/rpc/hasSession.js';
 		} else {
-			VGS.Ajax.sessionUrl = (options.https ? 'https' : 'http')+'://'+options.server+'/ajax/hassession.js';
+			VGS.Ajax.sessionUrl = (options.https ? 'https' : 'http')+'://'+options.server+'/ajax/hasSession.js';
 		}
 		VGS.log('VGS.init("'+VGS.client_id+', '+VGS.Ajax.serverUrl+'")', 'log');
 
@@ -334,7 +334,7 @@ var VGS = VGS || {
 			if (response.success) {
 				VGS.log('SUCCESS: ' + response.success, 'log');
 			} else if (response.error) {
-				VGS.log('ERROR: ' + response.error, 'error');
+				VGS.log('ERROR: ' + response.error, 'log');
 				if (VGS.Event) {
 					VGS.Event.fire('VGS.error', {'type': 'response', 'code':400, 'description':response.error});
 				}
@@ -460,13 +460,18 @@ var VGS = VGS || {
 				}
 			} else if (response.error && response.response) {
 				// There is an error and a response indicating the session status
-				VGS.log(response.error, 'error');
-				if(VGS._cache_notloggedin) {
-					// Override expiresIn to VGS._refresh_timeout
-					response.response.expiresIn = parseInt(VGS._refresh_timeout, 10)/1000;
-					VGS.Auth.setSession(response.response, 'unknown');
+				if(response.error.type === 'LoginException') {
+					VGS.log(response.error, 'log');
+					VGS.Event.fire('VGS.loginException', response);
 				} else {
-					VGS.Auth.setSession(null, 'unknown');
+					VGS.log(response.error, 'error');
+					if(VGS._cache_notloggedin) {
+						// Override expiresIn to VGS._refresh_timeout
+						response.response.expiresIn = parseInt(VGS._refresh_timeout, 10)/1000;
+						VGS.Auth.setSession(response.response, 'unknown');
+					} else {
+						VGS.Auth.setSession(null, 'unknown');
+					}
 				}
 			} else {
 				VGS.log(response, 'error');
@@ -635,9 +640,17 @@ var VGS = VGS || {
 		id = VGS.guid();
 		VGS.callbacks[id] = lsCb;
 
-		//Place a VGS.error listener to monitor failed requests
-		VGS.Event.subscribe('VGS.error', function() {
-			//VGS.Ajax.send();
+		VGS.Event.subscribe('VGS.loginException', function() {
+			id = VGS.guid();
+			VGS.callbacks[id] = function(response) {
+				VGS.log('VGS.callbacks -- '+VGS.Auth._loadState, 'log');
+				VGS.Auth._loadState = 'loaded';
+				VGS.Auth.validate(response);
+				VGS.Event.fire('VGS.loginStatus', response);
+				VGS.Event.clear('VGS.loginStatus');
+			};
+			VGS.Event.clear('VGS.loginException');
+			VGS.Ajax.send('ajax/hasSession.js?callback='+id+'&autologin=1');
 		});
 
 		// finally make the call to login status
