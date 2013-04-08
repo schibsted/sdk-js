@@ -21,6 +21,9 @@ module.exports = function(grunt) {
       },
       sdk: {
         src: 'src/spid-sdk-<%= pkg.version %>.js'
+      },
+      tracker: {
+        src: 'src/spid-tracker-0.1.0.js'
       }
     },
     concat: {
@@ -29,7 +32,7 @@ module.exports = function(grunt) {
         banner: '<%= banner %>'
       },
       sdk: {
-        src: ['lib/json2.js', '<%= jshint.sdk.src %>'],
+        src: ['lib/json2.js', '<%= jshint.sdk.src %>',  '<%= jshint.tracker.src %>'],
         dest: 'dist/spid-sdk-<%= pkg.version %>.js'
       }
     },
@@ -60,11 +63,11 @@ module.exports = function(grunt) {
       },
       sdkdev: {
         files: '<%= jshint.sdk.src %>',
-        tasks: ['jshint:sdk', 'jshint:testfile', 'concat', 'uglify']
+        tasks: ['jshint:sdk', 'jshint:tracker', 'jshint:testfile', 'concat', 'uglify']
       },
       sdk: {
         files: ['<%= jshint.sdk.src %>', 'test/test.js'],
-        tasks: ['jshint:sdk', 'jshint:testfile', 'mocha']
+        tasks: ['jshint:sdk', 'jshint:tracker', 'jshint:testfile', 'mocha']
       }
     }
   });
@@ -77,6 +80,6 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-mocha');
 
   // Default task.
-  grunt.registerTask('default', ['jshint:sdk', 'jshint:testfile', 'concat', 'uglify']);
+  grunt.registerTask('default', ['jshint:sdk', 'jshint:tracker', 'jshint:testfile', 'concat', 'uglify']);
 
 };
