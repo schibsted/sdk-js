@@ -1,5 +1,5 @@
 /*global VGS */
-(function(win, v) {
+(function(win, vgs) {
 
     var config = {
         pulseServer      : 'http://127.0.0.1:8080/pulse/rest/analytics/report',
@@ -97,7 +97,7 @@
 
     var spid,
         executed = false;
-    v.Event.subscribe('auth.sessionChange', function(data) {
+    vgs.Event.subscribe('auth.sessionChange', function(data) {
         spid = data.session ? data.session.userId : 0;
         if (Math.random() <= config.throttlingFactor && !executed) { report(); executed = true; }
     });

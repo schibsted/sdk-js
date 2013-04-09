@@ -1332,7 +1332,7 @@ if(typeof (window.vgsAsyncInit) === 'function' && !window.vgsAsyncInit.hasRun) {
 	window.vgsAsyncInit();
 }
 }, 0);
-(function(win, v) {
+(function(win, vgs) {
 
     var config = {
         pulseServer      : 'http://127.0.0.1:8080/pulse/rest/analytics/report',
@@ -1430,7 +1430,7 @@ if(typeof (window.vgsAsyncInit) === 'function' && !window.vgsAsyncInit.hasRun) {
 
     var spid,
         executed = false;
-    v.Event.subscribe('auth.sessionChange', function(data) {
+    vgs.Event.subscribe('auth.sessionChange', function(data) {
         spid = data.session ? data.session.userId : 0;
         if (Math.random() <= config.throttlingFactor && !executed) { report(); executed = true; }
     });
