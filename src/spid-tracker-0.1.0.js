@@ -1,8 +1,6 @@
+/*global $ */
 $(document).ready(function () {
     try {
-        var throttlingFactor = 1.0;
-        if (throttlingFactor == 1.0 || Math.random() < throttlingFactor) reportStatistics();
-
         function reportStatistics() {
             var pulseServer = 'http://127.0.0.1:8080/pulse/rest/analytics/report';
             var clientId = '5087dc1b421c7a0b79000000';
@@ -26,7 +24,7 @@ $(document).ready(function () {
                         x = biscuits[i].substr(0, biscuits[i].indexOf("="));
                         y = biscuits[i].substr(biscuits[i].indexOf("=") + 1);
                         x = x.replace(/^\s+|\s+$/g, "");
-                        if (x == name) {
+                        if (x === name) {
                             return y;
                         }
                     }
@@ -37,7 +35,7 @@ $(document).ready(function () {
 
                 if (value == null) {
                     value = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-                        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+                        var r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
                         return v.toString(16);
                     });
                 }
@@ -77,7 +75,7 @@ $(document).ready(function () {
             $.getScript(spidServer,
                 function () {
                     try {
-                        triggerResponse();
+                        parent.triggerResponse();
                         sendReport();
                     } catch (e) {
                     }
@@ -106,7 +104,7 @@ $(document).ready(function () {
             // hook into clicks from this page
             var onClick = function () {
                 try {
-                    var payload = createPayload({toUrl: $(this).attr("href"), leave: new Date()})
+                    var payload = createPayload({toUrl: $(this).attr("href"), leave: new Date()});
                     sendPulse(payload);
                 } catch (e) {
                 }
@@ -118,7 +116,7 @@ $(document).ready(function () {
             // hook into exiting this page
             window.addEventListener(
                 'beforeunload',
-                function (ex) {
+                function () {
                     try {
                         var payload = createPayload({leave: new Date()});
                         sendPulse(payload);
@@ -129,6 +127,10 @@ $(document).ready(function () {
             );
 
         }
+
+        var throttlingFactor = 1.0;
+        if (throttlingFactor === 1.0 || Math.random() < throttlingFactor) { reportStatistics(); }
+
     } catch (e) {
     }
 });
