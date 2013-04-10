@@ -75,23 +75,28 @@
 
         var uid = updateCookie(config.cookiePrefix + 'uid', 365, 0),
             sid = updateCookie(config.cookiePrefix + 'sid', 0, 15),
-            pageLoadTime = new Date().getTime();
+            pageLoadTime = (new Date()).getTime();
 
         function pulse(attr) {
-            var payload = { url: win.document.URL, agent: win.navigator.userAgent, uid: uid, sid: sid, arrive: pageLoadTime, throttle: config.throttlingFactor, spid: spid };
+            // a=arrive, t=throttle, l=leave
+            var payload = { url: win.encodeURIComponent(win.document.URL), uid: uid, sid: sid, a: pageLoadTime, t: config.throttlingFactor, spid: spid };
             for (var a in attr) {
                 payload[a] = attr[a];
             }
-            win.console.log(JSON.stringify(payload));
+            var query = [];
+            for (var i in payload) {
+                query.push(i+'='+payload[i]);
+            }
+            (new Image()).src = config.pulseServer + '?' + query.join('&');
         }
 
         //This will trigger on every link click
         on('a', 'click', function() {
-            pulse({toUrl: this.getAttribute('href'), leave: new Date()});
+            pulse({toUrl: this.getAttribute('href'), l: (new Date()).getTime()});
         });
         //This will trigger on every unload, meaning also when linked is clicked
         on(win, 'beforeunload', function() {
-            pulse({leave: new Date()});
+            pulse({l: (new Date()).getTime()});
         });
     }
 
