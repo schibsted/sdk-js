@@ -1,4 +1,4 @@
-/*! sdk-js - v1.7.0 - 2013-04-10
+/*! sdk-js - v1.7.0 - 2013-04-11
 * Copyright (c) 2013 Schibsted Payment AS; */
 /*jslint evil: true, regexp: true */
 
@@ -1340,37 +1340,64 @@ if(typeof (window.vgsAsyncInit) === 'function' && !window.vgsAsyncInit.hasRun) {
         throttlingFactor : 1.0
     };
 
+    /**
+    * Event binder
+    * @param selector  string | element  'a' or window
+    * @param event     string            type of event, 'click'
+    * @param callback  function          called on event triggers. function() { this }
+    */
     function on(selector, event, callback) {
-        function getHandler() {
+        function getAttacher() {
+            function traverse(node) {
+                //Traverse DOM upwards until selector node is found or document is reached
+                while(node.nodeName.toLowerCase() !== selector.toLowerCase() && node.nodeType !== 9) {
+                    node = node.parentNode;
+                }
+                return node.nodeType === 1 ? node : false;
+            }
+            function cb(evt) {
+                //Cross browser event getting
+                var e = evt || win.event;
+                var elem = e.target || e.srcElement;
+                //traverse to node if selector is string (not window)
+                var match = (typeof selector === 'string') ? traverse(elem) : elem;
+                //Only call callback if we have a match
+                if(match) { callback.call(match); }
+            }
+            //Event listener for modern browsers
             if(win.addEventListener) {
-                return function(element, event, callback) { element.addEventListener(event, callback, false); };
+                return function(element, event) { element.addEventListener(event, cb , false); };
             }
+            //Event listener for IE
             if(win.attachEvent) {
-                return function(element, event, callback) { element.attachEvent('on'+event, function() { callback.call(this, win.event); }); };
+                return function(element, event) { element.attachEvent('on'+event, cb); };
             }
-            return function(element, event, callback) {
+            //Event listener for old browsers
+            return function(element, event) {
                 var old = element["on"+event] ? element["on"+event] : function() {};
                 element["on"+event] = function(e) {
-                    if (!e) {
-                        e = win.event;
-                    }
+                    if (!e) { e = win.event; }
                     old.call(this, e);
-                    callback.call(this, e);
+                    cb.call(this, e);
                 };
             };
         }
-        var handler = getHandler();
-        var elements;
+        var attach = getAttacher();
         if(typeof selector === 'string') {
-            elements = Array.prototype.slice.call(win.document.getElementsByTagName(selector));
+            //if selector is string, add listener to document
+            attach(win.document, event);
         } else {
-            elements = [selector];
-        }
-        for(var i in elements) {
-            handler(elements[i], event, callback);    
+            //otherwise add to selector
+            attach(selector, event);
         }
     }
 
+    /**
+    * Updates or sets tracking cookie
+    * @param name       string  Name of cookie
+    * @param days       int     days from now to expire
+    * @param minutes    int     minutes from now to expire
+    */
     function updateCookie(name, days, minutes) {
         function setCookie(value) {
             var exdate = new Date();
@@ -1406,10 +1433,15 @@ if(typeof (window.vgsAsyncInit) === 'function' && !window.vgsAsyncInit.hasRun) {
 
     function report() {
 
+        //Update cookies and get load datetime
         var uid = updateCookie(config.cookiePrefix + 'uid', 365, 0),
             sid = updateCookie(config.cookiePrefix + 'sid', 0, 15),
             pageLoadTime = (new Date()).getTime();
 
+        /**
+        * Sends ping to pulse server, through an img and query params
+        * @param    attr    object  contain key/val pairs to add to ping
+        */
         function pulse(attr) {
             // a=arrive, t=throttle, l=leave
             var payload = { url: win.encodeURIComponent(win.document.URL), uid: uid, sid: sid, a: pageLoadTime, t: config.throttlingFactor, spid: spid };
@@ -1423,16 +1455,20 @@ if(typeof (window.vgsAsyncInit) === 'function' && !window.vgsAsyncInit.hasRun) {
             (new Image()).src = config.pulseServer + '?' + query.join('&');
         }
 
+        //Main app. Place event handlers and callbacks to send pulse
         var triggered = false;
         on('a', 'click', function() {
+            //Listener for link clicks. If link clicked, avoid unload event
             var link = this.getAttribute('href');
             if(link.substr(0,4) === 'http') {
-                pulse({toUrl: link, l: (new Date()).getTime()});
+                //Only send links that starts with http, encoded. Also supply l for leave.
+                pulse({toUrl: win.encodeURIComponent(link), l: (new Date()).getTime()});
                 triggered = true;
             }
         });
 
         on(win, 'beforeunload', function() {
+            //Only trigger if not already triggered by link
             if(!triggered) {
                 pulse({l: (new Date()).getTime()});
             }
@@ -1442,6 +1478,7 @@ if(typeof (window.vgsAsyncInit) === 'function' && !window.vgsAsyncInit.hasRun) {
     var spid,
         executed = false;
     vgs.Event.subscribe('auth.sessionChange', function(data) {
+        //Listen to sessionChange event, always triggered and sometimes multiple. Avoids multiple event placements.
         spid = data.session ? data.session.userId : 0;
         if (Math.random() <= config.throttlingFactor && !executed) { report(); executed = true; }
     });
