@@ -32,8 +32,12 @@ module.exports = function(grunt) {
         banner: '<%= banner %>'
       },
       sdk: {
-        src: ['lib/json2.js', '<%= jshint.sdk.src %>',  '<%= jshint.tracker.src %>'],
+        src: ['lib/json2.js', '<%= jshint.sdk.src %>'],
         dest: 'dist/spid-sdk-<%= pkg.version %>.js'
+      },
+      sdktracker: {
+        src: ['lib/json2.js', '<%= jshint.sdk.src %>', '<%= jshint.tracker.src %>'],
+        dest: 'dist/spid-sdk-pulse-<%= pkg.version %>.js'
       }
     },
     uglify: {
@@ -43,6 +47,10 @@ module.exports = function(grunt) {
       sdk: {
         src: '<%= concat.sdk.dest %>',
         dest: 'dist/spid-sdk-<%= pkg.version %>.min.js'
+      },
+      sdktracker: {
+        src: '<%= concat.sdktracker.dest %>',
+        dest: 'dist/spid-sdk-pulse-<%= pkg.version %>.min.js'
       }
     },
     mocha: {
