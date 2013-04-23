@@ -2,7 +2,7 @@
 (function(win, vgs) {
 
     var config = {
-        pulseServer      : 'http://127.0.0.1:8080/pulse/rest/analytics/report',
+        pulseServer      : 'http://pulse.pulse-analytics.com/pulse/rest/analytics/report',
         cookiePrefix     : 'spd_pls_',
         throttlingFactor : 1.0
     };
@@ -17,7 +17,7 @@
         function getAttacher() {
             function traverse(node) {
                 //Traverse DOM upwards until selector node is found or document is reached
-                while(node.nodeName.toLowerCase() !== selector.toLowerCase() && node.nodeType !== 9) {
+                while(node.nodeName !== selector.toUpperCase() && node.nodeType !== 9) {
                     node = node.parentNode;
                 }
                 return node.nodeType === 1 ? node : false;
@@ -111,12 +111,13 @@
         */
         function pulse(attr) {
             // a=arrive, t=throttle, l=leave
-            var payload = { url: win.encodeURIComponent(win.document.URL), uid: uid, sid: sid, a: pageLoadTime, t: config.throttlingFactor, spid: spid };
-            for (var a in attr) {
-                payload[a] = attr[a];
+            var payload = { url: win.encodeURIComponent(win.document.URL), uid: uid, sid: sid, a: pageLoadTime, t: config.throttlingFactor, spid: spid },
+                query = [],
+                i;
+            for (i in attr) {
+                payload[i] = attr[i];
             }
-            var query = [];
-            for (var i in payload) {
+            for (i in payload) {
                 query.push(i+'='+payload[i]);
             }
             (new Image()).src = config.pulseServer + '?' + query.join('&');
@@ -134,7 +135,7 @@
             }
         });
 
-        on(win, 'beforeunload', function() {
+        on(win, 'unload', function() {
             //Only trigger if not already triggered by link
             if(!triggered) {
                 pulse({l: (new Date()).getTime()});
