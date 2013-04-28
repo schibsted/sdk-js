@@ -146,6 +146,7 @@
     var spid,
         executed = false;
     vgs.Event.subscribe('auth.sessionChange', function(data) {
+        config.throttlingFactor = VGS._track_throttle;
         //Listen to sessionChange event, always triggered and sometimes multiple. Avoids multiple event placements.
         spid = data.session ? data.session.userId : 0;
         if (Math.random() <= config.throttlingFactor && !executed) { report(); executed = true; }

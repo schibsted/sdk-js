@@ -15,6 +15,7 @@ var VGS = VGS || {
 	_cache : true,
 	_cache_notloggedin : false,
 	_cacheLastReset : (new Date()).getTime(),
+	_track_throttle : 1,
 	
 	// pending callbacks for VGS.getLoginStatus() calls
 	callbacks: [],
@@ -77,6 +78,7 @@ var VGS = VGS || {
 			refresh_timeout : VGS._refresh_timeout,
 			logging : VGS._logging,
 			timeout : VGS._timeout,
+			track_throttle : VGS._track_throttle,
 			cookie : true,
 			status : false,
 			https: true
@@ -99,6 +101,7 @@ var VGS = VGS || {
 		VGS._cache = options.cache;
 		VGS._cache_notloggedin = options.cache_notloggedin;
 		VGS.Ajax.timeoutPeriod = options.timeout;
+		VGS._track_throttle = options.track_throttle;
 		VGS.log('Default connection timeout set to ("'+ VGS.Ajax.timeoutPeriod +'")', 'log');
 
 		if (VGS._prod) {

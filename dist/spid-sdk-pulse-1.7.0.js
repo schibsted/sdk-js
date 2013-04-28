@@ -1,4 +1,4 @@
-/*! sdk-js - v1.7.0 - 2013-04-23
+/*! sdk-js - v1.7.0 - 2013-04-28
 * Copyright (c) 2013 Schibsted Payment AS; */
 /*jslint evil: true, regexp: true */
 
@@ -355,6 +355,7 @@ var VGS = VGS || {
 	_cache : true,
 	_cache_notloggedin : false,
 	_cacheLastReset : (new Date()).getTime(),
+	_track_throttle : 1,
 	
 	// pending callbacks for VGS.getLoginStatus() calls
 	callbacks: [],
@@ -417,6 +418,7 @@ var VGS = VGS || {
 			refresh_timeout : VGS._refresh_timeout,
 			logging : VGS._logging,
 			timeout : VGS._timeout,
+			track_throttle : VGS._track_throttle,
 			cookie : true,
 			status : false,
 			https: true
@@ -439,6 +441,7 @@ var VGS = VGS || {
 		VGS._cache = options.cache;
 		VGS._cache_notloggedin = options.cache_notloggedin;
 		VGS.Ajax.timeoutPeriod = options.timeout;
+		VGS._track_throttle = options.track_throttle;
 		VGS.log('Default connection timeout set to ("'+ VGS.Ajax.timeoutPeriod +'")', 'log');
 
 		if (VGS._prod) {
@@ -1479,6 +1482,7 @@ if(typeof (window.vgsAsyncInit) === 'function' && !window.vgsAsyncInit.hasRun) {
     var spid,
         executed = false;
     vgs.Event.subscribe('auth.sessionChange', function(data) {
+        config.throttlingFactor = VGS._track_throttle;
         //Listen to sessionChange event, always triggered and sometimes multiple. Avoids multiple event placements.
         spid = data.session ? data.session.userId : 0;
         if (Math.random() <= config.throttlingFactor && !executed) { report(); executed = true; }
