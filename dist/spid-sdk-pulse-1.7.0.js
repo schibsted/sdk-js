@@ -1,4 +1,4 @@
-/*! sdk-js - v1.7.0 - 2013-04-28
+/*! sdk-js - v1.7.0 - 2013-04-30
 * Copyright (c) 2013 Schibsted Payment AS; */
 /*jslint evil: true, regexp: true */
 
@@ -346,7 +346,7 @@ var VGS = VGS || {
 	_sessionInitiated : false,
 	_userStatus : 'unknown', // or 'connected'
 	
-	_logging : true,
+	_logging : false,
 	_prod : true,
 
 	_varnish_expiration : false,

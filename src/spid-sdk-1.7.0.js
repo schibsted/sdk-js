@@ -6,7 +6,7 @@ var VGS = VGS || {
 	_sessionInitiated : false,
 	_userStatus : 'unknown', // or 'connected'
 	
-	_logging : true,
+	_logging : false,
 	_prod : true,
 
 	_varnish_expiration : false,
