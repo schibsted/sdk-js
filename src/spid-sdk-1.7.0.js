@@ -66,6 +66,7 @@ var VGS = VGS || {
 	 * refresh_timeout    | Integer | Refresh session timeout          | *Optional*  | `900000` // miliseconds (15 minutes)
 	 * cache              | Boolean | Response caching.                | *Optional*  | `true` // Uses refresh_timeout for caching refresh
 	 * cache_notloggedin  | Boolean | Cache user not logged in status  | *Optional*  | `false` // Uses refresh_timeout for caching refresh
+	 * track_throttle     | Float   | Use with tracker. Between 0-1    | *Optional*  | 1
 	 */
 	init : function(options) {
 		var valid = true;
