@@ -1,4 +1,4 @@
-/*! sdk-js - v1.7.0 - 2013-05-06
+/*! sdk-js - v1.7.0 - 2013-05-13
 * Copyright (c) 2013 Schibsted Payment AS; */
 /*jslint evil: true, regexp: true */
 
@@ -1339,7 +1339,7 @@ if(typeof (window.vgsAsyncInit) === 'function' && !window.vgsAsyncInit.hasRun) {
 (function(win, vgs) {
 
     var config = {
-        pulseServer      : 'http://pulse.pulse-analytics.com/pulse/rest/analytics/report',
+        pulseServer      : (win.location.protocol.substr(0,5) === 'https' ? 'https' : 'http' ) +'://pulse.schibstedpayment.no/pulse/rest/analytics/report',
         cookiePrefix     : 'spd_pls_',
         throttlingFactor : 1.0
     };
