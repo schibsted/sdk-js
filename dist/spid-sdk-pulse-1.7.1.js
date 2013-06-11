@@ -1,4 +1,4 @@
-/*! sdk-js - v1.7.1 - 2013-06-05
+/*! sdk-js - v1.7.1 - 2013-06-11
 * Copyright (c) 2013 Schibsted Payment AS; */
 /*jslint evil: true, regexp: true */
 
@@ -428,6 +428,7 @@ var VGS = VGS || {
 		// disable logging if told to do so, but only if the url doesnt have
 		// the token to turn it on. this allows for easier debugging of third
 		// party sites even if logging has been turned off.
+		VGS._logging = options.logging;
 		if ((!options.logging && window.location.toString().indexOf('vgs_debug=1') < 0) || !window.console) {
 			VGS._logging = false;
 		}

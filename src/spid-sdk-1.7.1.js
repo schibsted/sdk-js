@@ -88,6 +88,7 @@ var VGS = VGS || {
 		// disable logging if told to do so, but only if the url doesnt have
 		// the token to turn it on. this allows for easier debugging of third
 		// party sites even if logging has been turned off.
+		VGS._logging = options.logging;
 		if ((!options.logging && window.location.toString().indexOf('vgs_debug=1') < 0) || !window.console) {
 			VGS._logging = false;
 		}
