@@ -599,9 +599,22 @@ var VGS = VGS || {
 				// then we would also need to rely on the local time available in JS
 				// which is often incorrect.
 				VGS.log('--  refresh every '+VGS._refresh_timeout+' milliseconds', 'log');
-				VGS.Auth._refreshTimer = window.setTimeout(function() {
-					VGS.getLoginStatus(null, true); // force refresh
-					}, VGS._refresh_timeout);
+				// Keep track of the time in milliseconds when we need to refresh the session.
+				VGS.Auth._refreshTime = (new Date()).getTime() + VGS._refresh_timeout;
+				// Check the current time in milliseconds against the time when we need to refresh the session.
+				// We do this every second to avoid problems when the computer is suspended, time passes, and when
+				// the computer is resumed yet again, the cookie session has expired, but the timeout will not fire
+				// until the timer has expired.
+				var _needsSessionRefresh = function() {
+					if((new Date()).getTime() >= VGS.Auth._refreshTime) {
+						VGS.getLoginStatus(null, true); // force refresh
+					}
+					else {
+						VGS.Auth._refreshTimer = window.setTimeout(_needsSessionRefresh, 1000);
+					}
+				};
+
+				_needsSessionRefresh();
 			}
 			return response;
 		}
