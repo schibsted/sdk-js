@@ -940,13 +940,13 @@ var VGS = VGS || {
 				// which is often incorrect.
 				VGS.log('--  refresh every '+VGS._refresh_timeout+' milliseconds', 'log');
 				// Keep track of the time in milliseconds when we need to refresh the session.
-				VGS.Auth._refreshTime = Date.now() + VGS._refresh_timeout;
+				VGS.Auth._refreshTime = (new Date()).getTime() + VGS._refresh_timeout;
 				// Check the current time in milliseconds against the time when we need to refresh the session.
 				// We do this every second to avoid problems when the computer is suspended, time passes, and when
 				// the computer is resumed yet again, the cookie session has expired, but the timeout will not fire
 				// until the timer has expired.
 				var _needsSessionRefresh = function() {
-					if(Date.now() >= VGS.Auth._refreshTime) {
+					if((new Date()).getTime() >= VGS.Auth._refreshTime) {
 						VGS.getLoginStatus(null, true); // force refresh
 					}
 					else {
