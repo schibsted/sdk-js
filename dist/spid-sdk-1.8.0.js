@@ -1,4 +1,4 @@
-/*! sdk-js - v1.8.0 - 2013-06-12
+/*! sdk-js - v1.8.0 - 2013-09-17
 * Copyright (c) 2013 Schibsted Payment AS; */
 /*jslint evil: true, regexp: true */
 
@@ -339,6 +339,7 @@ if (typeof JSON !== 'object') {
     }
 }());
 var VGS = VGS || {
+  version: '1.8.0',
 	client_id : false,
 	redirect_uri : window.location.toString(),
 	
