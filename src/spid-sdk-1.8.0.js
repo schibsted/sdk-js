@@ -1,4 +1,5 @@
 var VGS = VGS || {
+	version: '<%= pkg.version %>',
 	client_id : false,
 	redirect_uri : window.location.toString(),
 	
