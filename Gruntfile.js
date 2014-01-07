@@ -29,7 +29,8 @@ module.exports = function(grunt) {
     concat: {
       options: {
         stripBanners: true,
-        banner: '<%= banner %>'
+        banner: '<%= banner %>',
+        process: true
       },
       sdk: {
         src: ['lib/json2.js', '<%= jshint.sdk.src %>'],
