@@ -1,4 +1,4 @@
-/*! sdk-js - v1.7.1 - 2013-06-11
+/*! sdk-js - v1.7.2 - 2013-06-21
 * Copyright (c) 2013 Schibsted Payment AS; */
 /*jslint evil: true, regexp: true */
 
@@ -424,11 +424,10 @@ var VGS = VGS || {
 			status : false,
 			https: true
 		});
-
+		VGS._logging = options.logging;
 		// disable logging if told to do so, but only if the url doesnt have
 		// the token to turn it on. this allows for easier debugging of third
 		// party sites even if logging has been turned off.
-		VGS._logging = options.logging;
 		if ((!options.logging && window.location.toString().indexOf('vgs_debug=1') < 0) || !window.console) {
 			VGS._logging = false;
 		}
@@ -436,7 +435,7 @@ var VGS = VGS || {
 		if (options.refresh_timeout >= 60000) { 
 			VGS._refresh_timeout = options.refresh_timeout;
 		}
-
+		
 		VGS.Cookie.enabled = options.cookie;
 		VGS._prod = options.prod;
 		VGS._varnish_expiration = options.varnish_expiration;
@@ -789,7 +788,17 @@ var VGS = VGS || {
 		validate : function(response) {
 			VGS.log('VGS.Auth.validate', 'log');
 			VGS.Auth.valid = false;
+			// Trigger visitor events
+			VGS.log(response, 'log');
 			if (response.result) {
+				if (typeof (response.visitor) !== 'undefined') {
+					/**
+					 * Fired when there is a identified visitor.
+					 * 
+					 * @event auth.visitor
+					 */
+					VGS.Event.fire('auth.visitor', response.visitor);
+				}
 				VGS.Auth.valid = response.result;
 				VGS.log('SUCCESS: ' + VGS.Auth.valid, 'log');
 				if (VGS.Auth.valid && typeof (response.userId) !== 'undefined') {
@@ -800,6 +809,14 @@ var VGS = VGS || {
 					VGS.Auth.setSession(null, 'unknown');
 				}
 			} else if (response.error && response.response) {
+				if (typeof (response.response.visitor) !== 'undefined') {
+					/**
+					 * Fired when there is a identified visitor.
+					 * 
+					 * @event auth.visitor
+					 */
+					VGS.Event.fire('auth.visitor', response.response.visitor);
+				}
 				// There is an error and a response indicating the session status
 				if(response.error.type === 'LoginException') {
 					VGS.log(response.error, 'log');
@@ -851,6 +868,7 @@ var VGS = VGS || {
 			if (sessionChange && VGS.Cookie.enabled) {
 				VGS.Cookie.set(session);
 			}
+			
 			if (notLoggedin) {
 				/**
 				 * Fired when there is no session.
@@ -1058,6 +1076,20 @@ var VGS = VGS || {
 		VGS.callbacks[id] = lsCb;
 		
 		VGS.Ajax.send('ajax/hassubscription.js?product_id=' + product_id + '&callback='+id);
+	},
+	setTraits : function(traits, callback) {
+		VGS.log('VGS.setTraits('+traits+')', 'log');
+		if (!VGS.client_id) {
+			VGS.log('ERROR: VGS.setTraits() called before calling VGS.init().','error');
+			return;
+		}
+		var lsCb = function(response) {
+			callback(response);
+		};
+		var id = VGS.guid();
+		VGS.callbacks[id] = lsCb;
+		
+		VGS.Ajax.send('ajax/traits.js?t=' + traits + '&callback='+id);
 	},
 	getLoginURI : function(redirect_uri, client_id) {
 		var params = {
