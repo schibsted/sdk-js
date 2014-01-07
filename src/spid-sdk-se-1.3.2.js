@@ -341,12 +341,12 @@ if (!VGS) {
 		
 		_domain : {
 			prod : {
-				api : 'https://payment.schibsted.no/api/',
-				www : 'https://payment.schibsted.no/'
+				api : 'https://payment.schibsted.se/api/',
+				www : 'https://payment.schibsted.se/'
 			},
 			test : {
-				api : 'https://stage.payment.schibsted.no/api/',
-				www : 'https://stage.payment.schibsted.no/'
+				api : 'https://stage.payment.schibsted.se/api/',
+				www : 'https://stage.payment.schibsted.se/'
 			}
 		},
 		
@@ -508,7 +508,7 @@ if (!VGS) {
 			buildConnectionUrl : function(query) {
 				VGS.log('VGS.Ajax.buildConnectionUrl("' + query + '")', 'log');
 				VGS.Ajax.connectionId = VGS.Ajax.connections.length;
-				var url = VGS.Ajax.serverUrl + query + '&connectionId='	+ VGS.Ajax.connectionId + '&client_id=' + VGS.client_id + '&redirect_uri=' + unescape(encodeURIComponent(VGS.redirect_uri));
+				var url = VGS.Ajax.serverUrl + query + '&connectionId='	+ VGS.Ajax.connectionId + '&client_id=' + VGS.client_id + '&redirect_uri=' + (encodeURIComponent(VGS.redirect_uri));
 				VGS.log('-- built url: [' + url + ']', 'log');
 				VGS.Ajax.requestQueue[VGS.Ajax.requestQueue.length] = new VGS.Ajax.requestQueueNode(url);
 			},
@@ -900,7 +900,7 @@ if (!VGS) {
 				client_id = VGS.client_id;
 			}
 			if (client_id) {
-				url = url + '?response_type=code&client_id=' + client_id + '&redirect_uri=' + unescape(encodeURIComponent(window.location.toString()));
+				url = url + '?response_type=code&client_id=' + client_id + '&redirect_uri=' + (encodeURIComponent(window.location.toString()));
 			}
 			return url;
 		},
@@ -910,7 +910,7 @@ if (!VGS) {
 				client_id = VGS.client_id;
 			}
 			if (client_id) {
-				url = url + '?response_type=code&client_id=' + client_id + '&redirect_uri=' + unescape(encodeURIComponent(window.location.toString()));
+				url = url + '?response_type=code&client_id=' + client_id + '&redirect_uri=' + (encodeURIComponent(window.location.toString()));
 			}
 			return url;
 		},
@@ -920,7 +920,7 @@ if (!VGS) {
 				client_id = VGS.client_id;
 			}
 			if (client_id) {
-				url = url + '?response_type=code&client_id=' + client_id + '&redirect_uri=' + unescape(encodeURIComponent(window.location.toString()));
+				url = url + '?response_type=code&client_id=' + client_id + '&redirect_uri=' + (encodeURIComponent(window.location.toString()));
 			}
 			return url;
 		},
@@ -930,7 +930,7 @@ if (!VGS) {
 				client_id = VGS.client_id;
 			}
 			if (client_id) {
-				url = url + '?response_type=code&client_id=' + client_id + '&redirect_uri=' + unescape(encodeURIComponent(window.location.toString()));
+				url = url + '?response_type=code&client_id=' + client_id + '&redirect_uri=' + (encodeURIComponent(window.location.toString()));
 			}
 			return url;
 		},
@@ -940,7 +940,7 @@ if (!VGS) {
 				client_id = VGS.client_id;
 			}
 			if (client_id) {
-				url = url + '?response_type=code&client_id=' + client_id + '&redirect_uri=' + unescape(encodeURIComponent(window.location.toString()));
+				url = url + '?response_type=code&client_id=' + client_id + '&redirect_uri=' + (encodeURIComponent(window.location.toString()));
 			}
 			return url;
 		},
