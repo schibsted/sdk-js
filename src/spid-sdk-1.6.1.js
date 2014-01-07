@@ -85,6 +85,7 @@ var VGS = VGS || {
 		// disable logging if told to do so, but only if the url doesnt have
 		// the token to turn it on. this allows for easier debugging of third
 		// party sites even if logging has been turned off.
+		VGS._logging = options.logging;
 		if ((!options.logging && window.location.toString().indexOf('vgs_debug=1') < 0) || !window.console) {
 			VGS._logging = false;
 		}
@@ -101,12 +102,6 @@ var VGS = VGS || {
 		VGS.Ajax.timeoutPeriod = options.timeout;
 		VGS.log('Default connection timeout set to ("'+ VGS.Ajax.timeoutPeriod +'")', 'log');
 
-		if (VGS._prod) {
-			VGS.Cookie.name = 'vgs_js_' + VGS.client_id;
-		} else {
-			VGS.Cookie.name = 'vgs_js_test_' + VGS.client_id;
-		}
-
 		if (typeof (options.client_id) === 'undefined') {
 			VGS.log('VGS.init: client_id is missing!', 'error');
 			valid = false;
@@ -120,8 +115,10 @@ var VGS = VGS || {
 		VGS.Ajax.serverUrl = (options.https ? 'https' : 'http')+'://'+options.server+'/';
 		if(VGS._prod) {
 			VGS.Ajax.sessionUrl = (options.https ? 'https' : 'http')+'://session.'+options.server+'/rpc/hasSession.js';
+			VGS.Cookie.name = 'vgs_js_' + VGS.client_id;
 		} else {
 			VGS.Ajax.sessionUrl = (options.https ? 'https' : 'http')+'://'+options.server+'/ajax/hasSession.js';
+			VGS.Cookie.name = 'vgs_js_test_' + VGS.client_id;
 		}
 		VGS.log('VGS.init("'+VGS.client_id+', '+VGS.Ajax.serverUrl+'")', 'log');
 
