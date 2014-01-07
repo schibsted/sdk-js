@@ -1,6 +1,6 @@
-# Javascript SDK, version 1.4
+# Javascript SDK, version 1.5
 
-Stable for production. However, it is recommended to update to latest stable version when possible.
+The 1.5 edition is now available for production. Test it out, let us know if there are any issue and we'll fix them as soon as possible.
 
 ## Documentation & Install
 
