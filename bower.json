@@ -1,6 +1,6 @@
 {
   "name": "spid-sdk-js",
-  "version": "1.7.0",
+  "version": "1.7.1",
   "homepage": "https://github.com/schibsted/sdk-js",
   "description": "JS SDK of Schibsted Payment AS",
   "main": "src/spid-sdk.js",

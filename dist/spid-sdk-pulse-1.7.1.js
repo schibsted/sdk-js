@@ -1,4 +1,4 @@
-/*! sdk-js - v1.7.0 - 2013-05-13
+/*! sdk-js - v1.7.1 - 2013-06-11
 * Copyright (c) 2013 Schibsted Payment AS; */
 /*jslint evil: true, regexp: true */
 
@@ -341,11 +341,11 @@ if (typeof JSON !== 'object') {
 var VGS = VGS || {
 	client_id : false,
 	redirect_uri : window.location.toString(),
-
+	
 	_session : null,
 	_sessionInitiated : false,
 	_userStatus : 'unknown', // or 'connected'
-
+	
 	_logging : false,
 	_prod : true,
 
@@ -356,11 +356,11 @@ var VGS = VGS || {
 	_cache_notloggedin : false,
 	_cacheLastReset : (new Date()).getTime(),
 	_track_throttle : 1,
-
+	
 	// pending callbacks for VGS.getLoginStatus() calls
 	callbacks: [],
 	cachedResponses: [],
-
+	
 	/**
 	 * Generates a weak random ID.
 	 *
@@ -373,7 +373,7 @@ var VGS = VGS || {
 
 	/**
 	 * Copies things from source into target.
-	 *
+	 * 
 	 * @access private
 	 * @param target {Object} the target object where things will be copied into
 	 * @param source {Object} the source object where things will be copied from
@@ -393,7 +393,7 @@ var VGS = VGS || {
 	/**
 	 * @access public
 	 * @param options {Object}
-	 *
+	 * 
 	 * client_id          | String  | Your client_id.                  | *Mandatory* | `null`
 	 * server             | String  | Path to the SPiD server.         | *Mandatory* | `null`
 	 * cookie             | Boolean | `true` to enable cookie support. | *Optional*  | `true`
@@ -428,11 +428,12 @@ var VGS = VGS || {
 		// disable logging if told to do so, but only if the url doesnt have
 		// the token to turn it on. this allows for easier debugging of third
 		// party sites even if logging has been turned off.
+		VGS._logging = options.logging;
 		if ((!options.logging && window.location.toString().indexOf('vgs_debug=1') < 0) || !window.console) {
 			VGS._logging = false;
 		}
 		// Hardlimit to 1 minute
-		if (options.refresh_timeout >= 60000) {
+		if (options.refresh_timeout >= 60000) { 
 			VGS._refresh_timeout = options.refresh_timeout;
 		}
 
@@ -444,12 +445,6 @@ var VGS = VGS || {
 		VGS.Ajax.timeoutPeriod = options.timeout;
 		VGS._track_throttle = options.track_throttle;
 		VGS.log('Default connection timeout set to ("'+ VGS.Ajax.timeoutPeriod +'")', 'log');
-
-		if (VGS._prod) {
-			VGS.Cookie.name = 'vgs_js_' + VGS.client_id;
-		} else {
-			VGS.Cookie.name = 'vgs_js_test_' + VGS.client_id;
-		}
 
 		if (typeof (options.client_id) === 'undefined') {
 			VGS.log('VGS.init: client_id is missing!', 'error');
@@ -464,8 +459,10 @@ var VGS = VGS || {
 		VGS.Ajax.serverUrl = (options.https ? 'https' : 'http')+'://'+options.server+'/';
 		if(VGS._prod) {
 			VGS.Ajax.sessionUrl = (options.https ? 'https' : 'http')+'://session.'+options.server+'/rpc/hasSession.js';
+			VGS.Cookie.name = 'vgs_js_' + VGS.client_id;
 		} else {
 			VGS.Ajax.sessionUrl = (options.https ? 'https' : 'http')+'://'+options.server+'/ajax/hasSession.js';
+			VGS.Cookie.name = 'vgs_js_test_' + VGS.client_id;
 		}
 		VGS.log('VGS.init("'+VGS.client_id+', '+VGS.Ajax.serverUrl+'")', 'log');
 
@@ -542,7 +539,7 @@ var VGS = VGS || {
 		sessionUrl : '',
 		timeoutPeriod : 5000, // if a connection goes on for longer than this many milliseconds, then timeout
 		version : '1.0',
-
+		
 		getFragmentFromUrl : function(url) {
 			url = url || window.location.href;
 			VGS.log('VGS.Ajax.getFragmentFromUrl("' + url + '")', 'log');
@@ -758,13 +755,13 @@ var VGS = VGS || {
 			}
 			// capture domain for use when we need to clear
 			VGS.Cookie.domain = domain;
-
+			
 			if (typeof (ts) !== 'undefined') {
 				var date = new Date();
 				date.setTime(date.getTime() + (ts * 1000));
 				expires = "; expires=" + date.toGMTString();
-
-				document.cookie = name + "=" + val + expires + "; path=/" + (domain ? '; domain=.' + domain : '');
+				
+				document.cookie = name + "=" + val + expires + "; path=/" + (domain ? '; domain=.' + domain : '');				
 			} else {
 				VGS.log('VGS.Cookie.setRaw() expiration is invalid:' + ts + ', no cookie set)', 'log');
 			}
@@ -833,7 +830,7 @@ var VGS = VGS || {
 			if (typeof (VGS._session) === 'object' && VGS._session !== null && VGS._session.hasOwnProperty('userId')) {
 				oldSession = true;
 			}
-
+			
 			var login = (!oldSession && newSession),
 				logout = (oldSession && !newSession),
 				notLoggedin = (!oldSession && !newSession),
@@ -847,17 +844,17 @@ var VGS = VGS || {
 			if (typeof (session) === 'object' && session !== null) {
 				session.clientTime = parseInt(VGS.Ajax.now(), 10);
 			}
-
+			
 			VGS._session = session;
 			VGS._userStatus = status;
-
+			
 			if (sessionChange && VGS.Cookie.enabled) {
 				VGS.Cookie.set(session);
 			}
 			if (notLoggedin) {
 				/**
 				 * Fired when there is no session.
-				 *
+				 * 
 				 * @event auth.notLoggedin
 				 */
 				VGS.Event.fire('auth.notLoggedin', response);
@@ -865,7 +862,7 @@ var VGS = VGS || {
 			if (statusChange) {
 				/**
 				 * Fired when the status changes.
-				 *
+				 * 
 				 * @event auth.statusChange
 				 */
 				VGS.Event.fire('auth.statusChange', response);
@@ -873,7 +870,7 @@ var VGS = VGS || {
 			if (logout || both) {
 				/**
 				 * Fired when a logout action is performed.
-				 *
+				 * 
 				 * @event auth.logout
 				 */
 				VGS.Event.fire('auth.logout', response);
@@ -881,7 +878,7 @@ var VGS = VGS || {
 			if (login || both) {
 				/**
 				 * Fired when a login action is performed.
-				 *
+				 * 
 				 * @event auth.login
 				 */
 				VGS.Event.fire('auth.login', response);
@@ -890,7 +887,7 @@ var VGS = VGS || {
 				/**
 				 * Fired when the session changes. This includes a session
 				 * being refreshed, or a login or logout action.
-				 *
+				 * 
 				 * @event auth.sessionChange
 				 */
 				VGS.Event.fire('auth.sessionChange', response);
@@ -898,7 +895,7 @@ var VGS = VGS || {
 			if (both) {
 				/**
 				 * Fired when the user changes.
-				 *
+				 * 
 				 * @event auth.sessionChange
 				 */
 				VGS.Event.fire('auth.userChange', response);
@@ -911,7 +908,7 @@ var VGS = VGS || {
 				 */
 				VGS.Event.fire('auth.sessionInit', response);
 			}
-
+			
 			// re-setup a timer to refresh the session if needed. we only do this if
 			// VGS.Auth._loadState exists, indicating that the application relies on the
 			// JS to get and refresh session information (vs managing it themselves).
@@ -1007,19 +1004,19 @@ var VGS = VGS || {
 			return;
 		}
 		force = (force === true);
-
+		
 		// Check if timed out
 		var now = (new Date()).getTime();
 		if (VGS._cacheLastReset+VGS._refresh_timeout < now) {
 			VGS.log('VGS.hasProduct('+product_id+'): Cache timedout, forcing request.','log');
 			force = true;
 		}
-
+		
 		if (!force && typeof (VGS.cachedResponses['prd_'+product_id]) === 'object' && VGS.cachedResponses['prd_'+product_id] !== null) {
 			VGS.log('VGS.hasProduct('+product_id+'): Product cached.','log');
 			callback( VGS.cachedResponses['prd_'+product_id] );
 			return;
-		}
+		} 
 		VGS.log('VGS.hasProduct('+product_id+'): Product NOT cached.','log');
 		var lsCb = function(response) {
 			VGS.cachedResponses['prd_'+product_id] = response;
@@ -1028,7 +1025,7 @@ var VGS = VGS || {
 		};
 		var id = VGS.guid();
 		VGS.callbacks[id] = lsCb;
-
+		
 		VGS.Ajax.send('ajax/hasproduct.js?product_id=' + product_id + '&callback='+id);
 	},
 	hasSubscription : function(product_id, callback, force) {
@@ -1038,19 +1035,19 @@ var VGS = VGS || {
 			return;
 		}
 		force = (force === true);
-
+		
 		// Check if timed out
 		var now = (new Date()).getTime();
 		if (VGS._cacheLastReset+VGS._refresh_timeout < now) {
 			VGS.log('VGS.hasSubscription('+product_id+'): Cache timedout, forcing request.','log');
 			force = true;
 		}
-
+		
 		if (!force && typeof (VGS.cachedResponses['sub_'+product_id]) === 'object' && VGS.cachedResponses['sub_'+product_id] !== null) {
 			VGS.log('VGS.hasSubscription('+product_id+'): Product cached.','log');
 			callback( VGS.cachedResponses['sub_'+product_id] );
 			return;
-		}
+		} 
 		VGS.log('VGS.hasSubscription('+product_id+'): Product NOT cached.','log');
 		var lsCb = function(response) {
 			VGS.cachedResponses['sub_'+product_id] = response;
@@ -1059,7 +1056,7 @@ var VGS = VGS || {
 		};
 		var id = VGS.guid();
 		VGS.callbacks[id] = lsCb;
-
+		
 		VGS.Ajax.send('ajax/hassubscription.js?product_id=' + product_id + '&callback='+id);
 	},
 	getLoginURI : function(redirect_uri, client_id) {
@@ -1172,7 +1169,7 @@ var VGS = VGS || {
 			}
 			return this._subscribersMap;
 		},
-
+	
 		/**
 		 * Subscribe to a given event name, invoking your callback function whenever
 		 * the event is fired.
@@ -1197,14 +1194,14 @@ var VGS = VGS || {
 		 */
 		subscribe : function(name, cb) {
 			var subs = this.subscribers();
-
+	
 			if (!subs[name]) {
 				subs[name] = [ cb ];
 			} else {
 				subs[name].push(cb);
 			}
 		},
-
+	
 		/**
 		 * Removes subscribers, inverse of [VGS.Event.subscribe](VGS.Event.subscribe).
 		 *
@@ -1227,14 +1224,14 @@ var VGS = VGS || {
 		 */
 		unsubscribe : function(name, cb) {
 			var subs = this.subscribers()[name];
-
+	
 			VGS.Array.forEach(subs, function(value, key) {
 				if (value === cb) {
 					subs[key] = null;
 				}
 			});
 		},
-
+	
 		/**
 		 * Repeatedly listen for an event over time. The callback is invoked
 		 * immediately when monitor is called, and then every time the event
@@ -1253,11 +1250,11 @@ var VGS = VGS || {
 						ctx.unsubscribe(name, fn);
 					}
 				};
-
+	
 				this.subscribe(name, fn);
 			}
 		},
-
+	
 		/**
 		 * Removes all subscribers for named event.
 		 *
@@ -1271,7 +1268,7 @@ var VGS = VGS || {
 		clear : function(name) {
 			delete this.subscribers()[name];
 		},
-
+	
 		/**
 		 * Fires a named event. The first argument is the name, the rest of the
 		 * arguments are passed to the subscribers.
@@ -1281,7 +1278,7 @@ var VGS = VGS || {
 		 */
 		fire : function() {
 			var args = Array.prototype.slice.call(arguments), name = args.shift();
-
+	
 			VGS.Array.forEach(this.subscribers()[name], function(sub) {
 				// this is because we sometimes null out unsubscribed rather than jiggle
 				// the array
@@ -1295,7 +1292,7 @@ var VGS = VGS || {
 	Array : {
 		/**
 		 * For looping through Arrays and Objects.
-		 *
+		 * 
 		 * @param {Object}
 		 *            item an Array or an Object
 		 * @param {Function}
@@ -1304,7 +1301,7 @@ var VGS = VGS || {
 		 * @param {Bool}
 		 *            proto indicate if properties from the prototype should
 		 *            be included
-		 *
+		 * 
 		 */
 		forEach : function(item, fn, proto) {
 			if (!item) {
