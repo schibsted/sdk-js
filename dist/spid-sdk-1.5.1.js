@@ -1,4 +1,4 @@
-/*! sdk-js - v1.5.0 - 2013-02-15
+/*! sdk-js - v1.5.1 - 2013-02-18
 * Copyright (c) 2013 Schibsted Payment AS; */
 /*jslint evil: true, regexp: true */
 
