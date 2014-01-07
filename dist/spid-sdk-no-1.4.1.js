@@ -341,14 +341,16 @@ if (!VGS) {
 		
 		_domain : {
 			prod : {
-				api : 'https://payment.schibsted.se/api/',
-				www : 'https://payment.schibsted.se/'
+				api : 'https://payment.schibsted.no/api/',
+				www : 'https://payment.schibsted.no/'
 			},
 			test : {
-				api : 'https://stage.payment.schibsted.se/api/',
-				www : 'https://stage.payment.schibsted.se/'
+				api : 'https://stage.payment.schibsted.no/api/',
+				www : 'https://stage.payment.schibsted.no/'
 			}
 		},
+		
+		_varnish_expiration : null,
 		
 		// pending callbacks for VGS.getLoginStatus() calls
 		callbacks: [],
@@ -386,13 +388,14 @@ if (!VGS) {
 		 * @access public
 		 * @param options {Object}
 		 * 
-		 * client_id| String 	| Your client_id. 					| *Mandatory*	| `null`
-		 * cookie 	| Boolean 	| `true` to enable cookie support. 	| *Optional* 	| `true` 
-		 * logging 	| Boolean 	| `true` to enable logging. 		| *Optional* 	| `false` 
-		 * session 	| Object 	| Use specified session object. 	| *Optional* 	| `null` 
-		 * status 	| Boolean 	| `true` to fetch fresh status. 	| *Optional* 	| `false`
-		 * prod 	| Boolean 	| `true` to fetch from LIVE server 	| *Optional* 	| `true`
-		 * timeout 	| Integer 	| Connection response timeout 	 	| *Optional* 	| `5000` // miliseconds
+		 * client_id			| String 	| Your client_id. 					| *Mandatory*	| `null`
+		 * cookie 				| Boolean 	| `true` to enable cookie support. 	| *Optional* 	| `true` 
+		 * logging 				| Boolean 	| `true` to enable logging. 		| *Optional* 	| `false` 
+		 * session 				| Object 	| Use specified session object. 	| *Optional* 	| `null` 
+		 * status 				| Boolean 	| `true` to fetch fresh status. 	| *Optional* 	| `false`
+		 * prod 				| Boolean 	| `true` to fetch from LIVE server 	| *Optional* 	| `true`
+		 * varnish_expiration 	| Integer 	| Varnish cookie expiration		 	| *Optional* 	| Same as session expiration (in secconds)
+		 * timeout 				| Integer 	| Connection response timeout 	 	| *Optional* 	| `5000` // miliseconds
 		 */
 		init : function(options) {
 	    	// only need to list values here that do not already have a falsy default
@@ -400,13 +403,17 @@ if (!VGS) {
 				cookie : true,
 				prod : true,
 				status : false,
-				timeout: 5000
+				timeout: 5000,
+				varnish_expiration: false
 			});
 			// disable logging if told to do so, but only if the url doesnt have
 			// the token to turn it on. this allows for easier debugging of third
 			// party sites even if logging has been turned off.
-	        if (!options.logging && window.location.toString().indexOf('vgs_debug=1') < 0) {
-	        	VGS._logging = false;
+			if (!options.logging && window.location.toString().indexOf('vgs_debug=1') < 0) {
+				VGS._logging = false;
+			}
+	        if (options.varnish_expiration) {
+	        	VGS._varnish_expiration = options.varnish_expiration;
 	        }
 			if (!window.console) {
 				VGS._logging = false;
@@ -633,7 +640,10 @@ if (!VGS) {
 					VGS.Cookie.setRaw(VGS.Cookie.encode(session), session.expiresIn, session.baseDomain, VGS.Cookie.name);
 					// Set sp_id cookie
 					if (session.sp_id) {
-						VGS.Cookie.setRaw(session.sp_id, session.expiresIn, session.baseDomain, 'SP_ID');
+						if (!VGS._varnish_expiration) {
+							VGS._varnish_expiration = session.expiresIn;
+						}
+						VGS.Cookie.setRaw(session.sp_id, VGS._varnish_expiration, session.baseDomain, 'SP_ID');
 					}
 				} else {
 					VGS.Cookie.clear();
