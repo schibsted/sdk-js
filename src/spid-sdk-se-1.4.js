@@ -894,53 +894,148 @@ if (!VGS) {
 			
 		    VGS.Ajax.send('ajax/hassubscription.js?product_id=' + productId + '&callback='+id);
 		},
-		getLoginURI : function(client_id, test) {
+		getLoginURI : function(redirect_uri, client_id) {
 			var url = VGS.Ajax.serverUrl + 'login';
 			if (!client_id && VGS.client_id) {
 				client_id = VGS.client_id;
 			}
+			if (!redirect_uri) {
+				redirect_uri = window.location.toString();
+			}
 			if (client_id) {
-				url = url + '?response_type=code&client_id=' + client_id + '&redirect_uri=' + (encodeURIComponent(window.location.toString()));
+				url = url + '?response_type=code&flow=signup&client_id=' + client_id + '&redirect_uri=' + (encodeURIComponent(redirect_uri));
 			}
 			return url;
 		},
-		getSignupURI : function(client_id, test) {
+		getSignupURI : function(redirect_uri, client_id) {
 			var url = VGS.Ajax.serverUrl + 'signup';
 			if (!client_id && VGS.client_id) {
 				client_id = VGS.client_id;
 			}
+			if (!redirect_uri) {
+				redirect_uri = window.location.toString();
+			}
 			if (client_id) {
-				url = url + '?response_type=code&client_id=' + client_id + '&redirect_uri=' + (encodeURIComponent(window.location.toString()));
+				url = url + '?response_type=code&flow=signup&client_id=' + client_id + '&redirect_uri=' + (encodeURIComponent(redirect_uri));
 			}
 			return url;
 		},
-		getLogoutURI : function(client_id, test) {
+		getLogoutURI : function(redirect_uri, client_id) {
 			var url = VGS.Ajax.serverUrl + 'logout';
 			if (!client_id && VGS.client_id) {
 				client_id = VGS.client_id;
 			}
+			if (!redirect_uri) {
+				redirect_uri = window.location.toString();
+			}
 			if (client_id) {
-				url = url + '?response_type=code&client_id=' + client_id + '&redirect_uri=' + (encodeURIComponent(window.location.toString()));
+				url = url + '?response_type=code&client_id=' + client_id + '&redirect_uri=' + (encodeURIComponent(redirect_uri));
 			}
 			return url;
 		},
-		getAccountURI : function(client_id, test) {
+		getAccountURI : function(redirect_uri, client_id) {
 			var url = VGS.Ajax.serverUrl + 'account';
 			if (!client_id && VGS.client_id) {
 				client_id = VGS.client_id;
 			}
+			if (!redirect_uri) {
+				redirect_uri = window.location.toString();
+			}
 			if (client_id) {
-				url = url + '?response_type=code&client_id=' + client_id + '&redirect_uri=' + (encodeURIComponent(window.location.toString()));
+				url = url + '?response_type=code&client_id=' + client_id + '&redirect_uri=' + (encodeURIComponent(redirect_uri));
 			}
 			return url;
 		},
-		getPurchaseHistoryURI : function(client_id, test) {
+		getPurchaseHistoryURI : function(redirect_uri, client_id) {
 			var url = VGS.Ajax.serverUrl + 'account/purchasehistory';
 			if (!client_id && VGS.client_id) {
 				client_id = VGS.client_id;
 			}
+			if (!redirect_uri) {
+				redirect_uri = window.location.toString();
+			}
 			if (client_id) {
-				url = url + '?response_type=code&client_id=' + client_id + '&redirect_uri=' + (encodeURIComponent(window.location.toString()));
+				url = url + '?response_type=code&client_id=' + client_id + '&redirect_uri=' + (encodeURIComponent(redirect_uri));
+			}
+			return url;
+		},
+		getSubscriptionsURI : function(redirect_uri, client_id) {
+			var url = VGS.Ajax.serverUrl + 'account/subscriptions';
+			if (!client_id && VGS.client_id) {
+				client_id = VGS.client_id;
+			}
+			if (!redirect_uri) {
+				redirect_uri = window.location.toString();
+			}
+			if (client_id) {
+				url = url + '?response_type=code&client_id=' + client_id + '&redirect_uri=' + (encodeURIComponent(redirect_uri));
+			}
+			return url;
+		},
+		getProductsURI : function(redirect_uri, client_id) {
+			var url = VGS.Ajax.serverUrl + 'account/products';
+			if (!client_id && VGS.client_id) {
+				client_id = VGS.client_id;
+			}
+			if (!redirect_uri) {
+				redirect_uri = window.location.toString();
+			}
+			if (client_id) {
+				url = url + '?response_type=code&client_id=' + client_id + '&redirect_uri=' + (encodeURIComponent(redirect_uri));
+			}
+			return url;
+		},
+		getRedeemVoucherURI : function(voucher_code, redirect_uri, client_id) {
+			var url = VGS.Ajax.serverUrl + 'account/redeem';
+			if (!client_id && VGS.client_id) {
+				client_id = VGS.client_id;
+			}
+			if (!redirect_uri) {
+				redirect_uri = window.location.toString();
+			}
+			if (client_id) {
+				url = url + '?response_type=code&client_id=' + client_id + '&redirect_uri=' + (encodeURIComponent(redirect_uri));
+				if (voucher_code) {
+					url = url + '&voucher_code='+voucher_code;
+				}
+			}
+			return url;
+		},
+		getPurchaseProductURI : function(product_id, redirect_uri, client_id) {
+			var url = VGS.Ajax.serverUrl + 'auth/start';
+			if (!client_id && VGS.client_id) {
+				client_id = VGS.client_id;
+			}
+			if (!redirect_uri) {
+				redirect_uri = window.location.toString();
+			}
+			if (client_id) {
+				url = url + '?response_type=code&client_id=' + client_id + '&flow=payment&redirect_uri=' + (encodeURIComponent(redirect_uri));
+				if (product_id) {
+					url = url + '&product_id='+product_id;
+				}
+			}
+			return url;
+		},
+		getPurchaseCampaignURI : function(campaign_id, product_id, voucher_code, redirect_uri, client_id) {
+			var url = VGS.Ajax.serverUrl + 'auth/start';
+			if (!client_id && VGS.client_id) {
+				client_id = VGS.client_id;
+			}
+			if (!redirect_uri) {
+				redirect_uri = window.location.toString();
+			}
+			if (client_id) {
+				url = url + '?response_type=code&client_id=' + client_id + '&flow=payment&redirect_uri=' + (encodeURIComponent(redirect_uri));
+				if (campaign_id) {
+					url = url + '&campaign_id='+campaign_id;
+				}
+				if (product_id) {
+					url = url + '&product_id='+product_id;
+				}
+				if (voucher_code) {
+					url = url + '&voucher_code='+voucher_code;
+				}
 			}
 			return url;
 		},
