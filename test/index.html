@@ -10,14 +10,18 @@
     <script src="mocha/mocha.js"></script>
     <script src="mocha/chai.js"></script>
     <script>mocha.setup('bdd')</script>
+    <script>mocha.globals(['triggerResponse']);</script>
 
-
-    <script src="../dist/spid-sdk-1.5.0.min.js"></script>
+    <script src="../dist/spid-sdk-1.6.0.min.js"></script>
     <script src="test.js"></script>
 
 
     <script>
+    if (window.mochaPhantomJS) {
+      mochaPhantomJS.run();
+    } else {
       mocha.run();
+    }
     </script>
   </body>
 </html>

@@ -6,7 +6,7 @@
 
 var assert = chai.assert;
 
-var setup = {client_id : '4d00e8d6bf92fc8648000000', server: 'https://stage.payment.schibsted.se/', prod:false, logging:false};
+var setup = {client_id : '4d00e8d6bf92fc8648000000', server: 'stage.payment.schibsted.se', prod:false, logging:false};
 
 describe('VGS', function() {
 
@@ -23,7 +23,7 @@ describe('VGS', function() {
 
 		describe('Test URL generation', function() {
 			it('VGS.Ajax.buildUrl should return correctly formatted URL', function() {
-				assert.equal(VGS.Ajax.buildUrl('test', {a:1,b:2,c:null}), setup.server+'test?a=1&b=2');
+				assert.equal(VGS.Ajax.buildUrl('test', {a:1,b:2,c:null}), 'https://' + setup.server + '/test?a=1&b=2');
 			});
 			it('VGS.getLoginURI should return correctly formatted URL for login', function() {
 				assert.equal(VGS.getLoginURI('http://random.com', '123' ), VGS.Ajax.buildUrl('login', {'response_type':'code', 'flow':'signup', 'client_id':'123', 'redirect_uri':encodeURIComponent('http://random.com') }));

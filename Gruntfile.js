@@ -11,19 +11,7 @@ module.exports = function(grunt) {
     // Task configuration.
     jshint: {
       options: {
-        curly: true,
-        eqeqeq: true,
-        immed: true,
-        latedef: true,
-        newcap: true,
-        noarg: true,
-        sub: true,
-        undef: true,
-        unused: true,
-        boss: true,
-        eqnull: true,
-        browser: true,
-        smarttabs: true
+        jshintrc: '.jshintrc'
       },
       gruntfile: {
         src: 'Gruntfile.js'
@@ -71,9 +59,9 @@ module.exports = function(grunt) {
         tasks: ['jshint:gruntfile']
       },
       sdkdev: {
-          files: '<%= jshint.sdk.src %>',
-          tasks: ['jshint:sdk', 'jshint:testfile', 'concat', 'uglify']
-        },
+        files: '<%= jshint.sdk.src %>',
+        tasks: ['jshint:sdk', 'jshint:testfile', 'concat', 'uglify']
+      },
       sdk: {
         files: ['<%= jshint.sdk.src %>', 'test/test.js'],
         tasks: ['jshint:sdk', 'jshint:testfile', 'mocha']

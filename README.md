@@ -1,6 +1,6 @@
-# Javascript SDK, version 1.5
+# Javascript SDK, version 1.6
 
-The 1.5 edition is now available for production. Test it out, let us know if there are any issue and we'll fix them as soon as possible.
+Version 1.6 is now marked as stabile. This version use high performance session server on production. This is only available on Norway at the time being, and will be up in Sweden shortly.
 
 ## Documentation & Install
 

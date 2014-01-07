@@ -1,6 +1,6 @@
 {
   "name": "sdk-js",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "JS SDK of Schibsted Payment AS",
   "repository": {
     "type": "git",
@@ -18,12 +18,12 @@
     "node": ">= 0.8.0"
   },
   "devDependencies": {
-    "grunt": "~0.4.0rc7",
-    "grunt-contrib-jshint": "~0.1.0",
-    "grunt-contrib-watch": "~0.1.4",
-    "grunt-contrib-uglify": "~0.1.1rc6",
+    "grunt": "~0.4.0",
+    "grunt-contrib-jshint": "~0.1.1",
+    "grunt-contrib-watch": "~0.2.0",
+    "grunt-contrib-uglify": "~0.1.1",
     "mocha": "~1.8.1",
-    "grunt-mocha": "~0.2.1",
-    "grunt-contrib-concat": "~0.1.2rc6"
+    "grunt-mocha": "~0.2.2",
+    "grunt-contrib-concat": "~0.1.2"
   }
 }
