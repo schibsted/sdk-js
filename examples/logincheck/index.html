@@ -6,11 +6,11 @@
 </head>
 <body>
 	<div id="content"></div>
-	<script type="text/javascript" src="../../dist/spid-sdk-1.6.1.js"></script>
+	<script type="text/javascript" src="../../dist/spid-sdk-1.7.0.js"></script>
 	<script type="text/javascript">
 		try {
 			function getLoggedInUser(response) {
-				console.log(response);
+				VGS.log(response);
 				if (typeof (response.session) === 'object' && response.status === 'connected') {
 					// logged in and connected user
 					$("#content").html('Logged in as <a href="'+VGS.getAccountURI()+'">'+response.session.displayName+'</a> | <a href="javascript:;" onclick="VGS.Auth.logout();">Logg ut</a>');
@@ -21,15 +21,15 @@
 			}
 			$(document).ready(function() {
 				//Listen to auth.sessionChange event
-				VGS.Event.subscribe('auth.sessionChange', function(data) { console.log('sessionChange'); getLoggedInUser(data); });
+				VGS.Event.subscribe('auth.sessionChange', function(data) { VGS.log('sessionChange'); getLoggedInUser(data); });
 				/*
 				Or listen to specific event
-				VGS.Event.subscribe('auth.login', function(data) { console.log('login'); getLoggedInUser(data); });
-				VGS.Event.subscribe('auth.logout', function(data) { console.log('logout'); getLoggedInUser(data); });
-				VGS.Event.subscribe('auth.notLoggedin', function(data) { console.log('notLoggedin'); getLoggedInUser(data); });
-				VGS.Event.subscribe('auth.userChange', function(data) { console.log('userChange'); getLoggedInUser(data); });
-				VGS.Event.subscribe('auth.sessionInit', function(data) { console.log('sessionInit'); getLoggedInUser(data); });
-				VGS.Event.subscribe('auth.statusChange', function(data) { console.log('statusChange'); getLoggedInUser(data); });
+				VGS.Event.subscribe('auth.login', function(data) { VGS.log('login'); getLoggedInUser(data); });
+				VGS.Event.subscribe('auth.logout', function(data) { VGS.log('logout'); getLoggedInUser(data); });
+				VGS.Event.subscribe('auth.notLoggedin', function(data) { VGS.log('notLoggedin'); getLoggedInUser(data); });
+				VGS.Event.subscribe('auth.userChange', function(data) { VGS.log('userChange'); getLoggedInUser(data); });
+				VGS.Event.subscribe('auth.sessionInit', function(data) { VGS.log('sessionInit'); getLoggedInUser(data); });
+				VGS.Event.subscribe('auth.statusChange', function(data) { VGS.log('statusChange'); getLoggedInUser(data); });
 				*/
 				//Listen to VGS.error message, to set login/register button if something goes wrong
 				VGS.Event.subscribe('VGS.error', function(data) { getLoggedInUser(data); });

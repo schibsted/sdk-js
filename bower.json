@@ -1,0 +1,24 @@
+{
+  "name": "spid-sdk-js",
+  "version": "1.7.0",
+  "homepage": "https://github.com/schibsted/sdk-js",
+  "description": "JS SDK of Schibsted Payment AS",
+  "main": "src/spid-sdk.js",
+  "keywords": [
+    "spid",
+    "sdk"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "Gruntfile.js",
+    "package.json",
+    "bower.json",
+    "*.md",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests",
+    "examples"
+  ]
+}
