@@ -3,25 +3,37 @@
   <head>
     <title>SPiD SDK Mocha test</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <link rel="stylesheet" href="mocha/mocha.css" />
+    <link rel="stylesheet" href="../node_modules/mocha/mocha.css" />
   </head>
   <body>
     <div id="mocha"></div>
-    <script src="mocha/mocha.js"></script>
-    <script src="mocha/chai.js"></script>
+    <script src="../node_modules/mocha/mocha.js"></script>
+    <script src="../node_modules/chai/chai.js"></script>
     <script>mocha.setup('bdd')</script>
     <script>mocha.globals(['triggerResponse']);</script>
 
-    <script src="../dist/spid-sdk-1.7.3.min.js"></script>
-    <script src="test.js"></script>
+    <!-- Source files -->
+    <script src="../src/spid-sdk.js"></script>
+    <script src="../src/spid-log.js"></script>
+    <script src="../src/spid-io.js"></script>
+    <script src="../src/spid-event.js"></script>
+    <script src="../src/spid-uri.js"></script>
+    <script src="../src/spid-cookie.js"></script>
 
+    <!-- Spec files -->
+    <script src="./spec/spid-sdk_test.js"></script>
+    <script src="./spec/spid-log_test.js"></script>
+    <script src="./spec/spid-io_test.js"></script>
+    <script src="./spec/spid-event_test.js"></script>
+    <script src="./spec/spid-uri_test.js"></script>
+    <script src="./spec/spid-cookie_test.js"></script>
 
     <script>
-    if (window.mochaPhantomJS) {
-      mochaPhantomJS.run();
-    } else {
-      mocha.run();
-    }
+      if (window.mochaPhantomJS) {
+        mochaPhantomJS.run();
+      } else {
+        mocha.run();
+      }
     </script>
   </body>
 </html>
