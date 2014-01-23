@@ -12,30 +12,90 @@
 
             cache: true,
             refresh_timeout: 900000,
-            timeout: 5000,
             varnish_expiration: null
         },
-        _options = {};
-
-    function _copy(target, source) {
-        for (var key in source) {
-            if (target[key] === undefined) {
-                target[key] = source[key];
-            }
-        }
-        return target;
-    }
+        _options = {},
+        _initiated = false;
 
     function init(options) {
-        _options = _copy(options, _defaults);
+        _options = this.Util().copy(options, _defaults);
         if(!_options['server']) { throw new TypeError('[SPiD] server parameter is required'); }
         if(!_options['client_id']) { throw new TypeError('[SPiD] client_id parameter is required'); }
 
         //Set minimum refresh timeout
-        if(options.refresh_timeout <= 60000) {
-            options.refresh_timeout = 60000;
+        if(_options.refresh_timeout <= 60000) {
+            _options.refresh_timeout = 60000;
         }
+
+        _initiated = true;
     }
+
+    function hasSession(callback) {
+        callback = callback || function() {};
+        var handle = function(err, data) {
+            callback(err, data);
+        };
+        var that = this;
+        var cb = function(err, data) {
+            if(err && err.type === "LoginException") {
+                //Fallback to core
+                that.Talk.request(that.coreEndpoint(), null, {}, handle);
+            }
+            handle(err, data);
+        };
+        this.Talk.request(this.sessionEndpoint(), null, {}, cb);
+    }
+
+    function hasProduct(productId, callback) {
+        var cache = this['Cache'] && this.Cache().enabled() ? this.Cache() : null,
+            util = this.Util();
+        callback = callback || function() {};
+        if(cache) {
+            var cacheVal = cache.get('prd_{id}'.replace('{id}', productId));
+            if(cacheVal && (cacheVal.refreshed + _options.refresh_timeout) > util.now()) {
+                return callback(null, cacheVal);
+            }
+        }
+        var cb = function(err, data) {
+            if(cache && !err) {
+                data.refreshed = util.now();
+                cache.set('prd_{id}'.replace('{id}', productId), data);
+            }
+            callback(err, data);
+        };
+        this.Talk.request(this.server(), 'ajax/hasproduct.js', {product_id: productId}, cb);
+    }
+
+    function hasSubscription(productId, callback) {
+        var cache = this['Cache'] && this.Cache().enabled() ? this.Cache() : null,
+            util = this.Util();
+        callback = callback || function() {};
+        if(cache) {
+            var cacheVal = cache.get('sub_{id}'.replace('{id}', productId));
+            if(cacheVal && (cacheVal.refreshed + _options.refresh_timeout) > util.now()) {
+                return callback(null, cacheVal);
+            }
+        }
+        var cb = function(err, data) {
+            if(cache && !err) {
+                data.refreshed = util.now();
+                cache.set('sub_{id}'.replace('{id}', productId), data);
+            }
+            callback(err, data);
+        };
+        this.Talk.request(this.server(), 'ajax/hassubscription.js', {product_id: productId}, cb);
+    }
+
+    function setTraits(traits, callback) {
+        callback = callback || function() {};
+        this.Talk.request(this.server(), 'ajax/traits.js', {t: traits}, callback);
+    }
+
+    function logout(callback) {
+        callback = callback || function() {};
+        this.Talk.request(this.server(), 'ajax/logout.js', {}, callback);
+    }
+
 
     exports.SPiD = {
         version: function() {
@@ -44,6 +104,42 @@
         options: function() {
             return _options;
         },
-        init: init
+        initiated: function() {
+            return _initiated;
+        },
+        server: function() {
+            return (_options.https ? 'https' : 'http')+'://'+_options.server+'/';
+        },
+        sessionEndpoint: function() {
+            return (_options.https ? 'https' : 'http') + '://' + (_options.prod ? 'session.'+_options.server+'/rpc/hasSession.js' : _options.server+'/ajax/hasSession.js');
+        },
+        coreEndpoint: function() {
+            return (_options.https ? 'https' : 'http') + '://' + _options.server+'/ajax/hasSession.js';
+        },
+        init: init,
+        hasSession: hasSession,
+        hasProduct: hasProduct,
+        hasSubscription: hasSubscription,
+        setTraits: setTraits,
+        logout: logout
     };
+
+    //Async loader
+    window.setTimeout(function() {
+        if (typeof (window.asyncSPiD) === 'function' && !window.asyncSPiD.hasRun) {
+            window.asyncSPiD.hasRun = true;
+            window.asyncSPiD();
+        }
+    }, 0);
+
 }(window));
+//Legacy
+var VGS = VGS || {
+    callbacks: {},
+    Ajax: {
+        responseReceived: function() {},
+        success: function(data) {
+            window.SPiD.Talk.response(null, data);
+        }
+    }
+};

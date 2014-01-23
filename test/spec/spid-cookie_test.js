@@ -7,7 +7,7 @@
 var assert = chai.assert;
 
 var setup = {client_id : '4d00e8d6bf92fc8648000000', server: 'stage.payment.schibsted.se', prod:false, logging:false};
-var setupProd = {client_id : '4d00e8d6bf92fc8648000000', server: 'payment.schibsted.se', logging:false, cookie: false};
+var setupProd = {client_id : '4d00e8d6bf92fc8648000000', server: 'payment.schibsted.se', logging:false, cookie: false, cache:false};
 
 describe('SPiD.Cookie', function() {
 

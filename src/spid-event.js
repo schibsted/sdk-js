@@ -1,4 +1,4 @@
-/*global SPiD */
+/*global SPiD:false*/
 ;(function(exports) {
     /**
      * Returns the internal subscriber array that can be directly manipulated by
@@ -30,7 +30,7 @@
      * @param cb {Function} The handler function.
      */
     function subscribe(name, cb) {
-        exports.Log.info('SPiD.Event.subscribe({n})'.replace('{n}', name));
+        exports.Log().info('SPiD.Event.subscribe({n})'.replace('{n}', name));
         var subs = _subscribers();
 
         if (!subs[name]) {
@@ -61,7 +61,7 @@
      * @param cb {Function} The handler function.
      */
     function unsubscribe(name, cb) {
-        exports.Log.info('SPiD.Event.unsubscribe({n})'.replace('{n}', name));
+        exports.Log().info('SPiD.Event.unsubscribe({n})'.replace('{n}', name));
         var subs = _subscribers()[name];
         for (var i = 0, l = subs.length; i !== l; i++) {
             if(subs[i] === cb) {
@@ -79,7 +79,7 @@
      */
     function fire(/* polymorphic */) {
         var args = Array.prototype.slice.call(arguments), name = args.shift();
-        exports.Log.info('SPiD.Event.fire({n})'.replace('{n}', name));
+        exports.Log().info('SPiD.Event.fire({n})'.replace('{n}', name));
         var subs = _subscribers()[name];
         for (var i = 0, l = subs.length; i !== l; i++) {
             if (subs[i]) {

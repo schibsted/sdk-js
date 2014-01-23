@@ -1,5 +1,8 @@
-/*global SPiD */
+/*global SPiD:false*/
 ;(function(exports) {
+
+    /* Singleton */
+    var _instance;
 
     function enabled() {
         var options = exports.options();
@@ -20,9 +23,12 @@
         }
     }
 
-    exports.Log = {
-        enabled: enabled,
-        info: info,
-        error: error
+    exports.Log = function() {
+        _instance = _instance || {
+            enabled: enabled,
+            info: info,
+            error: error
+        };
+        return _instance;
     };
 }(SPiD));

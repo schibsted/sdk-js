@@ -17,16 +17,16 @@
         if(!session) { return false; }
         _domain = session.baseDomain;
         _setRaw(name(), encode(session), session.expiresIn, _domain);
-        exports.Log.info('SPiD.Cookie.set({n})'.replace('{n}', name()));
+        exports.Log().info('SPiD.Cookie.set({n})'.replace('{n}', name()));
         if(session.sp_id) {
             var expiresIn = options.varnish_expiration || session.expiresIn;
             _setRaw(_varnishCookieName, session.sp_id, expiresIn, _domain);
-            exports.Log.info('SPiD.Cookie.set({n})'.replace('{n}', _varnishCookieName));
+            exports.Log().info('SPiD.Cookie.set({n})'.replace('{n}', _varnishCookieName));
         }
     }
 
     function get() {
-        exports.Log.info('SPiD.Cookie.get()');
+        exports.Log().info('SPiD.Cookie.get()');
         var cookies = "; " + document.cookie;
         var parts = cookies.split("; " + name() + "=");
         var cookie = (parts.length === 2) ? parts.pop().split(";").shift() : null;
@@ -45,7 +45,7 @@
     }
 
     function clear() {
-        exports.Log.info('SPiD.Cookie.clear()');
+        exports.Log().info('SPiD.Cookie.clear()');
         _setRaw(name(), '', 0, _domain);
         _setRaw(_varnishCookieName, '', 0, _domain);
     }

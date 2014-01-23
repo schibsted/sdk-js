@@ -1,26 +1,12 @@
 /*global SPiD:false*/
 ;(function(exports) {
 
-    function server() {
-        var options = exports.options();
-        return (options.https ? 'https' : 'http')+'://'+options.server+'/';
-    }
-
-    function session() {
-        var options = exports.options();
-        return (options.https ? 'https' : 'http') + '://' + (options.prod ? 'session.'+options.server+'/rpc/hasSession.js' : options.server+'/ajax/hasSession.js');
+    function _encode(redirect_uri) {
+        return encodeURIComponent(redirect_uri || window.location.toString());
     }
 
     function build(path, params) {
-        var p = [];
-        for(var key in params) {
-            if(params[key]) {
-                p.push(key+'='+params[key]);
-            }
-        }
-        var url = server()+path+'?'+p.join('&');
-        exports.Log.info('SPiD.Uri.build() built {u}'.replace('{u}', url));
-        return url;
+        return exports.Util().buildUri(exports.server(), path, params);
     }
 
     function login(redirect_uri, client_id) {
@@ -29,7 +15,7 @@
             'response_type': 'code',
             'flow': 'signup',
             'client_id': client_id || options.client_id,
-            'redirect_uri': encodeURIComponent(redirect_uri || window.location.toString())
+            'redirect_uri': _encode(redirect_uri)
         };
         return build('login', params);
     }
@@ -40,7 +26,7 @@
             'response_type': 'code',
             'flow': 'signup',
             'client_id': client_id || options.client_id,
-            'redirect_uri': encodeURIComponent(redirect_uri || window.location.toString())
+            'redirect_uri': _encode(redirect_uri)
         };
         return build('signup', params);
     }
@@ -50,7 +36,7 @@
         var params = {
             'response_type': 'code',
             'client_id': client_id || options.client_id,
-            'redirect_uri': encodeURIComponent(redirect_uri || window.location.toString())
+            'redirect_uri': _encode(redirect_uri)
         };
         return build('logout', params);
     }
@@ -59,7 +45,7 @@
         var options = exports.options();
         var params = {
             'client_id': client_id || options.client_id,
-            'redirect_uri': encodeURIComponent(redirect_uri || window.location.toString())
+            'redirect_uri': _encode(redirect_uri)
         };
         return build('account/summary', params);
     }
@@ -68,7 +54,7 @@
         var options = exports.options();
         var params = {
             'client_id': client_id || options.client_id,
-            'redirect_uri': encodeURIComponent(redirect_uri || window.location.toString())
+            'redirect_uri': _encode(redirect_uri)
         };
         return build('account/purchasehistory', params);
     }
@@ -77,7 +63,7 @@
         var options = exports.options();
         var params = {
             'client_id': client_id || options.client_id,
-            'redirect_uri': encodeURIComponent(redirect_uri || window.location.toString())
+            'redirect_uri': _encode(redirect_uri)
         };
         return build('account/subscriptions', params);
     }
@@ -86,7 +72,7 @@
         var options = exports.options();
         var params = {
             'client_id': client_id || options.client_id,
-            'redirect_uri': encodeURIComponent(redirect_uri || window.location.toString())
+            'redirect_uri': _encode(redirect_uri)
         };
         return build('account/products', params);
     }
@@ -95,7 +81,7 @@
         var options = exports.options();
         var params = {
             'client_id': client_id || options.client_id,
-            'redirect_uri': encodeURIComponent(redirect_uri || window.location.toString()),
+            'redirect_uri': _encode(redirect_uri),
             'voucher_code': voucher_code || null
         };
         return build('account/redeem', params);
@@ -107,7 +93,7 @@
             'response_type': 'code',
             'flow': 'payment',
             'client_id': client_id || options.client_id,
-            'redirect_uri': encodeURIComponent(redirect_uri || window.location.toString()),
+            'redirect_uri': _encode(redirect_uri),
             'product_id': product_id || null
         };
         return build('auth/start', params);
@@ -119,7 +105,7 @@
             'response_type': 'code',
             'flow': 'payment',
             'client_id': client_id || options.client_id,
-            'redirect_uri': encodeURIComponent(redirect_uri || window.location.toString()),
+            'redirect_uri': _encode(redirect_uri),
             'campaign_id': campaign_id || null,
             'product_id': product_id || null,
             'voucher_code': voucher_code || null
@@ -128,8 +114,6 @@
     }
 
     exports.Uri = {
-        server: server,
-        session: session,
         build: build,
         login: login,
         signup: signup,

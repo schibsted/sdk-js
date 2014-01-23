@@ -20,7 +20,16 @@ module.exports = function(grunt) {
         src: 'test/spec/*.js'
       },
       sdk: {
-        src: ['src/spid-sdk.js', 'src/spid-log.js', 'src/spid-io.js', 'src/spid-cookie.js', 'src/spid-uri.js', 'src/spid-event.js']
+        src: [
+          'src/spid-sdk.js',
+          'src/spid-log.js',
+          'src/spid-util.js',
+          'src/spid-io.js',
+          'src/spid-talk.js',
+          'src/spid-cookie.js',
+          'src/spid-uri.js',
+          'src/spid-event.js'
+        ]
       },
       tracker: {
         src: 'src/spid-tracker.js'
