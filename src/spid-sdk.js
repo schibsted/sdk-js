@@ -5,11 +5,11 @@
         _defaults = {
             server: null,
             client_id: null,
-            https: true,
-            cookie: true,
+
             logging: false,
             prod: true,
-
+            https: true,
+            cookie: true,
             cache: true,
             refresh_timeout: 900000,
             varnish_expiration: null
@@ -17,7 +17,7 @@
         _options = {},
         _initiated = false;
 
-    function init(options) {
+    function init(options, callback) {
         _options = this.Util().copy(options, _defaults);
         if(!_options['server']) { throw new TypeError('[SPiD] server parameter is required'); }
         if(!_options['client_id']) { throw new TypeError('[SPiD] client_id parameter is required'); }
@@ -28,6 +28,9 @@
         }
 
         _initiated = true;
+        if(callback) {
+            callback();
+        }
     }
 
     function hasSession(callback) {
@@ -57,7 +60,7 @@
             }
         }
         var cb = function(err, data) {
-            if(cache && !err) {
+            if(cache && !err && !!data.result) {
                 data.refreshed = util.now();
                 cache.set('prd_{id}'.replace('{id}', productId), data);
             }
@@ -77,7 +80,7 @@
             }
         }
         var cb = function(err, data) {
-            if(cache && !err) {
+            if(cache && !err && !!data.result) {
                 data.refreshed = util.now();
                 cache.set('sub_{id}'.replace('{id}', productId), data);
             }

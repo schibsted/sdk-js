@@ -22,7 +22,7 @@
 
     function clear(key) {
         if(_storage[key]) {
-            delete _storage[key];
+            _storage[key] = null;
         }
     }
 

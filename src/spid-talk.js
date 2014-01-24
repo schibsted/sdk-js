@@ -6,7 +6,7 @@
         _callbacks = {},
         _poller,
         _pollInterval = 300,
-        _pollMaxCount = 100;
+        _pollMaxCount = 50;
         //_queue = {};
 
     function _guid() {
@@ -49,8 +49,8 @@
                 _failure('Poll max limit reached');
                 return _stopPoll();
             }
-            _poll();
             count++;
+            _poll();
         }, _pollInterval);
     }
     function _stopPoll() {
@@ -61,6 +61,7 @@
         exports.Log().info('Poll');
         if(window['triggerResponse']) {
             window.triggerResponse();
+            window.triggerResponse = null;
         }
     }
     function _failure(message) {
@@ -83,7 +84,7 @@
         _stopPoll();
         if(_callbacks[id]) {
             var f = _callbacks[id];
-            delete _callbacks[id];
+            _callbacks[id] = null;
             var err = data['error'] ? data['error'] : null,
                 res = data['response'] ? data['response'] : data;
             f(err, res);

@@ -1,18 +1,7 @@
 /*global SPiD:false*/
 ;(function(exports) {
-    /**
-     * Returns the internal subscriber array that can be directly manipulated by
-     * adding/removing things.
-     *
-     * @access private
-     * @return {Object}
-     */
-    function _subscribers() {
-        if (!this._subscribersMap) {
-            this._subscribersMap = {};
-        }
-        return this._subscribersMap;
-    }
+
+    var _subscribers = {};
 
     /**
      * Subscribe to a given event name, invoking your callback function whenever
@@ -31,13 +20,10 @@
      */
     function subscribe(name, cb) {
         exports.Log().info('SPiD.Event.subscribe({n})'.replace('{n}', name));
-        var subs = _subscribers();
-
-        if (!subs[name]) {
-            subs[name] = [ cb ];
-        } else {
-            subs[name].push(cb);
+        if (!_subscribers[name]) {
+            _subscribers[name] = [];
         }
+        _subscribers[name].push(cb);
     }
 
     /**
@@ -62,7 +48,7 @@
      */
     function unsubscribe(name, cb) {
         exports.Log().info('SPiD.Event.unsubscribe({n})'.replace('{n}', name));
-        var subs = _subscribers()[name];
+        var subs = _subscribers[name];
         for (var i = 0, l = subs.length; i !== l; i++) {
             if(subs[i] === cb) {
                 subs[i] = null;
@@ -78,9 +64,10 @@
      * @param name {String} the event name
      */
     function fire(/* polymorphic */) {
-        var args = Array.prototype.slice.call(arguments), name = args.shift();
+        var args = Array.prototype.slice.call(arguments),
+            name = args.shift();
         exports.Log().info('SPiD.Event.fire({n})'.replace('{n}', name));
-        var subs = _subscribers()[name];
+        var subs = _subscribers[name];
         for (var i = 0, l = subs.length; i !== l; i++) {
             if (subs[i]) {
                 subs[i].apply(this, args);
