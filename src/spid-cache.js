@@ -1,8 +1,7 @@
 /*global SPiD:false*/
 ;(function(exports) {
 
-    var _instance,
-        _storage = {};
+    var _storage = {};
 
     function decode(value) {
         return JSON.parse(window.unescape(value));
@@ -13,15 +12,19 @@
     }
 
     function set(key, value) {
-        _storage[key] = encode(value);
+        if(enabled()) {
+            _storage[key] = encode(value);
+        }
     }
 
     function get(key) {
-        return _storage[key] ? decode(_storage[key]) : null;
+        if(enabled()) {
+            return _storage[key] ? decode(_storage[key]) : null;
+        }
     }
 
     function clear(key) {
-        if(_storage[key]) {
+        if(enabled() && _storage[key]) {
             _storage[key] = null;
         }
     }
@@ -32,16 +35,13 @@
         return !!options.cache;
     }
 
-    exports.Cache = function() {
-        _instance = _instance || {
-            decode: decode,
-            encode: encode,
-            set: set,
-            get: get,
-            clear: clear,
-            enabled: enabled
-        };
-        return _instance;
+    exports.Cache = {
+        decode: decode,
+        encode: encode,
+        set: set,
+        get: get,
+        clear: clear,
+        enabled: enabled
     };
 
 }(SPiD));

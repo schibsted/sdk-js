@@ -75,7 +75,7 @@
         params = params || {};
         params.callback = id;
         var url = exports.Util().buildUri(server, path, params);
-        exports.Log().info('Request: '+url);
+        exports.Log().info('Request: ' + url);
         _startPoll(url);
     }
 

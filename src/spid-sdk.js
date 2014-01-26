@@ -42,15 +42,15 @@
         var cb = function(err, data) {
             if(err && err.type === "LoginException") {
                 //Fallback to core
-                that.Talk.request(that.coreEndpoint(), null, {}, handle);
+                that.Talk.request(that.coreEndpoint(), null, {autologin:1}, handle);
             }
             handle(err, data);
         };
-        this.Talk.request(this.sessionEndpoint(), null, {}, cb);
+        this.Talk.request(this.sessionEndpoint(), null, {autologin:1}, cb);
     }
 
     function hasProduct(productId, callback) {
-        var cache = this['Cache'] && this.Cache().enabled() ? this.Cache() : null,
+        var cache = this['Cache'] && this.Cache.enabled() ? this.Cache : null,
             util = this.Util();
         callback = callback || function() {};
         if(cache) {
@@ -70,7 +70,7 @@
     }
 
     function hasSubscription(productId, callback) {
-        var cache = this['Cache'] && this.Cache().enabled() ? this.Cache() : null,
+        var cache = this['Cache'] && this.Cache.enabled() ? this.Cache : null,
             util = this.Util();
         callback = callback || function() {};
         if(cache) {
@@ -130,8 +130,8 @@
     //Async loader
     window.setTimeout(function() {
         if (typeof (window.asyncSPiD) === 'function' && !window.asyncSPiD.hasRun) {
-            window.asyncSPiD.hasRun = true;
             window.asyncSPiD();
+            window.asyncSPiD.hasRun = true;
         }
     }, 0);
 
