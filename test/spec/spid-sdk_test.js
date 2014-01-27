@@ -9,7 +9,7 @@ describe('SPiD', function() {
 
     var assert = chai.assert;
     var setup = {client_id : '4d00e8d6bf92fc8648000000', server: 'stage.payment.schibsted.se', prod:false, logging:false, cache:true};
-    var setupProd = {client_id : '4d00e8d6bf92fc8648000000', server: 'payment.schibsted.se', logging:false};
+    var setupProd = {client_id : '4d00e8d6bf92fc8648000000', server: 'payment.schibsted.se', logging:false, refresh_timeout: 100};
 
     describe('SPiD.init', function() {
         it('SPiD.init should throw error when missing config', function() {
@@ -74,7 +74,7 @@ describe('SPiD', function() {
     });
     describe('SPiD initiated', function() {
         before(function() {
-            SPiD.init(setup);
+            SPiD.init(setupProd);
         });
 
         it('SPiD.options should return non empty object', function() {
@@ -85,6 +85,13 @@ describe('SPiD', function() {
         it('SPiD.version should return string', function() {
             var version = SPiD.version();
             assert.isString(version);
+        });
+        it('SPiD.initiated should return true', function() {
+            assert.isTrue(SPiD.initiated());
+        });
+        it('SPiD.options should not set lower refresh_timeout than 60000', function() {
+            var options = SPiD.options();
+            assert.equal(options.refresh_timeout, 60000);
         });
     });
 
