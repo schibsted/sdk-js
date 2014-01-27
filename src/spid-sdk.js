@@ -11,6 +11,7 @@
             https: true,
             cookie: true,
             cache: true,
+            timeout: 15000,
             refresh_timeout: 900000,
             varnish_expiration: null
         },
@@ -136,13 +137,11 @@
     }, 0);
 
 }(window));
-//Legacy
+/*Legacy
 var VGS = VGS || {
     callbacks: {},
     Ajax: {
         responseReceived: function() {},
-        success: function(data) {
-            window.SPiD.Talk.response(null, data);
-        }
+        success: function() {}
     }
-};
+};*/
