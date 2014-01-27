@@ -97,6 +97,5 @@ describe('SPiD.Cookie', function() {
             assert.equal(document.cookie.indexOf(SPiD.Cookie.name()), -1);
             assert.equal(document.cookie.indexOf('SP_ID'), -1);
         });
-
     });
 });

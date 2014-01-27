@@ -1,41 +1,43 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>SPiD SDK Mocha test</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <link rel="stylesheet" href="../node_modules/mocha/mocha.css" />
-  </head>
-  <body>
-    <div id="mocha"></div>
-    <script src="../node_modules/mocha/mocha.js"></script>
-    <script src="../node_modules/chai/chai.js"></script>
-    <script>mocha.setup('bdd')</script>
-    <script>mocha.globals(['triggerResponse']);</script>
+    <head>
+        <title>SPiD SDK Mocha test</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <link rel="stylesheet" href="../node_modules/mocha/mocha.css" />
+        <script src="../node_modules/mocha/mocha.js"></script>
+        <script src="../node_modules/chai/chai.js"></script>
 
-    <!-- Source files -->
-    <script src="../src/spid-sdk.js"></script>
-    <script src="../src/spid-log.js"></script>
-    <script src="../src/spid-util.js"></script>
-    <script src="../src/spid-event.js"></script>
-    <script src="../src/spid-talk.js"></script>
-    <script src="../src/spid-uri.js"></script>
-    <script src="../src/spid-cache.js"></script>
-    <script src="../src/spid-cookie.js"></script>
+        <script type="text/javascript" src="../node_modules/blanket/dist/qunit/blanket.min.js"> </script>
+        <script type="text/javascript" src="../node_modules/grunt-blanket-mocha/support/mocha-blanket.js"></script>
 
-    <!-- Spec files -->
-    <script src="./spec/spid-sdk_test.js"></script>
-    <script src="./spec/spid-log_test.js"></script>
-    <script src="./spec/spid-util_test.js"></script>
-    <script src="./spec/spid-event_test.js"></script>
-    <script src="./spec/spid-talk_test.js"></script>
-    <script src="./spec/spid-uri_test.js"></script>
-    <script src="./spec/spid-cache_test.js"></script>
-    <script src="./spec/spid-cookie_test.js"></script>
+        <!-- Source files -->
+        <script src="../src/spid-sdk.js" data-cover></script>
+        <script src="../src/spid-log.js" data-cover></script>
+        <script src="../src/spid-util.js" data-cover></script>
+        <script src="../src/spid-event.js" data-cover></script>
+        <script src="../src/spid-talk.js" data-cover></script>
+        <script src="../src/spid-uri.js" data-cover></script>
+        <script src="../src/spid-cache.js" data-cover></script>
+        <script src="../src/spid-cookie.js" data-cover></script>
 
-    <script>
-        if (navigator.userAgent.indexOf('PhantomJS') < 0) {
-            mocha.run();
-        }
-    </script>
-  </body>
+        <script>mocha.setup({ui: 'bdd',globals: ['SPiD']})</script>
+
+        <script>
+            if (window.PHANTOMJS) {
+                blanket.options("reporter", "../node_modules/grunt-blanket-mocha/support/grunt-reporter.js");
+            }
+        </script>
+
+        <script src="./spec/spid-sdk_test.js"></script>
+        <script src="./spec/spid-log_test.js"></script>
+        <script src="./spec/spid-util_test.js"></script>
+        <script src="./spec/spid-event_test.js"></script>
+        <script src="./spec/spid-talk_test.js"></script>
+        <script src="./spec/spid-uri_test.js"></script>
+        <script src="./spec/spid-cache_test.js"></script>
+        <script src="./spec/spid-cookie_test.js"></script>
+    </head>
+    <body>
+        <div id="mocha"></div>
+    </body>
 </html>

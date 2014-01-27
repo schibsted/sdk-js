@@ -5,3 +5,7 @@ Version 1.7 is now marked as stabile. This version use high performance session 
 ## Documentation & Install
 
 See documention where other documentation is kept (you should now where it is :)
+
+## Notes
+
+Currently blanketjs does not support mocha versions later than 1.12.1

@@ -63,15 +63,10 @@ module.exports = function(grunt) {
         dest: 'dist/spid-sdk-pulse-<%= pkg.version %>.min.js'
       }
     },
-    mocha: {
-      all: {
-        src: [ 'test/index.html'],
-        options: {
-         mocha: {
-            ignoreLeaks: false
-          },
-          run: true
-        }
+    blanket_mocha: {
+      all: [ 'test/index.html' ],
+      options: {
+        threshold: 70
       }
     },
     watch: {
@@ -95,9 +90,10 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-watch');
-  grunt.loadNpmTasks('grunt-mocha');
+  grunt.loadNpmTasks('grunt-blanket-mocha');
 
   // Default task.
   grunt.registerTask('default', ['jshint:sdk', 'jshint:tracker', 'concat', 'uglify']);
 
+  grunt.registerTask('test', ['blanket_mocha']);
 };
