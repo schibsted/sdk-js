@@ -3,7 +3,7 @@
 /*global SPiD:false*/
 
 describe('SPiD.Event', function() {
-/* //Problem with calling done multiple times when running in console
+
     it('SPiD.Event.subscribe once and fire', function(done) {
         var data = {test:true, str:'val'};
         SPiD.Event.subscribe('custom.event1', function(d) {
@@ -14,7 +14,7 @@ describe('SPiD.Event', function() {
             }
         });
         SPiD.Event.fire('custom.event1', data);
-    });*/
+    });
 
     it('SPiD.Event.subscribe twice and fire', function(done) {
         var data = {test:true, str:'val'};
@@ -33,7 +33,7 @@ describe('SPiD.Event', function() {
         });
         SPiD.Event.fire('custom.event2', data);
     });
-/* //Problem with calling done multiple times when running in console
+
     it('SPiD.Event.unsubscribe and fire', function(done) {
         var data = {test:true, str:'val'};
         var cb = function() {
@@ -42,10 +42,9 @@ describe('SPiD.Event', function() {
         SPiD.Event.subscribe('custom.event2', cb);
         SPiD.Event.unsubscribe('custom.event2', cb);
         SPiD.Event.fire('custom.event2', data);
-
         SPiD.Event.subscribe('custom.event3', function() {
             done();
         });
         SPiD.Event.fire('custom.event3', data);
-    });*/
+    });
 });

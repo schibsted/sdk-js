@@ -33,7 +33,7 @@ module.exports = function(grunt) {
       },
       tracker: {
         src: 'src/spid-tracker.js'
-      },
+      }
     },
     concat: {
       options: {
@@ -67,10 +67,10 @@ module.exports = function(grunt) {
       all: {
         src: [ 'test/index.html'],
         options: {
-          mocha: {
+         mocha: {
             ignoreLeaks: false
           },
-          run: true
+          run: false
         }
       }
     },
