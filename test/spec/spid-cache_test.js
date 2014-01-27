@@ -4,8 +4,6 @@
 /*global before:false*/
 /*global SPiD:false*/
 
-
-
 describe('SPiD.Cache', function() {
 
     var assert = chai.assert;

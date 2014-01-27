@@ -69,7 +69,7 @@
         var cookie = '{n}={v}; expires={e}; path=/; domain=.{d}'
             .replace('{n}', name)
             .replace('{v}', value)
-            .replace('{e}', date.toGMTString())
+            .replace('{e}', date.toUTCString())
             .replace('{d}', domain);
         document.cookie = cookie;
     }

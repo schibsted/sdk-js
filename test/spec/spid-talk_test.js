@@ -2,7 +2,6 @@
 /*global it:false*/
 /*global SPiD:false*/
 
-
 describe('SPiD.Talk', function() {
 
     it('SPiD.Talk.request should send request and call callback with error and response when successful', function(done) {
@@ -20,4 +19,5 @@ describe('SPiD.Talk', function() {
             }
         });
     });
+
 });

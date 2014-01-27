@@ -137,11 +137,3 @@
     }, 0);
 
 }(window));
-/*Legacy
-var VGS = VGS || {
-    callbacks: {},
-    Ajax: {
-        responseReceived: function() {},
-        success: function() {}
-    }
-};*/
