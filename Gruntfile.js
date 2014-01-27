@@ -70,7 +70,7 @@ module.exports = function(grunt) {
          mocha: {
             ignoreLeaks: false
           },
-          run: false
+          run: true
         }
       }
     },
