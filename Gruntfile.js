@@ -24,9 +24,9 @@ module.exports = function(grunt) {
           'src/spid-sdk.js',
           'src/spid-log.js',
           'src/spid-util.js',
-          'src/spid-io.js',
           'src/spid-talk.js',
           'src/spid-cookie.js',
+          'src/spid-cache.js',
           'src/spid-uri.js',
           'src/spid-event.js'
         ]
@@ -74,13 +74,9 @@ module.exports = function(grunt) {
         files: '<%= jshint.gruntfile.src %>',
         tasks: ['jshint:gruntfile']
       },
-      sdkdev: {
-        files: '<%= jshint.sdk.src %>',
-        tasks: ['jshint:sdk', 'jshint:tracker', 'jshint:tests', 'mocha', 'concat', 'uglify']
-      },
       sdk: {
         files: ['<%= jshint.sdk.src %>', '<%= jshint.tests.src %>'],
-        tasks: ['jshint:sdk', 'jshint:tracker', 'jshint:tests', 'mocha']
+        tasks: ['jshint:sdk', 'jshint:tracker', 'jshint:tests', 'blanket_mocha']
       }
     }
   });
