@@ -12,7 +12,7 @@
     "url": "http://schibstedpayment.no"
   },
   "scripts": {
-    "test": "grunt mocha",
+    "test": "grunt test",
     "build": "npm install && grunt",
     "start": "grunt watch"
   },
