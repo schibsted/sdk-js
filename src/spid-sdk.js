@@ -16,7 +16,8 @@
             varnish_expiration: null
         },
         _options = {},
-        _initiated = false;
+        _initiated = false,
+        _session = {};
 
     function init(options, callback) {
         _options = this.Util.copy(options, _defaults);
@@ -38,7 +39,10 @@
         callback = callback || function() {};
         var that = this,
             respond = function(err, data) {
-                //Event stuff
+                if(that.EventTrigger) {
+                    that.EventTrigger.session(_session, data);
+                }
+                _session = data;
                 callback(err, data);
             },
             handleResponse = function(err, data) {
@@ -58,6 +62,7 @@
         if(this.Cookie && this.Cookie.enabled()) {
             var data = this.Cookie.get();
             if(data) {
+                _session = data;
                 return respond(null, data);
             }
         }

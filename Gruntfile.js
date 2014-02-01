@@ -28,7 +28,8 @@ module.exports = function(grunt) {
           'src/spid-cookie.js',
           'src/spid-cache.js',
           'src/spid-uri.js',
-          'src/spid-event.js'
+          'src/spid-event.js',
+          'src/spid-event-trigger.js'
         ]
       },
       tracker: {

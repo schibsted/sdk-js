@@ -48,7 +48,7 @@
      */
     function unsubscribe(name, cb) {
         exports.Log.info('SPiD.Event.unsubscribe({n})'.replace('{n}', name));
-        var subs = _subscribers[name];
+        var subs = _subscribers[name] || [];
         for (var i = 0, l = subs.length; i !== l; i++) {
             if(subs[i] === cb) {
                 subs[i] = null;
@@ -67,7 +67,7 @@
         var args = Array.prototype.slice.call(arguments),
             name = args.shift();
         exports.Log.info('SPiD.Event.fire({n})'.replace('{n}', name));
-        var subs = _subscribers[name];
+        var subs = _subscribers[name] || [];
         for (var i = 0, l = subs.length; i !== l; i++) {
             if (subs[i]) {
                 subs[i].apply(this, args);
