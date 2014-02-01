@@ -53,7 +53,7 @@
     }
 
     function _failure(message, id) {
-        exports.Log().error(message);
+        exports.Log.error(message);
         _done(id, {'error': {'type': 'communication', 'code': 503, 'description': message}, 'response': {}});
     }
 
@@ -83,14 +83,14 @@
         var id = _createCallback(callback);
         params = params || {};
         params.callback = id;
-        var url = exports.Util().buildUri(server, path, params);
-        exports.Log().info('Request: ' + url);
+        var url = exports.Util.buildUri(server, path, params);
+        exports.Log.info('Request: ' + url);
         _queue(id, url);
         _processQueue();
     }
 
     function response(id, data) {
-        exports.Log().info('Response received');
+        exports.Log.info('Response received');
         _done(id, data);
     }
 

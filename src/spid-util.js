@@ -1,9 +1,6 @@
 /*global SPiD:false*/
 ;(function(exports) {
 
-    /* Singleton */
-    var _instance;
-
     function copy(target, source) {
         for (var key in source) {
             if (target[key] === undefined) {
@@ -25,16 +22,14 @@
             }
         }
         var url = server+(path || '')+'?'+p.join('&');
-        exports.Log().info('SPiD.Util().buildUri() built {u}'.replace('{u}', url));
+        exports.Log.info('SPiD.Util.buildUri() built {u}'.replace('{u}', url));
         return url;
     }
 
-    exports.Util = function() {
-        _instance = _instance || {
-            copy: copy,
-            now: now,
-            buildUri: buildUri
-        };
-        return _instance;
+    exports.Util = {
+        copy: copy,
+        now: now,
+        buildUri: buildUri
     };
+
 }(SPiD));

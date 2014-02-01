@@ -6,7 +6,7 @@
     }
 
     function build(path, params) {
-        return exports.Util().buildUri(exports.server(), path, params);
+        return exports.Util.buildUri(exports.server(), path, params);
     }
 
     function login(redirect_uri, client_id) {

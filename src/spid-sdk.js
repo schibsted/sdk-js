@@ -19,7 +19,7 @@
         _initiated = false;
 
     function init(options, callback) {
-        _options = this.Util().copy(options, _defaults);
+        _options = this.Util.copy(options, _defaults);
         if(!_options['server']) { throw new TypeError('[SPiD] server parameter is required'); }
         if(!_options['client_id']) { throw new TypeError('[SPiD] client_id parameter is required'); }
 
@@ -66,7 +66,7 @@
 
     function hasProduct(productId, callback) {
         var cache = this.Cache && this.Cache.enabled() ? this.Cache : null,
-            util = this.Util();
+            util = this.Util;
         callback = callback || function() {};
         if(cache) {
             var cacheVal = cache.get('prd_{id}'.replace('{id}', productId));
@@ -86,7 +86,7 @@
 
     function hasSubscription(productId, callback) {
         var cache = this.Cache && this.Cache.enabled() ? this.Cache : null,
-            util = this.Util();
+            util = this.Util;
         callback = callback || function() {};
         if(cache) {
             var cacheVal = cache.get('sub_{id}'.replace('{id}', productId));
