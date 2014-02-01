@@ -95,6 +95,75 @@ describe('SPiD', function() {
         });
     });
 
+    describe('SPiD.hasSession', function() {
+        var copy_Talk_request,
+            copy_Cookie_set,
+            copy_Cookie_get;
+        before(function() {
+            SPiD.init(setupProd);
+            copy_Talk_request = SPiD.Talk.request;
+            copy_Cookie_set = SPiD.Cookie.set;
+            copy_Cookie_get = SPiD.Cookie.get;
+        });
+
+        it('SPiD.hasSession should call Talk with parameter server, path, params, callback', function() {
+            SPiD.Talk.request = function(server, path, param, callback) {
+                assert.equal(server, 'https://session.payment.schibsted.se/rpc/hasSession.js');
+                assert.isNull(path);
+                assert.equal(param.autologin, 1);
+                assert.isFunction(callback);
+            };
+            SPiD.hasSession(function() {});
+        });
+
+        it('SPiD.hasSession should call Talk again if LoginException is returned', function() {
+            var calledOnce = false;
+            SPiD.Talk.request = function(server, path, param, callback) {
+                if(calledOnce) {
+                    assert.equal(server, 'https://payment.schibsted.se/ajax/hasSession.js');
+                    assert.isNull(path);
+                    assert.equal(param.autologin, 1);
+                    assert.isFunction(callback);
+                } else {
+                    calledOnce = true;
+                    callback({"code":401,"type":"LoginException","description":"Autologin required"}, {result: false});
+                }
+            };
+            SPiD.hasSession(function() {});
+        });
+
+        it('SPiD.hasSession should try to set cookie cookie when successful', function() {
+            SPiD.Talk.request = function(server, path, param, callback) {
+                callback(null, {"result":true,"expiresIn":7111,"baseDomain":"sdk.dev","userStatus":"connected","userId":1844813,"id":"4f1e2ae59caf7c2f4a058b76"});
+            };
+            SPiD.Cookie.set = function(data) {
+                assert.isTrue(data.result);
+                assert.equal(data.userId, 1844813);
+            };
+            SPiD.hasSession(function() {});
+        });
+
+        it('SPiD.hasSession should try to return cookie data without calling Talk', function(done) {
+            SPiD.Talk.request = function() {
+                done(new Error('SPiD.Talk.request called'));
+            };
+            SPiD.Cookie.get = function() {
+                return {"result":true,"expiresIn":7111,"baseDomain":"sdk.dev","userStatus":"connected","userId":1844813,"id":"4f1e2ae59caf7c2f4a058b76"};
+            };
+            SPiD.hasSession(function(err, res) {
+                if(!err && res.result && res.userId === 1844813) {
+                    done();
+                }
+            });
+        });
+
+        after(function() {
+            SPiD.Talk.request = copy_Talk_request;
+            SPiD.Cookie.set = copy_Cookie_set;
+            SPiD.Cookie.get = copy_Cookie_get;
+        });
+    });
+
     describe('SPiD.hasProduct', function() {
         var copy_Talk_request,
             copy_Cache_get,

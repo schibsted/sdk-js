@@ -36,22 +36,36 @@
 
     function hasSession(callback) {
         callback = callback || function() {};
-        var handle = function(err, data) {
-            callback(err, data);
-        };
-        var that = this;
-        var cb = function(err, data) {
-            if(err && err.type === "LoginException") {
-                //Fallback to core
-                that.Talk.request(that.coreEndpoint(), null, {autologin:1}, handle);
+        var that = this,
+            respond = function(err, data) {
+                //Event stuff
+                callback(err, data);
+            },
+            handleResponse = function(err, data) {
+                if(that.Cookie && that.Cookie.enabled() && !err && !!data.result) {
+                    that.Cookie.set(data);
+                }
+                respond(err, data);
+            },
+            handleException = function(err, data) {
+                if(err && err.type === "LoginException") {
+                    //Fallback to core
+                    return that.Talk.request(that.coreEndpoint(), null, {autologin:1}, handleResponse);
+                }
+                handleResponse(err, data);
+            };
+
+        if(this.Cookie && this.Cookie.enabled()) {
+            var data = this.Cookie.get();
+            if(data) {
+                return respond(null, data);
             }
-            handle(err, data);
-        };
-        this.Talk.request(this.sessionEndpoint(), null, {autologin:1}, cb);
+        }
+        this.Talk.request(this.sessionEndpoint(), null, {autologin:1}, handleException);
     }
 
     function hasProduct(productId, callback) {
-        var cache = this['Cache'] && this.Cache.enabled() ? this.Cache : null,
+        var cache = this.Cache && this.Cache.enabled() ? this.Cache : null,
             util = this.Util();
         callback = callback || function() {};
         if(cache) {
@@ -71,7 +85,7 @@
     }
 
     function hasSubscription(productId, callback) {
-        var cache = this['Cache'] && this.Cache.enabled() ? this.Cache : null,
+        var cache = this.Cache && this.Cache.enabled() ? this.Cache : null,
             util = this.Util();
         callback = callback || function() {};
         if(cache) {
