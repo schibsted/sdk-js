@@ -115,8 +115,16 @@
     }
 
     function logout(callback) {
-        callback = callback || function() {};
-        this.Talk.request(this.server(), 'ajax/logout.js', {}, callback);
+        var that = this;
+        var cb = function(err, data) {
+            if(data.result && that.Cookie && that.Cookie.enabled()) {
+                that.Cookie.clear();
+            }
+            if(callback) {
+                callback(err, data);
+            }
+        };
+        this.Talk.request(this.server(), 'ajax/logout.js', {}, cb);
     }
 
 

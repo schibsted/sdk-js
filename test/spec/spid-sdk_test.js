@@ -329,10 +329,12 @@ describe('SPiD', function() {
     });
 
     describe('SPiD.logout', function() {
-        var copy_Talk_request;
+        var copy_Talk_request,
+            copy_Cookie_clear;
         before(function() {
             SPiD.init(setup);
             copy_Talk_request = SPiD.Talk.request;
+            copy_Cookie_clear = SPiD.Cookie.clear;
         });
 
         it('SPiD.logout should call Talk with parameter server, path, params, callback', function() {
@@ -344,8 +346,30 @@ describe('SPiD', function() {
             SPiD.logout(function() {});
         });
 
+        it('SPiD.logout should call callback with error and response', function(done) {
+            SPiD.Talk.request = function(server, path, param, callback) {
+                callback({error:true}, {result:true});
+            };
+            SPiD.logout(function(err, res) {
+                if(err.error && res.result) {
+                    done();
+                }
+            });
+        });
+
+        it('SPiD.logout should call SPiD.Cookie.clear() when successful', function(done) {
+            SPiD.Talk.request = function(server, path, param, callback) {
+                callback(null, {result:true});
+            };
+            SPiD.Cookie.clear = function() {
+                done();
+            };
+            SPiD.logout();
+        });
+
         after(function() {
             SPiD.Talk.request = copy_Talk_request;
+            SPiD.Cookie.clear = copy_Cookie_clear;
         });
     });
 });
