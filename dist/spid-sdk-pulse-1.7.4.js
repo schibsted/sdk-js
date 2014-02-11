@@ -1369,7 +1369,7 @@ if(typeof (window.vgsAsyncInit) === 'function' && !window.vgsAsyncInit.hasRun) {
 (function(win, vgs) {
 
     var config = {
-        pulseServer      : (win.location.protocol.substr(0,5) === 'https' ? 'https' : 'http' ) +'://pulse.schibstedpayment.no/pulse/rest/analytics/report',
+        pulseServer      : (win.location.protocol.substr(0,5) === 'https' ? 'https' : 'http' ) +'://pulse.spid.se/pulse',
         cookiePrefix     : 'spd_pls_',
         throttlingFactor : 1.0
     };
@@ -1515,8 +1515,8 @@ if(typeof (window.vgsAsyncInit) === 'function' && !window.vgsAsyncInit.hasRun) {
         function pulse(attr) {
             var meta_info = get_meta_tags(win);
             // url   = page url
-            // uid   =
-            // sid   =
+            // uid   = user id
+            // sid   = session id
             // a     = arrive,
             // t     = throttle
             // l     = leave
@@ -1542,7 +1542,7 @@ if(typeof (window.vgsAsyncInit) === 'function' && !window.vgsAsyncInit.hasRun) {
             // mola  = meta og:local:aleternate
             // mosn  = meta og:site_name
             // mov   = meta og:video
-            // cust  = meta
+            // cust  = custom data
 
             var payload = {
                     url: win.encodeURIComponent(win.document.URL),
