@@ -2,7 +2,7 @@
 (function(win, vgs) {
 
     var config = {
-        pulseServer      : (win.location.protocol.substr(0,5) === 'https' ? 'https' : 'http' ) +'://pulse.schibstedpayment.no/pulse/rest/analytics/report',
+        pulseServer      : (win.location.protocol.substr(0,5) === 'https' ? 'https' : 'http' ) +'://pulse.spid.se/pulse',
         cookiePrefix     : 'spd_pls_',
         throttlingFactor : 1.0
     };
@@ -105,13 +105,108 @@
             sid = updateCookie(config.cookiePrefix + 'sid', 0, 15),
             pageLoadTime = (new Date()).getTime();
 
+        function get_viewport_size(win) {
+            var w = win,
+                d = win.document,
+                e = d.documentElement,
+                g = d.getElementsByTagName('body')[0],
+                x = w.innerWidth || e.clientWidth || g.clientWidth,
+                y = w.innerHeight|| e.clientHeight|| g.clientHeight;
+            return x + 'x' + y;
+        }
+
+        function get_screensize() {
+            return screen.width + 'x' + screen.height;
+        }
+
+        function get_scroll() {
+            var doc = document.documentElement;
+            var left = (window.pageXOffset || doc.scrollLeft) - (doc.clientLeft || 0);
+            var top = (window.pageYOffset || doc.scrollTop)  - (doc.clientTop || 0);
+            return left + 'x' + top;
+        }
+
+        function get_meta_tags(win) {
+            var meta_info = {};
+            var meta_tags = win.document.getElementsByTagName('meta');
+
+            for (var i=0; i<meta_tags.length; i++) {
+                var key = meta_tags[i].getAttribute("name");
+                if (key === undefined || key === null) {
+                    key = meta_tags[i].getAttribute("property");
+                }
+                var value = meta_tags[i].getAttribute("content");
+                meta_info[key] = value;
+            }
+            return meta_info;
+        }
+
         /**
         * Sends ping to pulse server, through an img and query params
         * @param    attr    object  contain key/val pairs to add to ping
         */
         function pulse(attr) {
-            // a=arrive, t=throttle, l=leave
-            var payload = { url: win.encodeURIComponent(win.document.URL), uid: uid, sid: sid, a: pageLoadTime, t: config.throttlingFactor, spid: spid },
+            var meta_info = get_meta_tags(win);
+            // url   = page url
+            // uid   = user id
+            // sid   = session id
+            // a     = arrive,
+            // t     = throttle
+            // l     = leave
+            // spid  = user_id from SPiD
+            // did   = distinct_id
+            // cid   = client_id
+            // ti    = document title
+            // ref   = document referer
+            // vs    = viewport sats
+            // ss    = screen size
+            // ps    = page scroll
+            // mti   = meta title
+            // md    = meta description
+            // mta   = meta tags
+            // moti  = meta og:title
+            // moty  = meta og:type
+            // mou   = meta og:url
+            // moi   = meta og:image
+            // modes = meta og:description
+            // moa   = meta og:audio
+            // modet = meta og:determiner
+            // mol   = meta og:local
+            // mola  = meta og:local:aleternate
+            // mosn  = meta og:site_name
+            // mov   = meta og:video
+            // cust  = custom data
+
+            var payload = {
+                    url: win.encodeURIComponent(win.document.URL),
+                    uid: uid,
+                    sid: sid,
+                    a: pageLoadTime,
+                    t: config.throttlingFactor,
+                    spid: spid,
+                    did: distinct_id,
+                    cid: vgs.client_id,
+                    ti: win.document.title,
+                    ref: win.document.referrer,
+                    vs: get_viewport_size(win),
+                    ss: get_screensize(win),
+                    ps: get_scroll(),
+                    mti: meta_info.title,
+                    md: meta_info.description,
+                    mta: meta_info.tags,
+                    moti: meta_info['og:title'],
+                    moty: meta_info['og:type'],
+                    mou: meta_info['og:url'],
+                    moi: meta_info['og:image'],
+                    modes: meta_info['og:description'],
+                    moa: meta_info['og:audio'],
+                    modet: meta_info['og:determiner'],
+                    mol: meta_info['og:local'],
+                    mola: meta_info['og:local:alternate'],
+                    mosn: meta_info['og:site_name'],
+                    mov: meta_info['og:video'],
+                    cust: vgs.custom_data
+                },
                 query = [],
                 i;
             for (i in attr) {
@@ -144,11 +239,15 @@
     }
 
     var spid,
+        distinct_id,
         executed = false;
     vgs.Event.subscribe('auth.sessionChange', function(data) {
         config.throttlingFactor = VGS._track_throttle;
         //Listen to sessionChange event, always triggered and sometimes multiple. Avoids multiple event placements.
         spid = data.session ? data.session.userId : 0;
         if (Math.random() <= config.throttlingFactor && !executed) { report(); executed = true; }
+    });
+    vgs.Event.subscribe('auth.visitor', function(data) {
+        distinct_id = data.uid;
     });
 }(window, VGS));
