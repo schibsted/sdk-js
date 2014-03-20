@@ -1,4 +1,4 @@
-/*! sdk-js - v1.7.4 - 2014-02-14
+/*! sdk-js - v1.7.6 - 2014-03-20
 * Copyright (c) 2014 Schibsted Payment AS; */
 /*jslint evil: true, regexp: true */
 
@@ -339,7 +339,7 @@ if (typeof JSON !== 'object') {
     }
 }());
 var VGS = VGS || {
-	version: '1.7.4',
+	version: '1.7.6',
 	client_id : false,
 	redirect_uri : window.location.toString(),
 
@@ -357,6 +357,9 @@ var VGS = VGS || {
 	_cache_notloggedin : false,
 	_cacheLastReset : (new Date()).getTime(),
 	_track_throttle : 1,
+    _track_anon_opt_out : false,
+    _track_opt_out : false,
+    _track_custom_data : null,
 
 	// pending callbacks for VGS.getLoginStatus() calls
 	callbacks: [],
@@ -408,6 +411,8 @@ var VGS = VGS || {
 	 * cache              | Boolean | Response caching.                | *Optional*  | `true` // Uses refresh_timeout for caching refresh
 	 * cache_notloggedin  | Boolean | Cache user not logged in status  | *Optional*  | `false` // Uses refresh_timeout for caching refresh
 	 * track_throttle     | Float   | Use with tracker. Between 0-1    | *Optional*  | 1
+     * track_anon_opt_out | Boolean | Use with tracker.                | *Optional*  | `false`
+     * track_custom_data  | String  | Custom track data                | *Optional*  | `null`
 	 */
 	init : function(options) {
 		var valid = true;
@@ -421,6 +426,7 @@ var VGS = VGS || {
 			logging : VGS._logging,
 			timeout : VGS._timeout,
 			track_throttle : VGS._track_throttle,
+            track_custom_data : VGS._track_custom_data,
 			cookie : true,
 			status : false,
 			https: true
@@ -444,6 +450,8 @@ var VGS = VGS || {
 		VGS._cache_notloggedin = options.cache_notloggedin;
 		VGS.Ajax.timeoutPeriod = options.timeout;
 		VGS._track_throttle = options.track_throttle;
+        VGS._track_anon_opt_out = options.track_anon_opt_out;
+        VGS._track_custom_data = options.track_custom_data;
 		VGS.log('Default connection timeout set to ("'+ VGS.Ajax.timeoutPeriod +'")', 'log');
 
 		if (typeof (options.client_id) === 'undefined') {
@@ -789,6 +797,9 @@ var VGS = VGS || {
 		validate : function(response) {
 			VGS.log('VGS.Auth.validate', 'log');
 			VGS.Auth.valid = false;
+            VGS._track_opt_out = response.tracking ? false : true;
+            VGS.log('VGS._track_opt_out: ' + VGS._track_opt_out, 'log');
+
 			// Trigger visitor events
 			VGS.log(response, 'log');
 			if (response.result) {
@@ -1508,72 +1519,50 @@ if(typeof (window.vgsAsyncInit) === 'function' && !window.vgsAsyncInit.hasRun) {
             return meta_info;
         }
 
+        function safe_url(value) {
+            return win.encodeURIComponent(value);
+        }
+
         /**
         * Sends ping to pulse server, through an img and query params
         * @param    attr    object  contain key/val pairs to add to ping
         */
         function pulse(attr) {
+            // Opt-out for anonymous and logged in users.
+            vgs.log('pulse: vgs._track_opt_out', 'log');
+            if (vgs._track_opt_out || (spid === 0 && vgs._track_anon_opt_out)) {
+                return null;
+            }
             var meta_info = get_meta_tags(win);
-            // url   = page url
-            // uid   = user id
-            // sid   = session id
-            // a     = arrive,
-            // t     = throttle
-            // r     = render time
-            // l     = leave
-            // spid  = user_id from SPiD
-            // did   = distinct_id
-            // cid   = client_id
-            // ti    = document title
-            // ref   = document referer
-            // vs    = viewport sats
-            // ss    = screen size
-            // ps    = page scroll
-            // mti   = meta title
-            // md    = meta description
-            // mta   = meta tags
-            // moti  = meta og:title
-            // moty  = meta og:type
-            // mou   = meta og:url
-            // moi   = meta og:image
-            // modes = meta og:description
-            // moa   = meta og:audio
-            // modet = meta og:determiner
-            // mol   = meta og:local
-            // mola  = meta og:local:aleternate
-            // mosn  = meta og:site_name
-            // mov   = meta og:video
-            // cust  = custom data
-
             var payload = {
-                    url: win.encodeURIComponent(win.document.URL),
-                    uid: uid,
-                    sid: sid,
-                    a: pageLoadTime,
-                    t: config.throttlingFactor,
-                    spid: spid,
-                    did: distinct_id,
-                    cid: vgs.client_id,
-                    ti: win.document.title,
-                    ref: win.document.referrer,
-                    vs: get_viewport_size(win),
-                    ss: get_screensize(win),
-                    ps: get_scroll(),
-                    mti: meta_info.title,
-                    md: meta_info.description,
-                    mta: meta_info.tags,
-                    moti: meta_info['og:title'],
-                    moty: meta_info['og:type'],
-                    mou: meta_info['og:url'],
-                    moi: meta_info['og:image'],
-                    modes: meta_info['og:description'],
-                    moa: meta_info['og:audio'],
-                    modet: meta_info['og:determiner'],
-                    mol: meta_info['og:local'],
-                    mola: meta_info['og:local:alternate'],
-                    mosn: meta_info['og:site_name'],
-                    mov: meta_info['og:video'],
-                    cust: vgs.custom_data
+                    url: safe_url(win.document.URL),  // page url
+                    uid: uid,                                                 // user id
+                    sid: sid,                                                 // session id
+                    a: pageLoadTime,                                          // arrive time
+                    t: config.throttlingFactor,                               // throttle
+                    spid: spid,                                               // user_id from SPiD
+                    did: distinct_id,                                         // distinct_id
+                    cid: vgs.client_id,                                       // client_id
+                    ti: safe_url(win.document.title),                         // document title
+                    ref: safe_url(win.document.referrer),                     // document referer
+                    vs: get_viewport_size(win),                               // viewport size
+                    ss: get_screensize(win),                                  // screen size
+                    ps: get_scroll(),                                         // page scroll
+                    mti: safe_url(meta_info.title),                           // meta title
+                    md: safe_url(meta_info.description),                      // meta description
+                    mta: safe_url(meta_info.tags),                            // meta tags
+                    moti: safe_url(meta_info['og:title']),                    // meta og:title
+                    moty: safe_url(meta_info['og:type']),                     // meta og:type
+                    mou: safe_url(meta_info['og:url']),                       // meta og:url
+                    moi: safe_url(meta_info['og:image']),                     // meta og:image
+                    modes: safe_url(meta_info['og:description']),             // meta og:description
+                    moa: safe_url(meta_info['og:audio']),                     // meta og:audio
+                    modet: safe_url(meta_info['og:determiner']),              // meta og:determiner
+                    mol: safe_url(meta_info['og:local']),                     // meta og:local
+                    mola: safe_url(meta_info['og:local:alternate']),          // meta og:local:aleternate
+                    mosn: safe_url(meta_info['og:site_name']),                // meta og:site_name
+                    mov: safe_url(meta_info['og:video']),                     // meta og:video
+                    cust: safe_url(vgs.custom_data || vgs._track_custom_data) // custom data
                 },
                 query = [],
                 i;
@@ -1587,14 +1576,13 @@ if(typeof (window.vgsAsyncInit) === 'function' && !window.vgsAsyncInit.hasRun) {
         }
 
         // Main app. Place event handlers and callbacks to send pulse
-        // TODO: Add opt-out option.
         var triggered = false;
         on('a', 'click', function() {
             //Listener for link clicks. If link clicked, avoid unload event
             var link = this.getAttribute('href');
             if(link.substr(0,4) === 'http') {
                 //Only send links that starts with http, encoded. Also supply l for leave.
-                pulse({toUrl: win.encodeURIComponent(link), l: (new Date()).getTime()});
+                pulse({name: 'page_exit', toUrl: win.encodeURIComponent(link), l: (new Date()).getTime()});
                 triggered = true;
             }
         });
@@ -1603,22 +1591,18 @@ if(typeof (window.vgsAsyncInit) === 'function' && !window.vgsAsyncInit.hasRun) {
         on(win, 'unload', function() {
             //Only trigger if not already triggered by link
             if(!triggered) {
-                pulse({l: (new Date()).getTime()});
+                pulse({name: 'page_exit', l: (new Date()).getTime()});
             }
         });
 
-        // TODO: Add page load event
-        //on(win, 'onload', function() {
-            //Only trigger if not already triggered by link
-            if(!triggered) {
-                pulse({r: (new Date()).getTime()});
-            }
-        //});
+        vgs.Event.subscribe('auth.visitor', function(data) {
+            vgs.log(data);
+            distinct_id = data.uid;
+            spid = data.user_id;
+            pulse({name: 'page_entry', r: (new Date()).getTime()});
+        });
 
-
-        // TODO: Add page read event. Triggered when a user has been on the page for more than x sec and maybe scrolled?
-
-
+        // TODO: Add page read event. Triggered when a user has been on the page for more than x sec and scrolled?
     }
 
     var spid,
@@ -1629,8 +1613,5 @@ if(typeof (window.vgsAsyncInit) === 'function' && !window.vgsAsyncInit.hasRun) {
         //Listen to sessionChange event, always triggered and sometimes multiple. Avoids multiple event placements.
         spid = data.session ? data.session.userId : 0;
         if (Math.random() <= config.throttlingFactor && !executed) { report(); executed = true; }
-    });
-    vgs.Event.subscribe('auth.visitor', function(data) {
-        distinct_id = data.uid;
     });
 }(window, VGS));
