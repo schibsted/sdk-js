@@ -17,6 +17,9 @@ var VGS = VGS || {
 	_cache_notloggedin : false,
 	_cacheLastReset : (new Date()).getTime(),
 	_track_throttle : 1,
+    _track_anon_opt_out : false,
+    _track_opt_out : false,
+    _track_custom_data : null,
 
 	// pending callbacks for VGS.getLoginStatus() calls
 	callbacks: [],
@@ -68,6 +71,8 @@ var VGS = VGS || {
 	 * cache              | Boolean | Response caching.                | *Optional*  | `true` // Uses refresh_timeout for caching refresh
 	 * cache_notloggedin  | Boolean | Cache user not logged in status  | *Optional*  | `false` // Uses refresh_timeout for caching refresh
 	 * track_throttle     | Float   | Use with tracker. Between 0-1    | *Optional*  | 1
+     * track_anon_opt_out | Boolean | Use with tracker.                | *Optional*  | `false`
+     * track_custom_data  | String  | Custom track data                | *Optional*  | `null`
 	 */
 	init : function(options) {
 		var valid = true;
@@ -81,6 +86,7 @@ var VGS = VGS || {
 			logging : VGS._logging,
 			timeout : VGS._timeout,
 			track_throttle : VGS._track_throttle,
+            track_custom_data : VGS._track_custom_data,
 			cookie : true,
 			status : false,
 			https: true
@@ -104,6 +110,8 @@ var VGS = VGS || {
 		VGS._cache_notloggedin = options.cache_notloggedin;
 		VGS.Ajax.timeoutPeriod = options.timeout;
 		VGS._track_throttle = options.track_throttle;
+        VGS._track_anon_opt_out = options.track_anon_opt_out;
+        VGS._track_custom_data = options.track_custom_data;
 		VGS.log('Default connection timeout set to ("'+ VGS.Ajax.timeoutPeriod +'")', 'log');
 
 		if (typeof (options.client_id) === 'undefined') {
@@ -449,6 +457,9 @@ var VGS = VGS || {
 		validate : function(response) {
 			VGS.log('VGS.Auth.validate', 'log');
 			VGS.Auth.valid = false;
+            VGS._track_opt_out = response.tracking ? false : true;
+            VGS.log('VGS._track_opt_out: ' + VGS._track_opt_out, 'log');
+
 			// Trigger visitor events
 			VGS.log(response, 'log');
 			if (response.result) {
