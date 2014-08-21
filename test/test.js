@@ -15,9 +15,9 @@ describe('VGS', function() {
 			assert.isObject(VGS, 'object', 'Its an object');
 		});
 	});
-	describe('VGS initiated', function() { 
+	describe('VGS initiated', function() {
 		before(function() {
-			VGS.init(setup); 
+			VGS.init(setup);
 		});
 		//Test VGS init?
 
@@ -26,14 +26,14 @@ describe('VGS', function() {
 				assert.equal(VGS.Ajax.buildUrl('test', {a:1,b:2,c:null}), 'https://' + setup.server + '/test?a=1&b=2');
 			});
 			it('VGS.getLoginURI should return correctly formatted URL for login', function() {
-				assert.equal(VGS.getLoginURI('http://random.com', '123' ), VGS.Ajax.buildUrl('login', {'response_type':'code', 'flow':'signup', 'client_id':'123', 'redirect_uri':encodeURIComponent('http://random.com') }));
-				assert.equal(VGS.getLoginURI(null, '123'), VGS.Ajax.buildUrl('login', {'response_type':'code', 'flow':'signup', 'client_id':'123', 'redirect_uri':encodeURIComponent(window.location.toString()) }));
-				assert.equal(VGS.getLoginURI(), VGS.Ajax.buildUrl('login', {'response_type':'code', 'flow':'signup', 'client_id':setup.client_id, 'redirect_uri':encodeURIComponent(window.location.toString()) }));
+				assert.equal(VGS.getLoginURI('http://random.com', '123' ), VGS.Ajax.buildUrl('flow/login', {'response_type':'code', 'client_id':'123', 'redirect_uri':encodeURIComponent('http://random.com') }));
+				assert.equal(VGS.getLoginURI(null, '123'), VGS.Ajax.buildUrl('flow/login', {'response_type':'code', 'client_id':'123', 'redirect_uri':encodeURIComponent(window.location.toString()) }));
+				assert.equal(VGS.getLoginURI(), VGS.Ajax.buildUrl('flow/login', {'response_type':'code', 'client_id':setup.client_id, 'redirect_uri':encodeURIComponent(window.location.toString()) }));
 			});
 			it('VGS.getSignupURI should return correctly formatted URL for signup', function() {
-				assert.equal(VGS.getSignupURI('http://random.com', '123' ), VGS.Ajax.buildUrl('signup', {'response_type': 'code','flow': 'signup','client_id':'123','redirect_uri': encodeURIComponent('http://random.com') }));
-				assert.equal(VGS.getSignupURI(null, '123'), VGS.Ajax.buildUrl('signup', {'response_type': 'code','flow': 'signup','client_id':'123','redirect_uri': encodeURIComponent(window.location.toString()) }));
-				assert.equal(VGS.getSignupURI(), VGS.Ajax.buildUrl('signup', {'response_type': 'code','flow': 'signup','client_id':setup.client_id,'redirect_uri': encodeURIComponent(window.location.toString()) }));
+				assert.equal(VGS.getSignupURI('http://random.com', '123' ), VGS.Ajax.buildUrl('flow/signup', {'response_type': 'code','client_id':'123','redirect_uri': encodeURIComponent('http://random.com') }));
+				assert.equal(VGS.getSignupURI(null, '123'), VGS.Ajax.buildUrl('flow/signup', {'response_type': 'code','client_id':'123','redirect_uri': encodeURIComponent(window.location.toString()) }));
+				assert.equal(VGS.getSignupURI(), VGS.Ajax.buildUrl('flow/signup', {'response_type': 'code','client_id':setup.client_id,'redirect_uri': encodeURIComponent(window.location.toString()) }));
 			});
 			it('VGS.getLogoutURI should return correctly formatted URL for logout', function() {
 				assert.equal(VGS.getLogoutURI('http://random.com', '123' ), VGS.Ajax.buildUrl('logout', {'response_type': 'code','client_id':'123','redirect_uri': encodeURIComponent('http://random.com') }));
@@ -66,13 +66,13 @@ describe('VGS', function() {
 				assert.equal(VGS.getRedeemVoucherURI(), VGS.Ajax.buildUrl('account/redeem', {'response_type': 'code','client_id':setup.client_id,'redirect_uri': encodeURIComponent(window.location.toString()) }));
 			});
 			it('VGS.getPurchaseProductURI should return correctly formatted URL for purchase product', function() {
-				assert.equal(VGS.getPurchaseProductURI(10010,'http://random.com', '123' ), VGS.Ajax.buildUrl('auth/start', {'response_type': 'code','flow': 'payment','client_id':'123','redirect_uri': encodeURIComponent('http://random.com'), 'product_id': 10010 }));
-				assert.equal(VGS.getPurchaseProductURI(null, null, '123'), VGS.Ajax.buildUrl('auth/start', {'response_type': 'code','flow': 'payment','client_id':'123','redirect_uri': encodeURIComponent(window.location.toString()) }));
-				assert.equal(VGS.getPurchaseProductURI(), VGS.Ajax.buildUrl('auth/start', {'response_type':'code', 'flow':'payment', 'client_id':setup.client_id, 'redirect_uri':encodeURIComponent(window.location.toString()) }));
+				assert.equal(VGS.getPurchaseProductURI(10010,'http://random.com', '123' ), VGS.Ajax.buildUrl('flow/checkout', {'response_type': 'code','client_id':'123','redirect_uri': encodeURIComponent('http://random.com'), 'product_id': 10010 }));
+				assert.equal(VGS.getPurchaseProductURI(null, null, '123'), VGS.Ajax.buildUrl('flow/checkout', {'response_type': 'code','client_id':'123','redirect_uri': encodeURIComponent(window.location.toString()) }));
+				assert.equal(VGS.getPurchaseProductURI(), VGS.Ajax.buildUrl('flow/checkout', {'response_type':'code', 'client_id':setup.client_id, 'redirect_uri':encodeURIComponent(window.location.toString()) }));
 			});
 			it('VGS.getPurchaseCampaignURI should return correctly formatted URL for purchase product', function() {
-				assert.equal(VGS.getPurchaseCampaignURI(10020, 10010, 'vcode'), VGS.Ajax.buildUrl('auth/start', {'response_type': 'code','flow': 'payment','client_id':setup.client_id,'redirect_uri': encodeURIComponent(window.location.toString()), 'campaign_id':10020, 'product_id': 10010, 'voucher_code':'vcode' }));
-				assert.equal(VGS.getPurchaseCampaignURI(10020, 10010), VGS.Ajax.buildUrl('auth/start', {'response_type': 'code','flow': 'payment','client_id':setup.client_id,'redirect_uri': encodeURIComponent(window.location.toString()), 'campaign_id':10020, 'product_id': 10010 }));
+				assert.equal(VGS.getPurchaseCampaignURI(10020, 10010, 'vcode'), VGS.Ajax.buildUrl('flow/checkout', {'response_type': 'code','client_id':setup.client_id,'redirect_uri': encodeURIComponent(window.location.toString()), 'campaign_id':10020, 'product_id': 10010, 'voucher_code':'vcode' }));
+				assert.equal(VGS.getPurchaseCampaignURI(10020, 10010), VGS.Ajax.buildUrl('flow/checkout', {'response_type': 'code','client_id':setup.client_id,'redirect_uri': encodeURIComponent(window.location.toString()), 'campaign_id':10020, 'product_id': 10010 }));
 
 			});
 		});
