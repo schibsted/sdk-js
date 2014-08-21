@@ -73,7 +73,16 @@ describe('VGS', function() {
 			it('VGS.getPurchaseCampaignURI should return correctly formatted URL for purchase product', function() {
 				assert.equal(VGS.getPurchaseCampaignURI(10020, 10010, 'vcode'), VGS.Ajax.buildUrl('flow/checkout', {'response_type': 'code','client_id':setup.client_id,'redirect_uri': encodeURIComponent(window.location.toString()), 'campaign_id':10020, 'product_id': 10010, 'voucher_code':'vcode' }));
 				assert.equal(VGS.getPurchaseCampaignURI(10020, 10010), VGS.Ajax.buildUrl('flow/checkout', {'response_type': 'code','client_id':setup.client_id,'redirect_uri': encodeURIComponent(window.location.toString()), 'campaign_id':10020, 'product_id': 10010 }));
-
+			});
+			it('VGS.getFlowUrl should return correctly formatted URL for given flow', function() {
+				assert.equal(
+					VGS.getFlowUrl('checkout', { 'product_id': 10010 }),
+					VGS.Ajax.buildUrl('flow/checkout',
+						{'product_id': 10010, 'client_id':setup.client_id,'redirect_uri': encodeURIComponent(window.location.toString()), 'response_type': 'code'}));
+				assert.equal(
+					VGS.getFlowUrl('checkout', { 'client_id': '123', 'redirect_uri': 'http://google.com', 'product_id': 10010 }),
+					VGS.Ajax.buildUrl('flow/checkout',
+						{'client_id': '123', 'redirect_uri': 'http://google.com', 'product_id': 10010, 'response_type': 'code'}));
 			});
 		});
 	});

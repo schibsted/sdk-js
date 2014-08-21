@@ -848,6 +848,15 @@ var VGS = VGS || {
 		};
 		return VGS.Ajax.buildUrl('flow/checkout', params);
 	},
+	getFlowUrl : function(flowname, params) {
+		params = VGS.copy(params, {
+			'client_id' : VGS.client_id,
+			'redirect_uri' : encodeURIComponent(window.location.toString()),
+			'response_type' : 'code'
+		});
+		var path = 'flow/'+flowname;
+		return VGS.Ajax.buildUrl(path, params);
+	},
 	/**
 	 * Event handling mechanism for globally named events. Borrowed from Facebook connect js.
 	 */
