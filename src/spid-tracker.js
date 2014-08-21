@@ -41,8 +41,8 @@
             }
             //Event listener for old browsers
             return function(element, event) {
-                var old = element["on"+event] ? element["on"+event] : function() {};
-                element["on"+event] = function(e) {
+                var old = element['on'+event] ? element['on'+event] : function() {};
+                element['on'+event] = function(e) {
                     if (!e) { e = win.event; }
                     old.call(this, e);
                     cb.call(this, e);
@@ -70,16 +70,16 @@
             var exdate = new Date();
             exdate.setDate(exdate.getDate() + days);
             exdate.setMinutes(exdate.getMinutes() + minutes);
-            var c_value = value + "; expires=" + exdate.toUTCString();
-            document.cookie = name + "=" + c_value;
+            var c_value = value + '; expires=' + exdate.toUTCString();
+            document.cookie = name + '=' + c_value;
         }
 
         function getCookie() {
-            var i, x, y, biscuits = document.cookie.split(";");
+            var i, x, y, biscuits = document.cookie.split(';');
             for (i = 0; i < biscuits.length; i++) {
-                x = biscuits[i].substr(0, biscuits[i].indexOf("="));
-                y = biscuits[i].substr(biscuits[i].indexOf("=") + 1);
-                x = x.replace(/^\s+|\s+$/g, "");
+                x = biscuits[i].substr(0, biscuits[i].indexOf('='));
+                y = biscuits[i].substr(biscuits[i].indexOf('=') + 1);
+                x = x.replace(/^\s+|\s+$/g, '');
                 if (x === name) {
                     return y;
                 }
@@ -131,11 +131,11 @@
             var meta_tags = win.document.getElementsByTagName('meta');
 
             for (var i=0; i<meta_tags.length; i++) {
-                var key = meta_tags[i].getAttribute("name");
+                var key = meta_tags[i].getAttribute('name');
                 if (key === undefined || key === null) {
-                    key = meta_tags[i].getAttribute("property");
+                    key = meta_tags[i].getAttribute('property');
                 }
-                var value = meta_tags[i].getAttribute("content");
+                var value = meta_tags[i].getAttribute('content');
                 meta_info[key] = value;
             }
             return meta_info;

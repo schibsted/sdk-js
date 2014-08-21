@@ -11,5 +11,7 @@
   "boss": true,
   "eqnull": true,
   "browser": true,
+  "trailing": true,
+  "quotmark": "single",
   "smarttabs": true
 }

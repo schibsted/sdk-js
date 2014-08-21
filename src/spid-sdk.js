@@ -287,7 +287,7 @@ var VGS = VGS || {
             } else if (VGS.Ajax.requestQueue.length > 0) {
                 // Queue size validation in order to avoid abuse and overload of the platform. Allow max 10 requests in the queue.
                 if (VGS.Ajax.requestQueue.length > 10) {
-                    VGS.Ajax.failure("Queue size too big: "+VGS.Ajax.requestQueue.length+" requests! In order to avoid abuse and overload of the platform we allow max 10 requests in the queue.");
+                    VGS.Ajax.failure('Queue size too big: '+VGS.Ajax.requestQueue.length+' requests! In order to avoid abuse and overload of the platform we allow max 10 requests in the queue.');
                     VGS.Ajax.stopPolling();
                 } else {
                     VGS.Ajax.makeRequest();
@@ -384,7 +384,7 @@ var VGS = VGS || {
         get : function() {
             VGS.log('VGS.Cookie.get() -- ' + VGS.Cookie.name, 'log');
             var cookie, session, name, carray = null;
-            name = VGS.Cookie.name + "=";
+            name = VGS.Cookie.name + '=';
             carray = document.cookie.split(';');
             for ( var i = 0; i < carray.length; i++) {
                 var c = carray[i];
@@ -417,7 +417,7 @@ var VGS = VGS || {
           */
         setRaw : function(val, ts, domain, name) {
             VGS.log('VGS.Cookie.setRaw(val, ' + ts + ', ' + domain + ', ' + name + ')', 'log');
-            var expires = "";
+            var expires = '';
             if (typeof (name) === 'undefined') {
                 name = VGS.Cookie.name;
             }
@@ -427,9 +427,9 @@ var VGS = VGS || {
             if (typeof (ts) !== 'undefined') {
                 var date = new Date();
                 date.setTime(date.getTime() + (ts * 1000));
-                expires = "; expires=" + date.toGMTString();
+                expires = '; expires=' + date.toGMTString();
 
-                document.cookie = name + "=" + val + expires + "; path=/" + (domain ? '; domain=.' + domain : '');
+                document.cookie = name + '=' + val + expires + '; path=/' + (domain ? '; domain=.' + domain : '');
             } else {
                 VGS.log('VGS.Cookie.setRaw() expiration is invalid:' + ts + ', no cookie set)', 'log');
             }
