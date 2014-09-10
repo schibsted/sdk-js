@@ -1,6 +1,6 @@
 {
   "name": "sdk-js",
-  "version": "1.7.7",
+  "version": "1.7.8",
   "description": "JS SDK of Schibsted Payment AS",
   "repository": {
     "type": "git",

@@ -197,6 +197,8 @@
             (new Image()).src = config.pulseServer + '?' + query.join('&');
         }
 
+        report.pulse = pulse;
+
         // Main app. Place event handlers and callbacks to send pulse
         var triggered = false;
         on('a', 'click', function() {
@@ -226,6 +228,11 @@
 
         // TODO: Add page read event. Triggered when a user has been on the page for more than x sec and scrolled?
     }
+
+    vgs.getPulseTrack = function(options){
+        report();
+        report.pulse(JSON.stringify(options));
+    };
 
     var spid,
         distinct_id,

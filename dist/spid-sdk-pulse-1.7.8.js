@@ -1,5 +1,345 @@
+/*! sdk-js - v1.7.8 - 2014-09-10
+* Copyright (c) 2014 Schibsted Payment AS; */
+/*jslint evil: true, regexp: true */
+
+/*members "", "\b", "\t", "\n", "\f", "\r", "\"", JSON, "\\", apply,
+    call, charCodeAt, getUTCDate, getUTCFullYear, getUTCHours,
+    getUTCMinutes, getUTCMonth, getUTCSeconds, hasOwnProperty, join,
+    lastIndex, length, parse, prototype, push, replace, slice, stringify,
+    test, toJSON, toString, valueOf
+*/
+
+
+// Create a JSON object only if one does not already exist. We create the
+// methods in a closure to avoid creating global variables.
+
+if (typeof JSON !== 'object') {
+    JSON = {};
+}
+
+(function () {
+    'use strict';
+
+    function f(n) {
+        // Format integers to have at least two digits.
+        return n < 10 ? '0' + n : n;
+    }
+
+    if (typeof Date.prototype.toJSON !== 'function') {
+
+        Date.prototype.toJSON = function (key) {
+
+            return isFinite(this.valueOf())
+                ? this.getUTCFullYear()     + '-' +
+                    f(this.getUTCMonth() + 1) + '-' +
+                    f(this.getUTCDate())      + 'T' +
+                    f(this.getUTCHours())     + ':' +
+                    f(this.getUTCMinutes())   + ':' +
+                    f(this.getUTCSeconds())   + 'Z'
+                : null;
+        };
+
+        String.prototype.toJSON      =
+            Number.prototype.toJSON  =
+            Boolean.prototype.toJSON = function (key) {
+                return this.valueOf();
+            };
+    }
+
+    var cx = /[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
+        escapable = /[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
+        gap,
+        indent,
+        meta = {    // table of character substitutions
+            '\b': '\\b',
+            '\t': '\\t',
+            '\n': '\\n',
+            '\f': '\\f',
+            '\r': '\\r',
+            '"' : '\\"',
+            '\\': '\\\\'
+        },
+        rep;
+
+
+    function quote(string) {
+
+// If the string contains no control characters, no quote characters, and no
+// backslash characters, then we can safely slap some quotes around it.
+// Otherwise we must also replace the offending characters with safe escape
+// sequences.
+
+        escapable.lastIndex = 0;
+        return escapable.test(string) ? '"' + string.replace(escapable, function (a) {
+            var c = meta[a];
+            return typeof c === 'string'
+                ? c
+                : '\\u' + ('0000' + a.charCodeAt(0).toString(16)).slice(-4);
+        }) + '"' : '"' + string + '"';
+    }
+
+
+    function str(key, holder) {
+
+// Produce a string from holder[key].
+
+        var i,          // The loop counter.
+            k,          // The member key.
+            v,          // The member value.
+            length,
+            mind = gap,
+            partial,
+            value = holder[key];
+
+// If the value has a toJSON method, call it to obtain a replacement value.
+
+        if (value && typeof value === 'object' &&
+                typeof value.toJSON === 'function') {
+            value = value.toJSON(key);
+        }
+
+// If we were called with a replacer function, then call the replacer to
+// obtain a replacement value.
+
+        if (typeof rep === 'function') {
+            value = rep.call(holder, key, value);
+        }
+
+// What happens next depends on the value's type.
+
+        switch (typeof value) {
+        case 'string':
+            return quote(value);
+
+        case 'number':
+
+// JSON numbers must be finite. Encode non-finite numbers as null.
+
+            return isFinite(value) ? String(value) : 'null';
+
+        case 'boolean':
+        case 'null':
+
+// If the value is a boolean or null, convert it to a string. Note:
+// typeof null does not produce 'null'. The case is included here in
+// the remote chance that this gets fixed someday.
+
+            return String(value);
+
+// If the type is 'object', we might be dealing with an object or an array or
+// null.
+
+        case 'object':
+
+// Due to a specification blunder in ECMAScript, typeof null is 'object',
+// so watch out for that case.
+
+            if (!value) {
+                return 'null';
+            }
+
+// Make an array to hold the partial results of stringifying this object value.
+
+            gap += indent;
+            partial = [];
+
+// Is the value an array?
+
+            if (Object.prototype.toString.apply(value) === '[object Array]') {
+
+// The value is an array. Stringify every element. Use null as a placeholder
+// for non-JSON values.
+
+                length = value.length;
+                for (i = 0; i < length; i += 1) {
+                    partial[i] = str(i, value) || 'null';
+                }
+
+// Join all of the elements together, separated with commas, and wrap them in
+// brackets.
+
+                v = partial.length === 0
+                    ? '[]'
+                    : gap
+                    ? '[\n' + gap + partial.join(',\n' + gap) + '\n' + mind + ']'
+                    : '[' + partial.join(',') + ']';
+                gap = mind;
+                return v;
+            }
+
+// If the replacer is an array, use it to select the members to be stringified.
+
+            if (rep && typeof rep === 'object') {
+                length = rep.length;
+                for (i = 0; i < length; i += 1) {
+                    if (typeof rep[i] === 'string') {
+                        k = rep[i];
+                        v = str(k, value);
+                        if (v) {
+                            partial.push(quote(k) + (gap ? ': ' : ':') + v);
+                        }
+                    }
+                }
+            } else {
+
+// Otherwise, iterate through all of the keys in the object.
+
+                for (k in value) {
+                    if (Object.prototype.hasOwnProperty.call(value, k)) {
+                        v = str(k, value);
+                        if (v) {
+                            partial.push(quote(k) + (gap ? ': ' : ':') + v);
+                        }
+                    }
+                }
+            }
+
+// Join all of the member texts together, separated with commas,
+// and wrap them in braces.
+
+            v = partial.length === 0
+                ? '{}'
+                : gap
+                ? '{\n' + gap + partial.join(',\n' + gap) + '\n' + mind + '}'
+                : '{' + partial.join(',') + '}';
+            gap = mind;
+            return v;
+        }
+    }
+
+// If the JSON object does not yet have a stringify method, give it one.
+
+    if (typeof JSON.stringify !== 'function') {
+        JSON.stringify = function (value, replacer, space) {
+
+// The stringify method takes a value and an optional replacer, and an optional
+// space parameter, and returns a JSON text. The replacer can be a function
+// that can replace values, or an array of strings that will select the keys.
+// A default replacer method can be provided. Use of the space parameter can
+// produce text that is more easily readable.
+
+            var i;
+            gap = '';
+            indent = '';
+
+// If the space parameter is a number, make an indent string containing that
+// many spaces.
+
+            if (typeof space === 'number') {
+                for (i = 0; i < space; i += 1) {
+                    indent += ' ';
+                }
+
+// If the space parameter is a string, it will be used as the indent string.
+
+            } else if (typeof space === 'string') {
+                indent = space;
+            }
+
+// If there is a replacer, it must be a function or an array.
+// Otherwise, throw an error.
+
+            rep = replacer;
+            if (replacer && typeof replacer !== 'function' &&
+                    (typeof replacer !== 'object' ||
+                    typeof replacer.length !== 'number')) {
+                throw new Error('JSON.stringify');
+            }
+
+// Make a fake root object containing our value under the key of ''.
+// Return the result of stringifying the value.
+
+            return str('', {'': value});
+        };
+    }
+
+
+// If the JSON object does not yet have a parse method, give it one.
+
+    if (typeof JSON.parse !== 'function') {
+        JSON.parse = function (text, reviver) {
+
+// The parse method takes a text and an optional reviver function, and returns
+// a JavaScript value if the text is a valid JSON text.
+
+            var j;
+
+            function walk(holder, key) {
+
+// The walk method is used to recursively walk the resulting structure so
+// that modifications can be made.
+
+                var k, v, value = holder[key];
+                if (value && typeof value === 'object') {
+                    for (k in value) {
+                        if (Object.prototype.hasOwnProperty.call(value, k)) {
+                            v = walk(value, k);
+                            if (v !== undefined) {
+                                value[k] = v;
+                            } else {
+                                delete value[k];
+                            }
+                        }
+                    }
+                }
+                return reviver.call(holder, key, value);
+            }
+
+
+// Parsing happens in four stages. In the first stage, we replace certain
+// Unicode characters with escape sequences. JavaScript handles many characters
+// incorrectly, either silently deleting them, or treating them as line endings.
+
+            text = String(text);
+            cx.lastIndex = 0;
+            if (cx.test(text)) {
+                text = text.replace(cx, function (a) {
+                    return '\\u' +
+                        ('0000' + a.charCodeAt(0).toString(16)).slice(-4);
+                });
+            }
+
+// In the second stage, we run the text against regular expressions that look
+// for non-JSON patterns. We are especially concerned with '()' and 'new'
+// because they can cause invocation, and '=' because it can cause mutation.
+// But just to be safe, we want to reject all unexpected forms.
+
+// We split the second stage into 4 regexp operations in order to work around
+// crippling inefficiencies in IE's and Safari's regexp engines. First we
+// replace the JSON backslash pairs with '@' (a non-JSON character). Second, we
+// replace all simple value tokens with ']' characters. Third, we delete all
+// open brackets that follow a colon or comma or that begin the text. Finally,
+// we look to see that the remaining characters are only whitespace or ']' or
+// ',' or ':' or '{' or '}'. If that is so, then the text is safe for eval.
+
+            if (/^[\],:{}\s]*$/
+                    .test(text.replace(/\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g, '@')
+                        .replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, ']')
+                        .replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
+
+// In the third stage we use the eval function to compile the text into a
+// JavaScript structure. The '{' operator is subject to a syntactic ambiguity
+// in JavaScript: it can begin a block or an object literal. We wrap the text
+// in parens to eliminate the ambiguity.
+
+                j = eval('(' + text + ')');
+
+// In the optional fourth stage, we recursively walk the new structure, passing
+// each name/value pair to a reviver function for possible transformation.
+
+                return typeof reviver === 'function'
+                    ? walk({'': j}, '')
+                    : j;
+            }
+
+// If the text is not JSON parseable, then a SyntaxError is thrown.
+
+            throw new SyntaxError('JSON.parse');
+        };
+    }
+}());
 var VGS = VGS || {
-    version: '<%= pkg.version %>',
+    version: '1.7.8',
     client_id : false,
     redirect_uri : window.location.toString(),
 
@@ -1043,3 +1383,248 @@ if(typeof (window.vgsAsyncInit) === 'function' && !window.vgsAsyncInit.hasRun) {
     window.vgsAsyncInit();
 }
 }, 0);
+(function(win, vgs) {
+
+    var config = {
+        pulseServer      : (win.location.protocol.substr(0,5) === 'https' ? 'https' : 'http' ) +'://pulse.spid.se/pulse',
+        cookiePrefix     : 'spd_pls_',
+        throttlingFactor : 1.0
+    };
+
+    /**
+    * Event binder
+    * @param selector  string | element  'a' or window
+    * @param event     string            type of event, 'click'
+    * @param callback  function          called on event triggers. function() { this }
+    */
+    function on(selector, event, callback) {
+        function getAttacher() {
+            function traverse(node) {
+                //Traverse DOM upwards until selector node is found or document is reached
+                while(node.nodeName !== selector.toUpperCase() && node.nodeType !== 9) {
+                    node = node.parentNode;
+                }
+                return node.nodeType === 1 ? node : false;
+            }
+            function cb(evt) {
+                //Cross browser event getting
+                var e = evt || win.event;
+                var elem = e.target || e.srcElement;
+                //traverse to node if selector is string (not window)
+                var match = (typeof selector === 'string') ? traverse(elem) : elem;
+                //Only call callback if we have a match
+                if(match) { callback.call(match); }
+            }
+            //Event listener for modern browsers
+            if(win.addEventListener) {
+                return function(element, event) { element.addEventListener(event, cb , false); };
+            }
+            //Event listener for IE
+            if(win.attachEvent) {
+                return function(element, event) { element.attachEvent('on'+event, cb); };
+            }
+            //Event listener for old browsers
+            return function(element, event) {
+                var old = element['on'+event] ? element['on'+event] : function() {};
+                element['on'+event] = function(e) {
+                    if (!e) { e = win.event; }
+                    old.call(this, e);
+                    cb.call(this, e);
+                };
+            };
+        }
+        var attach = getAttacher();
+        if(typeof selector === 'string') {
+            //if selector is string, add listener to document
+            attach(win.document, event);
+        } else {
+            //otherwise add to selector
+            attach(selector, event);
+        }
+    }
+
+    /**
+    * Updates or sets tracking cookie
+    * @param name       string  Name of cookie
+    * @param days       int     days from now to expire
+    * @param minutes    int     minutes from now to expire
+    */
+    function updateCookie(name, days, minutes) {
+        function setCookie(value) {
+            var exdate = new Date();
+            exdate.setDate(exdate.getDate() + days);
+            exdate.setMinutes(exdate.getMinutes() + minutes);
+            var c_value = value + '; expires=' + exdate.toUTCString();
+            document.cookie = name + '=' + c_value;
+        }
+
+        function getCookie() {
+            var i, x, y, biscuits = document.cookie.split(';');
+            for (i = 0; i < biscuits.length; i++) {
+                x = biscuits[i].substr(0, biscuits[i].indexOf('='));
+                y = biscuits[i].substr(biscuits[i].indexOf('=') + 1);
+                x = x.replace(/^\s+|\s+$/g, '');
+                if (x === name) {
+                    return y;
+                }
+            }
+            return null;
+        }
+
+        var value = getCookie();
+        if (value === null) {
+            value = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+                var r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+        setCookie(value);
+        return value;
+    }
+
+    function report() {
+
+        //Update cookies and get load datetime
+        var uid = updateCookie(config.cookiePrefix + 'uid', 365, 0),
+            sid = updateCookie(config.cookiePrefix + 'sid', 0, 15),
+            pageLoadTime = (new Date()).getTime();
+
+        function get_viewport_size(win) {
+            var w = win,
+                d = win.document,
+                e = d.documentElement,
+                g = d.getElementsByTagName('body')[0],
+                x = w.innerWidth || e.clientWidth || g.clientWidth,
+                y = w.innerHeight|| e.clientHeight|| g.clientHeight;
+            return x + 'x' + y;
+        }
+
+        function get_screensize() {
+            return screen.width + 'x' + screen.height;
+        }
+
+        function get_scroll() {
+            var doc = document.documentElement;
+            var left = (window.pageXOffset || doc.scrollLeft) - (doc.clientLeft || 0);
+            var top = (window.pageYOffset || doc.scrollTop)  - (doc.clientTop || 0);
+            return left + 'x' + top;
+        }
+
+        function get_meta_tags(win) {
+            var meta_info = {};
+            var meta_tags = win.document.getElementsByTagName('meta');
+
+            for (var i=0; i<meta_tags.length; i++) {
+                var key = meta_tags[i].getAttribute('name');
+                if (key === undefined || key === null) {
+                    key = meta_tags[i].getAttribute('property');
+                }
+                var value = meta_tags[i].getAttribute('content');
+                meta_info[key] = value;
+            }
+            return meta_info;
+        }
+
+        function safe_url(value) {
+            return win.encodeURIComponent(value);
+        }
+
+        /**
+        * Sends ping to pulse server, through an img and query params
+        * @param    attr    object  contain key/val pairs to add to ping
+        */
+        function pulse(attr) {
+            // Opt-out for anonymous and logged in users.
+            vgs.log('pulse: vgs._track_opt_out', 'log');
+            if (vgs._track_opt_out || (spid === 0 && vgs._track_anon_opt_out)) {
+                return null;
+            }
+            var meta_info = get_meta_tags(win);
+            var payload = {
+                    url: safe_url(win.document.URL),  // page url
+                    uid: uid,                                                 // user id
+                    sid: sid,                                                 // session id
+                    a: pageLoadTime,                                          // arrive time
+                    t: config.throttlingFactor,                               // throttle
+                    spid: spid,                                               // user_id from SPiD
+                    did: distinct_id,                                         // distinct_id
+                    cid: vgs.client_id,                                       // client_id
+                    ti: safe_url(win.document.title),                         // document title
+                    ref: safe_url(win.document.referrer),                     // document referer
+                    vs: get_viewport_size(win),                               // viewport size
+                    ss: get_screensize(win),                                  // screen size
+                    ps: get_scroll(),                                         // page scroll
+                    mti: safe_url(meta_info.title),                           // meta title
+                    md: safe_url(meta_info.description),                      // meta description
+                    mta: safe_url(meta_info.tags),                            // meta tags
+                    moti: safe_url(meta_info['og:title']),                    // meta og:title
+                    moty: safe_url(meta_info['og:type']),                     // meta og:type
+                    mou: safe_url(meta_info['og:url']),                       // meta og:url
+                    moi: safe_url(meta_info['og:image']),                     // meta og:image
+                    modes: safe_url(meta_info['og:description']),             // meta og:description
+                    moa: safe_url(meta_info['og:audio']),                     // meta og:audio
+                    modet: safe_url(meta_info['og:determiner']),              // meta og:determiner
+                    mol: safe_url(meta_info['og:local']),                     // meta og:local
+                    mola: safe_url(meta_info['og:local:alternate']),          // meta og:local:aleternate
+                    mosn: safe_url(meta_info['og:site_name']),                // meta og:site_name
+                    mov: safe_url(meta_info['og:video']),                     // meta og:video
+                    cust: safe_url(vgs.custom_data || vgs._track_custom_data) // custom data
+                },
+                query = [],
+                i;
+            for (i in attr) {
+                payload[i] = attr[i];
+            }
+            for (i in payload) {
+                query.push(i+'='+payload[i]);
+            }
+            (new Image()).src = config.pulseServer + '?' + query.join('&');
+        }
+
+        report.pulse = pulse;
+
+        // Main app. Place event handlers and callbacks to send pulse
+        var triggered = false;
+        on('a', 'click', function() {
+            //Listener for link clicks. If link clicked, avoid unload event
+            var link = this.getAttribute('href');
+            if(link.substr(0,4) === 'http') {
+                //Only send links that starts with http, encoded. Also supply l for leave.
+                pulse({name: 'page_exit', toUrl: win.encodeURIComponent(link), l: (new Date()).getTime()});
+                triggered = true;
+            }
+        });
+
+        // Issue: This event is not triggered when you close a tab or the browser, so you loose all the one-page readers.
+        on(win, 'unload', function() {
+            //Only trigger if not already triggered by link
+            if(!triggered) {
+                pulse({name: 'page_exit', l: (new Date()).getTime()});
+            }
+        });
+
+        vgs.Event.subscribe('auth.visitor', function(data) {
+            vgs.log(data);
+            distinct_id = data.uid;
+            spid = data.user_id;
+            pulse({name: 'page_entry', r: (new Date()).getTime()});
+        });
+
+        // TODO: Add page read event. Triggered when a user has been on the page for more than x sec and scrolled?
+    }
+
+    vgs.getPulseTrack = function(options){
+        report();
+        report.pulse(JSON.stringify(options));
+    };
+
+    var spid,
+        distinct_id,
+        executed = false;
+    vgs.Event.subscribe('auth.sessionChange', function(data) {
+        config.throttlingFactor = VGS._track_throttle;
+        //Listen to sessionChange event, always triggered and sometimes multiple. Avoids multiple event placements.
+        spid = data.session ? data.session.userId : 0;
+        if (Math.random() <= config.throttlingFactor && !executed) { report(); executed = true; }
+    });
+}(window, VGS));
