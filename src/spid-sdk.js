@@ -763,7 +763,6 @@ var VGS = VGS || {
 
         VGS.Ajax.send('ajax/traits.js?t=' + traits + '&callback='+id);
     },
-    setManualEvent : function(){},
     getLoginURI : function(redirect_uri, client_id) {
         var params = {
             'response_type': 'code',
