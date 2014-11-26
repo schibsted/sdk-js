@@ -229,9 +229,9 @@
         // TODO: Add page read event. Triggered when a user has been on the page for more than x sec and scrolled?
     }
 
-    vgs.getPulseTrack = function(options){
+    vgs.setManualEvent = function(name, options){
         report();
-        report.pulse(JSON.stringify(options));
+        report.pulse({name: name, cust: JSON.stringify(options)});
     };
 
     var spid,
