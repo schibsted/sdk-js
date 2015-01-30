@@ -4,7 +4,7 @@
     var config = {
         pulseServer      : (win.location.protocol.substr(0,5) === 'https' ? 'https' : 'http' ) +'://pulse.spid.se/pulse',
         cookiePrefix     : 'spd_pls_',
-        throttlingFactor : 1.0
+        throttlingFactor : vgs._track_throttle || 1.0
     };
 
     /**
@@ -98,7 +98,13 @@
         return value;
     }
 
+    function throttle() {
+        return Math.random() <= config.throttlingFactor;
+    }
+
     function report() {
+
+        var user = { user_id: 0, distinct_id: 0 };
 
         //Update cookies and get load datetime
         var uid = updateCookie(config.cookiePrefix + 'uid', 365, 0),
@@ -145,6 +151,11 @@
             return win.encodeURIComponent(value);
         }
 
+        function setUser(user_id, distinct_id) {
+            user.user_id = user_id || user.user_id;
+            user.distinct_id = distinct_id || user.distinct_id;
+        }
+
         /**
         * Sends ping to pulse server, through an img and query params
         * @param    attr    object  contain key/val pairs to add to ping
@@ -152,7 +163,7 @@
         function pulse(attr) {
             // Opt-out for anonymous and logged in users.
             vgs.log('pulse: vgs._track_opt_out', 'log');
-            if (vgs._track_opt_out || (spid === 0 && vgs._track_anon_opt_out)) {
+            if (vgs._track_opt_out || (!user.user_id && vgs._track_anon_opt_out)) {
                 return null;
             }
             var meta_info = get_meta_tags(win);
@@ -162,8 +173,8 @@
                     sid: sid,                                                 // session id
                     a: pageLoadTime,                                          // arrive time
                     t: config.throttlingFactor,                               // throttle
-                    spid: spid,                                               // user_id from SPiD
-                    did: distinct_id,                                         // distinct_id
+                    spid: user.user_id,                                       // user_id from SPiD
+                    did: user.distinct_id,                                    // distinct_id
                     cid: vgs.client_id,                                       // client_id
                     ti: safe_url(win.document.title),                         // document title
                     ref: safe_url(win.document.referrer),                     // document referer
@@ -197,50 +208,63 @@
             (new Image()).src = config.pulseServer + '?' + query.join('&');
         }
 
-        report.pulse = pulse;
-
-        // Main app. Place event handlers and callbacks to send pulse
-        var triggered = false;
-        on('a', 'click', function() {
-            //Listener for link clicks. If link clicked, avoid unload event
-            var link = this.getAttribute('href');
-            if(link.substr(0,4) === 'http') {
-                //Only send links that starts with http, encoded. Also supply l for leave.
-                pulse({name: 'page_exit', toUrl: win.encodeURIComponent(link), l: (new Date()).getTime()});
-                triggered = true;
-            }
-        });
-
-        // Issue: This event is not triggered when you close a tab or the browser, so you loose all the one-page readers.
-        on(win, 'unload', function() {
-            //Only trigger if not already triggered by link
-            if(!triggered) {
-                pulse({name: 'page_exit', l: (new Date()).getTime()});
-            }
-        });
-
-        vgs.Event.subscribe('auth.visitor', function(data) {
-            vgs.log(data);
-            distinct_id = data.uid;
-            spid = data.user_id;
-            pulse({name: 'page_entry', r: (new Date()).getTime()});
-        });
-
-        // TODO: Add page read event. Triggered when a user has been on the page for more than x sec and scrolled?
+        return {
+            pulse: pulse,
+            setUser: setUser
+        };
     }
 
+    var reporter = report(),
+        triggered = false;
+
+    // Place listener for clicks on a-tags
+    on('a', 'click', function() {
+        if (!throttle()) {
+            return;
+        }
+
+        //Listener for link clicks. If link clicked, avoid unload event
+        var link = this.getAttribute('href');
+        if (!link || link.substr(0,4) !== 'http') {
+            //Only send links that starts with http
+            return;
+        }
+
+        // Supply l for leave.
+        reporter.pulse({name: 'page_exit', toUrl: win.encodeURIComponent(link), l: (new Date()).getTime()});
+        triggered = true;
+    });
+
+    // Place listener on unload, to trigger on exit
+    // Issue: This event is not triggered when you close a tab or the browser, so you loose all the one-page readers.
+    on(win, 'unload', function() {
+        if (!throttle() && !triggered) {
+            return;
+        }
+        reporter.pulse({name: 'page_exit', l: (new Date()).getTime()});
+    });
+
+    vgs.Event.subscribe('auth.visitor', function(data) {
+        if (!throttle()) {
+            return;
+        }
+        reporter.setUser(data.user_id, data.uid);
+        reporter.pulse({name: 'page_entry', r: (new Date()).getTime()});
+    });
+
+    vgs.Event.subscribe('auth.sessionChange', function(data) {
+        if (!throttle()) {
+            return;
+        }
+        if (data.session) {
+            reporter.setUser(data.session.userId);
+        }
+        reporter.pulse();
+    });
+
+    // Add custom event tracking function to VGS
     vgs.Event.track = function(name, options){
-        report();
-        report.pulse({name: name, cust: JSON.stringify(options)});
+        reporter.pulse({name: name, cust: JSON.stringify(options)});
     };
 
-    var spid,
-        distinct_id,
-        executed = false;
-    vgs.Event.subscribe('auth.sessionChange', function(data) {
-        config.throttlingFactor = VGS._track_throttle;
-        //Listen to sessionChange event, always triggered and sometimes multiple. Avoids multiple event placements.
-        spid = data.session ? data.session.userId : 0;
-        if (Math.random() <= config.throttlingFactor && !executed) { report(); executed = true; }
-    });
 }(window, VGS));
