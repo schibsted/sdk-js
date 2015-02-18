@@ -252,16 +252,6 @@
         reporter.pulse({name: 'page_entry', r: (new Date()).getTime()});
     });
 
-    vgs.Event.subscribe('auth.sessionChange', function(data) {
-        if (!throttle()) {
-            return;
-        }
-        if (data.session) {
-            reporter.setUser(data.session.userId);
-        }
-        reporter.pulse();
-    });
-
     // Add custom event tracking function to VGS
     vgs.Event.track = function(name, options){
         reporter.pulse({name: name, cust: JSON.stringify(options)});
