@@ -469,7 +469,7 @@ var VGS = VGS || {
                      *
                      * @event auth.visitor
                      */
-                    response.visitor.status = "1";
+                    response.visitor.status = "Logged in";
                     VGS.Event.fire('auth.visitor', response.visitor);
                 }
                 VGS.Auth.valid = response.result;
@@ -487,7 +487,7 @@ var VGS = VGS || {
                 *
                 * @event auth.visitor
                  */
-                response.visitor.status = "2";
+                response.visitor.status = "SPiD user";
                 VGS.Event.fire('auth.visitor', response.visitor);
                 
             } else if (response.error && response.response) {
@@ -497,7 +497,7 @@ var VGS = VGS || {
                      *
                      * @event auth.visitor
                      */
-                    response.response.visitor.status = "3"; 
+                    response.response.visitor.status = "Not logged in"; 
                     VGS.Event.fire('auth.visitor', response.response.visitor);
                 }
                 // There is an error and a response indicating the session status
