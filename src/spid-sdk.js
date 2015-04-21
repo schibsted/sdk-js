@@ -781,7 +781,6 @@ var VGS = VGS || {
     },
     getLogoutURI : function(redirect_uri, client_id) {
         var params = {
-            'response_type': 'code',
             'client_id': client_id || VGS.client_id,
             'redirect_uri': encodeURIComponent(redirect_uri || window.location.toString())
         };
