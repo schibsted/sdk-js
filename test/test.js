@@ -36,9 +36,9 @@ describe('VGS', function() {
                 assert.equal(VGS.getSignupURI(), VGS.Ajax.buildUrl('flow/signup', {'response_type': 'code','client_id':setup.client_id,'redirect_uri': encodeURIComponent(window.location.toString()) }));
             });
             it('VGS.getLogoutURI should return correctly formatted URL for logout', function() {
-                assert.equal(VGS.getLogoutURI('http://random.com', '123' ), VGS.Ajax.buildUrl('logout', {'response_type': 'code','client_id':'123','redirect_uri': encodeURIComponent('http://random.com') }));
-                assert.equal(VGS.getLogoutURI(null, '123'), VGS.Ajax.buildUrl('logout', {'response_type': 'code','client_id':'123','redirect_uri': encodeURIComponent(window.location.toString()) }));
-                assert.equal(VGS.getLogoutURI(), VGS.Ajax.buildUrl('logout', {'response_type': 'code','client_id':setup.client_id,'redirect_uri': encodeURIComponent(window.location.toString()) }));
+                assert.equal(VGS.getLogoutURI('http://random.com', '123' ), VGS.Ajax.buildUrl('logout', {'client_id':'123','redirect_uri': encodeURIComponent('http://random.com') }));
+                assert.equal(VGS.getLogoutURI(null, '123'), VGS.Ajax.buildUrl('logout', {'client_id':'123','redirect_uri': encodeURIComponent(window.location.toString()) }));
+                assert.equal(VGS.getLogoutURI(), VGS.Ajax.buildUrl('logout', {'client_id':setup.client_id,'redirect_uri': encodeURIComponent(window.location.toString()) }));
             });
             it('VGS.getAccountURI should return correctly formatted URL for account summary', function() {
                 assert.equal(VGS.getAccountURI('http://random.com', '123' ), VGS.Ajax.buildUrl('account/summary', {'response_type': 'code','client_id':'123','redirect_uri': encodeURIComponent('http://random.com') }));
