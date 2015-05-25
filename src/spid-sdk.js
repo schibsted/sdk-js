@@ -257,7 +257,6 @@ var VGS = VGS || {
             if (VGS.Ajax.requestQueue.length > 0) {
                 VGS.processing('on');
                 var connectionCode = VGS.Ajax.requestQueue[0].connectionUrl;
-                parent.triggerResponse = null;
                 VGS.Ajax.createScriptObject(connectionCode);
                 VGS.Ajax.serverTimeoutTime = VGS.Ajax.now() + VGS.Ajax.timeoutPeriod;
             }
@@ -281,8 +280,6 @@ var VGS = VGS || {
                 if (VGS.Ajax.serverTimeoutTime <= VGS.Ajax.now()) {
                     VGS.Ajax.stopPolling();
                     VGS.Ajax.failure('Server Timed Out');
-                } else if (parent.triggerResponse != null) {
-                    parent.triggerResponse();
                 }
             } else if (VGS.Ajax.requestQueue.length > 0) {
                 // Queue size validation in order to avoid abuse and overload of the platform. Allow max 10 requests in the queue.
