@@ -13,5 +13,8 @@
   "browser": true,
   "trailing": true,
   "quotmark": "single",
-  "smarttabs": true
+  "smarttabs": true,
+  "globals": {
+      "module": false
+  }
 }
