@@ -1,4 +1,6 @@
 /*global module:false*/
+var path = require('path');
+
 module.exports = function(grunt) {
 
   // Project configuration.
@@ -65,6 +67,11 @@ module.exports = function(grunt) {
         }
       }
     },
+    shell: {
+      nodeMocha: {
+        command: path.join('node_modules', '.bin', 'mocha') + ' --reporter spec test/test.node'
+      }
+    },
     watch: {
       gruntfile: {
         files: '<%= jshint.gruntfile.src %>',
@@ -87,8 +94,10 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-mocha');
+  grunt.loadNpmTasks('grunt-shell-spawn');
 
   // Default task.
   grunt.registerTask('default', ['jshint:sdk', 'jshint:tracker', 'jshint:testfile', 'concat', 'uglify']);
+  grunt.registerTask('test', ['mocha', 'shell:nodeMocha'])
 
 };

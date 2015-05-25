@@ -8,7 +8,7 @@
     var VGS = {
         version: '<%= pkg.version %>',
         client_id: false,
-        redirect_uri: window.location.toString(),
+        redirect_uri: typeof window !== 'undefined' ? window.location.toString() : '',
 
         _session: null,
         _sessionInitiated: false,
@@ -1044,12 +1044,14 @@
         }
     };
 
-    window.setTimeout(function () {
-        if (typeof (window.vgsAsyncInit) === 'function' && !window.vgsAsyncInit.hasRun) {
-            window.vgsAsyncInit.hasRun = true;
-            window.vgsAsyncInit();
-        }
-    }, 0);
+    if (typeof window !== 'undefined') {
+        window.setTimeout(function () {
+            if (typeof (window.vgsAsyncInit) === 'function' && !window.vgsAsyncInit.hasRun) {
+                window.vgsAsyncInit.hasRun = true;
+                window.vgsAsyncInit();
+            }
+        }, 0);
+    }
 
     return VGS;
 });
