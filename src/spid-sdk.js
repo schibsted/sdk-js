@@ -462,11 +462,8 @@ var VGS = VGS || {
 
             // Trigger visitor events
             VGS.log(response, 'log');
-            if (response.visitor || response.response) {
-                var visitor = response.visitor || response.response.visitor;
-                if (visitor) {
-                    VGS.Event.fire('auth.visitor', visitor);
-                }
+            if (response.visitor || (response.response && response.response.visitor)) {
+                VGS.Event.fire('auth.visitor', response.visitor || response.response.visitor);
             }
 
             if (response.result) {
