@@ -462,15 +462,14 @@ var VGS = VGS || {
 
             // Trigger visitor events
             VGS.log(response, 'log');
-            if (response.result) {
-                if (typeof (response.visitor) !== 'undefined') {
-                    /**
-                     * Fired when there is a identified visitor.
-                     *
-                     * @event auth.visitor
-                     */
-                    VGS.Event.fire('auth.visitor', response.visitor);
+            if (response.visitor || response.response) {
+                var visitor = response.visitor || response.response.visitor;
+                if (visitor) {
+                    VGS.Event.fire('auth.visitor', visitor);
                 }
+            }
+
+            if (response.result) {
                 VGS.Auth.valid = response.result;
                 VGS.log('SUCCESS: ' + VGS.Auth.valid, 'log');
                 if (VGS.Auth.valid && typeof (response.userId) !== 'undefined') {
@@ -481,14 +480,6 @@ var VGS = VGS || {
                     VGS.Auth.setSession(null, 'unknown');
                 }
             } else if (response.error && response.response) {
-                if (typeof (response.response.visitor) !== 'undefined') {
-                    /**
-                     * Fired when there is a identified visitor.
-                     *
-                     * @event auth.visitor
-                     */
-                    VGS.Event.fire('auth.visitor', response.response.visitor);
-                }
                 // There is an error and a response indicating the session status
                 if(response.error.type === 'LoginException') {
                     VGS.log(response.error, 'log');
