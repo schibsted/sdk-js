@@ -33,7 +33,7 @@
                 */
                 //Listen to VGS.error message, to set login/register button if something goes wrong
                 VGS.Event.subscribe('VGS.error', function(data) { getLoggedInUser(data); });
-                VGS.init({client_id: '4d00e8d6bf92fc8648000000', server: 'stage.payment.schibsted.se', prod:false, logging:true});
+                VGS.init({client_id: '4d00e8d6bf92fc8648000000', server: 'identity-pre.schibsted.com', logging:true});
             });
         } catch (error) {
             alert(error);
