@@ -95,7 +95,48 @@ describe('SPiD.Persist', function() {
                 assert.equal('key', key);
                 done();
             };
-            SPiD.Persist.clear("key");
+            SPiD.Persist.clear('key');
+        });
+    });
+
+    describe(' with cache setup ', function() {
+        var SPiDCache;
+        before(function() {
+            var cacheSetup = setup;
+            cacheSetup.storage = 'cache';
+            SPiD.init(cacheSetup);
+            SPiDCache = SPiD.Cache;
+        });
+
+        it('should have set/get/clear methods ', function() {
+            assert.isFunction(SPiD.Persist.get);
+            assert.isFunction(SPiD.Persist.set);
+            assert.isFunction(SPiD.Persist.clear);
+        });
+
+        it('should have a get method that calls through to SPiD.Cache ', function(done) {
+            SPiD.Cache.get = function(key) {
+                assert.equal('some', key);
+                done();
+            };
+            SPiD.Persist.get('some');
+        });
+
+        it('should have a set method that calls through to SPiD.Cache ', function(done) {
+            SPiD.Cache.set = function(key, value) {
+                assert.equal('key', key);
+                assert.equal('value', value);
+                done();
+            };
+            SPiD.Persist.set('key', 'value');
+        });
+
+        it('should have a clear method that calls through to SPiD.Cache', function(done) {
+            SPiD.Cache.clear = function(key) {
+                assert.equal('key', key);
+                done();
+            };
+            SPiD.Persist.clear('key');
         });
     });
 

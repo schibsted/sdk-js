@@ -1,6 +1,5 @@
 /*global SPiD:false*/
-;
-(function(exports) {
+;(function(exports) {
 
     var noop = function() {
     };

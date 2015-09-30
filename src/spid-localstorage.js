@@ -1,6 +1,5 @@
 /*global SPiD:false*/
-;
-(function(exports) {
+;(function(exports) {
 
     var logger = exports.Log,
         keyPrefix = "SPID_",
