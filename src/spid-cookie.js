@@ -55,12 +55,6 @@
         return 'spid_js_' + (options.prod ? '' : 'test_') + options.client_id;
     }
 
-    function enabled() {
-        var options = exports.options();
-        //Double negative to force boolean
-        return !!options.cookie;
-    }
-
     function _setRaw(name, value, expiresIn, domain) {
 
         var date = new Date();
@@ -80,7 +74,6 @@
         set: set,
         get: get,
         clear: clear,
-        name: name,
-        enabled: enabled
+        name: name
     };
 }(SPiD));

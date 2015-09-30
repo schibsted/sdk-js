@@ -21,11 +21,6 @@ describe('SPiD.Cookie', function() {
                 'spid_js_'+setup.client_id
             );
         });
-        it('SPiD.Cookie.enabled should return false', function() {
-            assert.isFalse(
-                SPiD.Cookie.enabled()
-            );
-        });
     });
 
     describe('SPiD.Cookie Stage', function() {
@@ -39,13 +34,6 @@ describe('SPiD.Cookie', function() {
                 'spid_js_test_'+setup.client_id
             );
         });
-
-        it('SPiD.Cookie.enabled should return true', function() {
-            assert.isTrue(
-                SPiD.Cookie.enabled()
-            );
-        });
-
         it('SPiD.Cookie.encode should return escaped JSON', function() {
             assert.equal(
                 SPiD.Cookie.encode({str:'val',test:true}),
