@@ -5,6 +5,7 @@
         throw new Error('SPiD.Event is not loaded');
     }
 
+    var _sessionInitiatedSent = false;
 
     function session(previous, current) {
         //Respons contains a visitor
@@ -31,10 +32,27 @@
         if(current.userId || previous.userId) {
             exports.Event.fire('SPiD.sessionChange', current);
         }
+
+        // No user neither before nor after
+        if(!(current.userId || previous.userId)) {
+            exports.Event.fire('SPiD.notLoggedin', current);
+        }
+
+        // Fired when the session is successfully initiated for the first time
+        if(current.userId && !_sessionInitiatedSent) {
+            _sessionInitiatedSent = true;
+            exports.Event.fire('SPiD.sessionInit', current);
+        }
+        // TODO: auth.statusChange / VGS.loginStatus?
+    }
+
+    function sessionError(err) {
+        exports.Event.fire('SPiD.error', {'type': 'communication', 'description':err});
     }
 
     exports.EventTrigger = {
-        session: session
+        session: session,
+        sessionError: sessionError
     };
 
 }(SPiD));

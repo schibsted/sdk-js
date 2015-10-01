@@ -52,8 +52,13 @@
             },
             handleException = function(err, data) {
                 if(err && err.type === "LoginException") {
+                    if(that.Event) {
+                        that.Event.fire('SPiD.loginException');
+                    }
                     //Fallback to core
                     return that.Talk.request(that.coreEndpoint(), null, {autologin:1}, handleResponse);
+                } else if(err && that.EventTrigger) {
+                    that.EventTrigger.sessionError(err);
                 }
                 handleResponse(err, data);
             };
@@ -70,7 +75,8 @@
 
     function hasProduct(productId, callback) {
         var cache = this.Persist,
-            util = this.Util;
+            util = this.Util,
+            that = this;
         callback = callback || function() {};
         if(cache) {
             var cacheVal = cache.get('prd_{id}'.replace('{id}', productId));
@@ -83,6 +89,12 @@
                 data.refreshed = util.now();
                 cache.set('prd_{id}'.replace('{id}', productId), data);
             }
+            if(that.Event && !err && !!data.result) {
+                that.Event.fire('SPiD.hasProduct', {
+                    productId: productId,
+                    result: data.result
+                });
+            }
             callback(err, data);
         };
         this.Talk.request(this.server(), 'ajax/hasproduct.js', {product_id: productId}, cb);
@@ -90,7 +102,8 @@
 
     function hasSubscription(productId, callback) {
         var cache = this.Persist,
-            util = this.Util;
+            util = this.Util,
+            that = this;
         callback = callback || function() {};
         if(cache) {
             var cacheVal = cache.get('sub_{id}'.replace('{id}', productId));
@@ -102,6 +115,12 @@
             if(cache && !err && !!data.result) {
                 data.refreshed = util.now();
                 cache.set('sub_{id}'.replace('{id}', productId), data);
+            }
+            if(that.Event && !err && !!data.result) {
+                that.Event.fire('SPiD.hasSubscription', {
+                    subscriptionId: productId,
+                    result: data.result
+                });
             }
             callback(err, data);
         };
