@@ -46,7 +46,7 @@
             },
             handleResponse = function(err, data) {
                 if(that.Persist && !err && !!data.result) {
-                    that.Persist.set("Session", data);
+                    that.Persist.set("Session", data, data.expiresIn);
                 }
                 respond(err, data);
             },

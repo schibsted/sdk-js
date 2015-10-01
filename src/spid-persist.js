@@ -18,8 +18,8 @@
         get: function(key) {
             getPersistenceModule().get(key);
         },
-        set: function(key, value) {
-            getPersistenceModule().set(key, value);
+        set: function(key, value, expiresIn) {
+            getPersistenceModule().set(key, value, expiresIn);
         },
         clear: function(key) {
             getPersistenceModule().clear(key);

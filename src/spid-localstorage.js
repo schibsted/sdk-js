@@ -2,7 +2,7 @@
 ;(function(exports) {
 
     var logger = exports.Log,
-        keyPrefix = "SPID_",
+        keyPrefix = "SPiD_",
         enabled = true;
 
     function decode(value) {
@@ -19,15 +19,25 @@
 
     function get(key) {
         try {
-            return decode(window.localStorage.getItem(_toKey(key)));
+            var storedItem = decode(window.localStorage.getItem(_toKey(key)));
+            if (isExpired(storedItem)) {
+                clear(key);
+                return null;
+            }
+            return storedItem;
         } catch(e) {
             logger.info(e);
         }
         return null;
     }
 
-    function set(key, value) {
+    function set(key, value, expiresInSeconds) {
         try {
+            if(expiresInSeconds) {
+                var date = new Date();
+                date.setTime(date.getTime() + (expiresInSeconds * 1000));
+                value._expires = date;
+            }
             window.localStorage.setItem(_toKey(key), encode(value));
         } catch(e) {
             logger.info(e);
@@ -36,10 +46,17 @@
 
     function clear(key) {
         try {
-            window.localStorage.setItem(_toKey(key), null);
+            window.localStorage.clear(_toKey(key));
         } catch(e) {
             logger.info(e);
         }
+    }
+
+    function isExpired(item) {
+        if(item._expires) {
+            return new Date(item._expires).getTime() < new Date().getTime();
+        }
+        return false;
     }
 
     exports.LocalStorage = {
