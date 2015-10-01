@@ -24,7 +24,7 @@ module.exports = function(grunt) {
           'src/spid-sdk.js',
           'src/spid-log.js',
           'src/spid-util.js',
-          'src/spid-talk.js',
+          'src/spid-talk-backwards-compatible.js',
           'src/spid-cookie.js',
           'src/spid-cache.js',
           'src/spid-uri.js',
