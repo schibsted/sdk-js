@@ -29,7 +29,7 @@
             _options.refresh_timeout = 60000;
         }
         // For a backwards compatible Talk module
-        if(this.Talk.init) {
+        if(this.Talk && this.Talk.init) {
             this.Talk.init(_options);
         }
 

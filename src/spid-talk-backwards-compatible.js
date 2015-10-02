@@ -1,3 +1,4 @@
+/*global SPiD:false*/
 ;(function(exports) {
 
     var logger = exports.Log,
@@ -15,7 +16,8 @@
             serverUrl: '',
             sessionUrl: '',
             timeoutPeriod: 5000, // if a connection goes on for longer than this many milliseconds, then timeout
-            version: '1.0'
+            version: '1.0',
+            testMode: false // If true, this will allow for relative requests to be made. Used for writing tests
         };
 
     function _guid() {
@@ -23,12 +25,12 @@
     }
 
     function _flushQueue() {
-        logger.log('SPiD.Talk.flushQueue()');
+        logger.info('SPiD.Talk.flushQueue()');
         _ajax.requestQueue.length = 0;
     }
 
     function _stopPolling() {
-        logger.log('SPiD.Talk.stopPolling()');
+        logger.info('SPiD.Talk.stopPolling()');
         _ajax.serverTimeoutTime = null;
         _flushQueue();
         if(_ajax.interval) {
@@ -38,9 +40,9 @@
     }
 
     function _startPolling() {
-        logger.log('SPiD.Talk.startPolling()');
+        logger.info('SPiD.Talk.startPolling()');
         if(_ajax.interval == null) {
-            logger.log('polling (re)started');
+            logger.info('polling (re)started');
             _ajax.connections[_ajax.connectionId] = null;
             _poll();
             _ajax.interval = window.setInterval(function() {
@@ -55,12 +57,12 @@
     }
 
     function _poll() {
-        logger.log('SPiD.Talk.poll()');
+        logger.info('SPiD.Talk.poll()');
         if(_ajax.pollingDebugCount === _ajax.pollingDebugThrottle) {
-            logger.log('-- poll [' + _now() + '] (x' + _ajax.pollingDebugCount + ')');
+            logger.info('-- poll [' + _now() + '] (x' + _ajax.pollingDebugCount + ')');
             _ajax.pollingDebugCount = 0;
         } else if(_ajax.pollingDebugFirst) {
-            logger.log('-- poll [' + _now() + ']');
+            logger.info('-- poll [' + _now() + ']');
             _ajax.pollingDebugFirst = false;
             _ajax.pollingDebugCount = 0;
         }
@@ -86,17 +88,16 @@
     }
 
     function _failure(errorMsg) {
-        logger.log('SPiD.Talk.failure("' + errorMsg + '")');
+        logger.info('SPiD.Talk.failure("' + errorMsg + '")');
         if(exports.Event) {
             exports.Event.fire('SPiD.error', {'type': 'communication', 'code': 503, 'description': errorMsg});
         }
     }
 
-
     function _makeRequest() {
-        logger.log('SPiD.Talk.makeRequest()');
+        logger.info('SPiD.Talk.makeRequest()');
         if(_ajax.requestQueue.length > 0) {
-            logger.log('Processing: on'); // fkn dumb
+            logger.info('Processing: on'); // fkn dumb
             var connectionCode = _ajax.requestQueue[0].connectionUrl;
             parent.triggerResponse = null;
             _createScriptObject(connectionCode);
@@ -105,7 +106,7 @@
     }
 
     function _createScriptObject(source) {
-        logger.log('SPiD.Talk.createScriptObject("' + source + '")');
+        logger.info('SPiD.Talk.createScriptObject("' + source + '")');
         _ajax.scriptObject = document.createElement('SCRIPT');
         _ajax.scriptObject.src = source;
         _ajax.scriptObject.type = 'text/javascript';
@@ -114,21 +115,22 @@
         head.appendChild(_ajax.scriptObject);
     }
 
-    function _buildConnectionUrl(queryParam, id) {
+    function _buildConnectionUrl(queryParam, id, allowRelativeUrls) {
         var query = queryParam + '&callback=' + id;
-        logger.log('SPiD.Talk.buildConnectionUrl("' + query + '")');
+        logger.info('SPiD.Talk.buildConnectionUrl("' + query + '")');
         _ajax.connectionId = _ajax.connections.length;
 
         var client_id = exports.options().client_id,
-            redirect_uri = window.location.toString();
+            redirect_uri = window.location.toString(),
+            requestBase = ((query.substr(0, 4) === 'http') || allowRelativeUrls) ? query : _ajax.serverUrl + query;
 
-        var url = ((query.substr(0, 4) === 'http') ? query : _ajax.serverUrl + query) + '&connectionId=' + _ajax.connectionId + '&client_id=' + client_id + '&redirect_uri=' + (encodeURIComponent(redirect_uri));
-        logger.log('-- built url: [' + url + ']');
+        var url = requestBase + '&connectionId=' + _ajax.connectionId + '&client_id=' + client_id + '&redirect_uri=' + (encodeURIComponent(redirect_uri));
+        logger.info('-- built url: [' + url + ']');
         _ajax.requestQueue[_ajax.requestQueue.length] = _makeRequestQueueNode(url);
     }
 
     function _makeRequestQueueNode(url) {
-        logger.log('Creating a new requestQueueNode("' + url + '")');
+        logger.info('Creating a new requestQueueNode("' + url + '")');
         return {
             connectionUrl: url,
             requestSent: false
@@ -136,7 +138,7 @@
     }
 
     function loadingError() {
-        logger.log('SPiD.Talk.loadingError()');
+        logger.info('SPiD.Talk.loadingError()');
         _stopPolling();
         _failure('Server Timed Out');
     }
@@ -145,8 +147,8 @@
         // Add the callback to the callbacks object
         var id = _guid();
         _callbacks[id] = callback;
-        logger.log('SPiD.Talk.send("' + query + '")');
-        _buildConnectionUrl(query, id);
+        logger.info('SPiD.Talk.send("' + query + '")');
+        _buildConnectionUrl(query, id, _ajax.testMode);
         _startPolling();
     }
 
@@ -159,23 +161,29 @@
         } else {
             _ajax.sessionUrl = (options.https ? 'https' : 'http') + '://' + options.server + '/ajax/hasSession.js';
         }
+        _ajax.testMode = options._testMode;
     }
 
     function _removeScriptObject() {
-        logger.log('SPiD.Talk.removeScriptObject()', 'log');
+        logger.info('SPiD.Talk.removeScriptObject()', 'log');
         _ajax.scriptObject.parentNode.removeChild(_ajax.scriptObject);
         _ajax.scriptObject = null;
     }
 
     function _responseReceived() {
-        logger.log('SPiD.Talk.responseReceived()');
-        logger.log('Processing: off');
+        logger.info('SPiD.Talk.responseReceived()');
+        logger.info('Processing: off');
         _ajax.requestQueue.shift();
         _ajax.serverTimeoutTime = null;
         _removeScriptObject();
     }
 
-    exports.VGS = {
+    function compatSend(server, path, params, callback) {
+        var url = exports.Util.buildUri(server, path, params);
+        send(url, callback);
+    }
+
+    window.VGS = {
         Ajax: {
             responseReceived: _responseReceived
         },
@@ -183,7 +191,11 @@
     };
 
     exports.Talk = {
-        request: send,
+        request: function() {
+            var sendFun = (arguments.length === 2) ? send: compatSend;
+            return sendFun.apply(this, arguments);
+        },
         init: init
     };
-}(window));
+
+}(SPiD));
