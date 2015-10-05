@@ -8,8 +8,8 @@
 describe('SPiD', function() {
 
     var assert = chai.assert;
-    var setup = {client_id : '4d00e8d6bf92fc8648000000', server: 'stage.payment.schibsted.se', prod:false, logging:false, cache:true};
-    var setupProd = {client_id : '4d00e8d6bf92fc8648000000', server: 'payment.schibsted.se', logging:false, refresh_timeout: 100};
+    var setup = {client_id : '4d00e8d6bf92fc8648000000', server: 'identity-pre.schibsted.com', prod:false, logging:false, cache:true, storage: 'cookie'};
+    var setupProd = {client_id : '4d00e8d6bf92fc8648000000', server: 'login.schibsted.com', logging:false, refresh_timeout: 100, storage: 'cookie'};
 
     describe('SPiD.init', function() {
         it('SPiD.init should throw error when missing config', function() {
@@ -29,21 +29,21 @@ describe('SPiD', function() {
         it('SPiD.server should return URL to Core server', function() {
             assert.equal(
                 SPiD.server(),
-                'https://payment.schibsted.se/'
+                'https://login.schibsted.com/'
             );
         });
 
         it('SPiD.sessionEndpoint should return URL to Session server endpoint', function() {
             assert.equal(
                 SPiD.sessionEndpoint(),
-                'https://session.payment.schibsted.se/rpc/hasSession.js'
+                'https://session.login.schibsted.com/rpc/hasSession.js'
             );
         });
 
         it('SPiD.coreEndpoint should return URL to Core Session server endpoint', function() {
             assert.equal(
                 SPiD.coreEndpoint(),
-                'https://payment.schibsted.se/ajax/hasSession.js'
+                'https://login.schibsted.com/ajax/hasSession.js'
             );
         });
     });
@@ -55,20 +55,20 @@ describe('SPiD', function() {
         it('SPiD.server should return URL to Core server', function() {
             assert.equal(
                 SPiD.server(),
-                'https://stage.payment.schibsted.se/'
+                'https://identity-pre.schibsted.com/'
             );
         });
 
         it('SPiD.sessionEndpoint should return URL to Core Session server endpoint', function() {
             assert.equal(
                 SPiD.sessionEndpoint(),
-                'https://stage.payment.schibsted.se/ajax/hasSession.js'
+                'https://identity-pre.schibsted.com/ajax/hasSession.js'
             );
         });
         it('SPiD.coreEndpoint should return URL to Core Session server endpoint', function() {
             assert.equal(
                 SPiD.coreEndpoint(),
-                'https://stage.payment.schibsted.se/ajax/hasSession.js'
+                'https://identity-pre.schibsted.com/ajax/hasSession.js'
             );
         });
     });
@@ -97,18 +97,18 @@ describe('SPiD', function() {
 
     describe('SPiD.hasSession', function() {
         var copy_Talk_request,
-            copy_Cookie_set,
-            copy_Cookie_get;
+            copy_Persist_set,
+            copy_Persist_get;
         before(function() {
             SPiD.init(setupProd);
             copy_Talk_request = SPiD.Talk.request;
-            copy_Cookie_set = SPiD.Cookie.set;
-            copy_Cookie_get = SPiD.Cookie.get;
+            copy_Persist_set = SPiD.Persist.set;
+            copy_Persist_get = SPiD.Persist.get;
         });
 
         it('SPiD.hasSession should call Talk with parameter server, path, params, callback', function() {
             SPiD.Talk.request = function(server, path, param, callback) {
-                assert.equal(server, 'https://session.payment.schibsted.se/rpc/hasSession.js');
+                assert.equal(server, 'https://session.login.schibsted.com/rpc/hasSession.js');
                 assert.isNull(path);
                 assert.equal(param.autologin, 1);
                 assert.isFunction(callback);
@@ -120,7 +120,7 @@ describe('SPiD', function() {
             var calledOnce = false;
             SPiD.Talk.request = function(server, path, param, callback) {
                 if(calledOnce) {
-                    assert.equal(server, 'https://payment.schibsted.se/ajax/hasSession.js');
+                    assert.equal(server, 'https://login.schibsted.com/ajax/hasSession.js');
                     assert.isNull(path);
                     assert.equal(param.autologin, 1);
                     assert.isFunction(callback);
@@ -132,24 +132,27 @@ describe('SPiD', function() {
             SPiD.hasSession(function() {});
         });
 
-        it('SPiD.hasSession should try to set cookie cookie when successful', function() {
+        it('SPiD.hasSession should try to set cookie (or whatever) when successful', function() {
             SPiD.Talk.request = function(server, path, param, callback) {
                 callback(null, {"result":true,"expiresIn":7111,"baseDomain":"sdk.dev","userStatus":"connected","userId":1844813,"id":"4f1e2ae59caf7c2f4a058b76"});
             };
-            SPiD.Cookie.set = function(data) {
+            SPiD.Persist.set = function(key, data) {
+                assert.equal('Session', key);
                 assert.isTrue(data.result);
                 assert.equal(data.userId, 1844813);
             };
             SPiD.hasSession(function() {});
         });
 
-        it('SPiD.hasSession should try to return cookie data without calling Talk', function(done) {
+        it('SPiD.hasSession should try to return persisted data without calling Talk', function(done) {
             SPiD.Talk.request = function() {
                 done(new Error('SPiD.Talk.request called'));
             };
-            SPiD.Cookie.get = function() {
+            SPiD.Persist.get = function(key) {
+                assert.equal('Session', key);
                 return {"result":true,"expiresIn":7111,"baseDomain":"sdk.dev","userStatus":"connected","userId":1844813,"id":"4f1e2ae59caf7c2f4a058b76"};
             };
+
             SPiD.hasSession(function(err, res) {
                 if(!err && res.result && res.userId === 1844813) {
                     done();
@@ -159,8 +162,8 @@ describe('SPiD', function() {
 
         after(function() {
             SPiD.Talk.request = copy_Talk_request;
-            SPiD.Cookie.set = copy_Cookie_set;
-            SPiD.Cookie.get = copy_Cookie_get;
+            SPiD.Persist.set = copy_Persist_set;
+            SPiD.Persist.get = copy_Persist_get;
         });
     });
 
@@ -177,7 +180,7 @@ describe('SPiD', function() {
 
         it('SPiD.hasProduct should call Talk with parameter server, path, params, callback', function() {
             SPiD.Talk.request = function(server, path, param, callback) {
-                assert.equal(server, 'https://stage.payment.schibsted.se/');
+                assert.equal(server, 'https://identity-pre.schibsted.com/');
                 assert.equal(path, 'ajax/hasproduct.js');
                 assert.equal(param.product_id, 10010);
                 assert.isFunction(callback);
@@ -248,7 +251,7 @@ describe('SPiD', function() {
 
         it('SPiD.hasSubscription should call Talk with parameter server, path, params, callback', function() {
             SPiD.Talk.request = function(server, path, param, callback) {
-                assert.equal(server, 'https://stage.payment.schibsted.se/');
+                assert.equal(server, 'https://identity-pre.schibsted.com/');
                 assert.equal(path, 'ajax/hassubscription.js');
                 assert.equal(param.product_id, 10010);
                 assert.isFunction(callback);
@@ -315,7 +318,7 @@ describe('SPiD', function() {
 
         it('SPiD.setTraits should call Talk with parameter server, path, params, callback', function() {
             SPiD.Talk.request = function(server, path, param, callback) {
-                assert.equal(server, 'https://stage.payment.schibsted.se/');
+                assert.equal(server, 'https://identity-pre.schibsted.com/');
                 assert.equal(path, 'ajax/traits.js');
                 assert.equal(param.t, 'traitObject');
                 assert.isFunction(callback);
@@ -334,12 +337,12 @@ describe('SPiD', function() {
         before(function() {
             SPiD.init(setup);
             copy_Talk_request = SPiD.Talk.request;
-            copy_Cookie_clear = SPiD.Cookie.clear;
+            copy_Cookie_clear = SPiD.Persist.clear;
         });
 
         it('SPiD.logout should call Talk with parameter server, path, params, callback', function() {
             SPiD.Talk.request = function(server, path, param, callback) {
-                assert.equal(server, 'https://stage.payment.schibsted.se/');
+                assert.equal(server, 'https://identity-pre.schibsted.com/');
                 assert.equal(path, 'ajax/logout.js');
                 assert.isFunction(callback);
             };
@@ -361,7 +364,8 @@ describe('SPiD', function() {
             SPiD.Talk.request = function(server, path, param, callback) {
                 callback(null, {result:true});
             };
-            SPiD.Cookie.clear = function() {
+            SPiD.Persist.clear = function(name) {
+                assert.equal("Session", name);
                 done();
             };
             SPiD.logout();
@@ -369,7 +373,7 @@ describe('SPiD', function() {
 
         after(function() {
             SPiD.Talk.request = copy_Talk_request;
-            SPiD.Cookie.clear = copy_Cookie_clear;
+            SPiD.Persist.clear = copy_Cookie_clear;
         });
     });
 });

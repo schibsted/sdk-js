@@ -9,8 +9,7 @@
             logging: false,
             prod: true,
             https: true,
-            cookie: true,
-            cache: true,
+            storage: 'localstorage',
             timeout: 15000,
             refresh_timeout: 900000,
             varnish_expiration: null
@@ -46,8 +45,8 @@
                 callback(err, data);
             },
             handleResponse = function(err, data) {
-                if(that.Cookie && that.Cookie.enabled() && !err && !!data.result) {
-                    that.Cookie.set(data);
+                if(that.Persist && !err && !!data.result) {
+                    that.Persist.set("Session", data, data.expiresIn);
                 }
                 respond(err, data);
             },
@@ -59,8 +58,8 @@
                 handleResponse(err, data);
             };
 
-        if(this.Cookie && this.Cookie.enabled()) {
-            var data = this.Cookie.get();
+        if(this.Persist) {
+            var data = this.Persist.get("Session");
             if(data) {
                 _session = data;
                 return respond(null, data);
@@ -70,7 +69,7 @@
     }
 
     function hasProduct(productId, callback) {
-        var cache = this.Cache && this.Cache.enabled() ? this.Cache : null,
+        var cache = this.Persist,
             util = this.Util;
         callback = callback || function() {};
         if(cache) {
@@ -90,7 +89,7 @@
     }
 
     function hasSubscription(productId, callback) {
-        var cache = this.Cache && this.Cache.enabled() ? this.Cache : null,
+        var cache = this.Persist,
             util = this.Util;
         callback = callback || function() {};
         if(cache) {
@@ -117,8 +116,8 @@
     function logout(callback) {
         var that = this;
         var cb = function(err, data) {
-            if(data.result && that.Cookie && that.Cookie.enabled()) {
-                that.Cookie.clear();
+            if(data.result) {
+                that.Persist.clear("Session");
             }
             if(callback) {
                 callback(err, data);
