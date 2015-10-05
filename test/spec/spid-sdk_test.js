@@ -8,8 +8,8 @@
 describe('SPiD', function() {
 
     var assert = chai.assert;
-    var setup = {client_id : '4d00e8d6bf92fc8648000000', server: 'stage.payment.schibsted.se', prod:false, logging:false, cache:true, storage: 'cookie'};
-    var setupProd = {client_id : '4d00e8d6bf92fc8648000000', server: 'payment.schibsted.se', logging:false, refresh_timeout: 100, storage: 'cookie'};
+    var setup = {client_id : '4d00e8d6bf92fc8648000000', server: 'identity-pre.schibsted.com', prod:false, logging:false, cache:true, storage: 'cookie'};
+    var setupProd = {client_id : '4d00e8d6bf92fc8648000000', server: 'login.schibsted.com', logging:false, refresh_timeout: 100, storage: 'cookie'};
 
     describe('SPiD.init', function() {
         it('SPiD.init should throw error when missing config', function() {
@@ -29,21 +29,21 @@ describe('SPiD', function() {
         it('SPiD.server should return URL to Core server', function() {
             assert.equal(
                 SPiD.server(),
-                'https://payment.schibsted.se/'
+                'https://login.schibsted.com/'
             );
         });
 
         it('SPiD.sessionEndpoint should return URL to Session server endpoint', function() {
             assert.equal(
                 SPiD.sessionEndpoint(),
-                'https://session.payment.schibsted.se/rpc/hasSession.js'
+                'https://session.login.schibsted.com/rpc/hasSession.js'
             );
         });
 
         it('SPiD.coreEndpoint should return URL to Core Session server endpoint', function() {
             assert.equal(
                 SPiD.coreEndpoint(),
-                'https://payment.schibsted.se/ajax/hasSession.js'
+                'https://login.schibsted.com/ajax/hasSession.js'
             );
         });
     });
@@ -55,20 +55,20 @@ describe('SPiD', function() {
         it('SPiD.server should return URL to Core server', function() {
             assert.equal(
                 SPiD.server(),
-                'https://stage.payment.schibsted.se/'
+                'https://identity-pre.schibsted.com/'
             );
         });
 
         it('SPiD.sessionEndpoint should return URL to Core Session server endpoint', function() {
             assert.equal(
                 SPiD.sessionEndpoint(),
-                'https://stage.payment.schibsted.se/ajax/hasSession.js'
+                'https://identity-pre.schibsted.com/ajax/hasSession.js'
             );
         });
         it('SPiD.coreEndpoint should return URL to Core Session server endpoint', function() {
             assert.equal(
                 SPiD.coreEndpoint(),
-                'https://stage.payment.schibsted.se/ajax/hasSession.js'
+                'https://identity-pre.schibsted.com/ajax/hasSession.js'
             );
         });
     });
@@ -108,7 +108,7 @@ describe('SPiD', function() {
 
         it('SPiD.hasSession should call Talk with parameter server, path, params, callback', function() {
             SPiD.Talk.request = function(server, path, param, callback) {
-                assert.equal(server, 'https://session.payment.schibsted.se/rpc/hasSession.js');
+                assert.equal(server, 'https://session.login.schibsted.com/rpc/hasSession.js');
                 assert.isNull(path);
                 assert.equal(param.autologin, 1);
                 assert.isFunction(callback);
@@ -120,7 +120,7 @@ describe('SPiD', function() {
             var calledOnce = false;
             SPiD.Talk.request = function(server, path, param, callback) {
                 if(calledOnce) {
-                    assert.equal(server, 'https://payment.schibsted.se/ajax/hasSession.js');
+                    assert.equal(server, 'https://login.schibsted.com/ajax/hasSession.js');
                     assert.isNull(path);
                     assert.equal(param.autologin, 1);
                     assert.isFunction(callback);
@@ -180,7 +180,7 @@ describe('SPiD', function() {
 
         it('SPiD.hasProduct should call Talk with parameter server, path, params, callback', function() {
             SPiD.Talk.request = function(server, path, param, callback) {
-                assert.equal(server, 'https://stage.payment.schibsted.se/');
+                assert.equal(server, 'https://identity-pre.schibsted.com/');
                 assert.equal(path, 'ajax/hasproduct.js');
                 assert.equal(param.product_id, 10010);
                 assert.isFunction(callback);
@@ -251,7 +251,7 @@ describe('SPiD', function() {
 
         it('SPiD.hasSubscription should call Talk with parameter server, path, params, callback', function() {
             SPiD.Talk.request = function(server, path, param, callback) {
-                assert.equal(server, 'https://stage.payment.schibsted.se/');
+                assert.equal(server, 'https://identity-pre.schibsted.com/');
                 assert.equal(path, 'ajax/hassubscription.js');
                 assert.equal(param.product_id, 10010);
                 assert.isFunction(callback);
@@ -318,7 +318,7 @@ describe('SPiD', function() {
 
         it('SPiD.setTraits should call Talk with parameter server, path, params, callback', function() {
             SPiD.Talk.request = function(server, path, param, callback) {
-                assert.equal(server, 'https://stage.payment.schibsted.se/');
+                assert.equal(server, 'https://identity-pre.schibsted.com/');
                 assert.equal(path, 'ajax/traits.js');
                 assert.equal(param.t, 'traitObject');
                 assert.isFunction(callback);
@@ -342,7 +342,7 @@ describe('SPiD', function() {
 
         it('SPiD.logout should call Talk with parameter server, path, params, callback', function() {
             SPiD.Talk.request = function(server, path, param, callback) {
-                assert.equal(server, 'https://stage.payment.schibsted.se/');
+                assert.equal(server, 'https://identity-pre.schibsted.com/');
                 assert.equal(path, 'ajax/logout.js');
                 assert.isFunction(callback);
             };

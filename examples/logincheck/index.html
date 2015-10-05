@@ -10,7 +10,7 @@
 	<script type="text/javascript">
 		try {
 			function getLoggedInUser(response) {
-				SPID.Log.info(response);
+				SPiD.Log.info(response);
 				if (typeof (response.session) === 'object' && response.status === 'connected') {
 					// logged in and connected user
 					$("#content").html('Logged in as <a href="'+ SPiD.Uri.account()  +'">'+response.session.displayName+'</a> | <a href="javascript:;" onclick="SPiD.logout();">Logg ut</a>');
@@ -36,11 +36,11 @@
                     getLoggedInUser(data);
                 });
 
-                SPiD.init({client_id: '4d00e8d6bf92fc8648000000', server: 'stage.payment.schibsted.se', prod:false, logging:true});
+                SPiD.init({client_id: '4d00e8d6bf92fc8648000000', server: 'identity-pre.schibsted.com', logging:true});
 
                 SPiD.hasSession(function(err, data) {
-                    SPID.Log.info("Wow ",err);
-                    SPID.Log.info("Such data ",data);
+                    SPiD.Log.info("Wow ",err);
+                    SPiD.Log.info("Such data ",data);
                 });
 
 
