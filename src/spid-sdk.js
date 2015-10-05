@@ -7,7 +7,7 @@
             client_id: null,
 
             logging: false,
-            prod: true,
+            useSessionCluster: true,
             https: true,
             storage: 'localstorage',
             timeout: 15000,
@@ -160,7 +160,7 @@
             return (_options.https ? 'https' : 'http')+'://'+_options.server+'/';
         },
         sessionEndpoint: function() {
-            return (_options.https ? 'https' : 'http') + '://' + (_options.prod ? 'session.'+_options.server+'/rpc/hasSession.js' : _options.server+'/ajax/hasSession.js');
+            return (_options.https ? 'https' : 'http') + '://' + (_options.useSessionCluster ? 'session.'+_options.server+'/rpc/hasSession.js' : _options.server+'/ajax/hasSession.js');
         },
         coreEndpoint: function() {
             return (_options.https ? 'https' : 'http') + '://' + _options.server+'/ajax/hasSession.js';

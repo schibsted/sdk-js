@@ -52,7 +52,7 @@
 
     function name() {
         var options = exports.options();
-        return 'spid_js_' + (options.prod ? '' : 'test_') + options.client_id;
+        return 'spid_js_' + options.client_id;
     }
 
     function _setRaw(name, value, expiresIn, domain) {

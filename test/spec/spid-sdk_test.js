@@ -8,7 +8,7 @@
 describe('SPiD', function() {
 
     var assert = chai.assert;
-    var setup = {client_id : '4d00e8d6bf92fc8648000000', server: 'identity-pre.schibsted.com', prod:false, logging:false, cache:true, storage: 'cookie'};
+    var setup = {client_id : '4d00e8d6bf92fc8648000000', server: 'identity-pre.schibsted.com', useSessionCluster:false, logging:false, cache:true, storage: 'cookie'};
     var setupProd = {client_id : '4d00e8d6bf92fc8648000000', server: 'login.schibsted.com', logging:false, refresh_timeout: 100, storage: 'cookie'};
 
     describe('SPiD.init', function() {
