@@ -4,7 +4,7 @@ var
     _defaults = {
         server: null,
         client_id: null,
-
+        cache: false,
         logging: false,
         useSessionCluster: true,
         https: true,

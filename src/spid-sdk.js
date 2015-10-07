@@ -8,6 +8,7 @@ var
     spidEvent = require('./spid-event'),
     eventTrigger = require('./spid-event-trigger'),
     persist = require('./spid-persist'),
+    cache = require('./spid-cache'),
     talk = require('./spid-talk');
 
 
@@ -68,16 +69,16 @@ function hasSession(callback) {
 function hasProduct(productId, callback) {
     callback = callback || function() {
         };
-    if(persist) {
-        var cacheVal = persist.get('prd_{id}'.replace('{id}', productId));
+    if(cache.enabled()) {
+        var cacheVal = cache.get('prd_{id}'.replace('{id}', productId));
         if(cacheVal && (cacheVal.refreshed + config.options().refresh_timeout) > util.now()) {
             return callback(null, cacheVal);
         }
     }
     var cb = function(err, data) {
-        if(persist && !err && !!data.result) {
+        if(cache.enabled() && !err && !!data.result) {
             data.refreshed = util.now();
-            persist.set('prd_{id}'.replace('{id}', productId), data);
+            cache.set('prd_{id}'.replace('{id}', productId), data);
         }
         if(spidEvent && !err && !!data.result) {
             spidEvent.fire('SPiD.hasProduct', {
@@ -91,17 +92,16 @@ function hasProduct(productId, callback) {
 }
 
 function hasSubscription(productId, callback) {
-    var cache = persist;
     callback = callback || function() {
         };
-    if(cache) {
+    if(cache.enabled()) {
         var cacheVal = cache.get('sub_{id}'.replace('{id}', productId));
         if(cacheVal && (cacheVal.refreshed + config.options().refresh_timeout) > util.now()) {
             return callback(null, cacheVal);
         }
     }
     var cb = function(err, data) {
-        if(cache && !err && !!data.result) {
+        if(cache.enabled() && !err && !!data.result) {
             data.refreshed = util.now();
             cache.set('sub_{id}'.replace('{id}', productId), data);
         }

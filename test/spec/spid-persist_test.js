@@ -86,41 +86,4 @@ describe('SPiD.Persist', function() {
             assert.equal('key', methodSpy.getCall(0).args[0]);
         });
     });
-
-    describe(' with cache setup ', function() {
-        var SPiDCache;
-        before(function() {
-            var cacheSetup = setup;
-            cacheSetup.storage = 'cache';
-            SPiD.init(cacheSetup);
-            SPiDCache = SPiD.Cache;
-        });
-
-        it('should have set/get/clear methods ', function() {
-            assert.isFunction(persist.get);
-            assert.isFunction(persist.set);
-            assert.isFunction(persist.clear);
-        });
-
-        it('should have a get method that calls through to SPiD.Cache ', function() {
-            var methodSpy = sinon.spy(require('../../src/spid-cache'), "get");
-            persist.get('some');
-            assert.equal('some', methodSpy.getCall(0).args[0]);
-        });
-
-        it('should have a set method that calls through to SPiD.Cache ', function() {
-            var methodSpy = sinon.spy(require('../../src/spid-cache'), "set");
-            persist.set('key','value');
-            assert.equal('key', methodSpy.getCall(0).args[0]);
-            assert.equal('value', methodSpy.getCall(0).args[1]);
-        });
-
-        it('should have a clear method that calls through to SPiD.Cache', function() {
-            var methodSpy = sinon.spy(require('../../src/spid-cache'), "clear");
-            persist.clear('key');
-            assert.isTrue(methodSpy.called);
-            assert.equal('key', methodSpy.getCall(0).args[0]);
-        });
-    });
-
 });
