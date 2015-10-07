@@ -14,12 +14,12 @@ function getPersistenceModule() {
 
 module.exports = {
     get: function(key) {
-        getPersistenceModule().get(key);
+        return getPersistenceModule().get(key);
     },
     set: function(key, value, expiresIn) {
-        getPersistenceModule().set(key, value, expiresIn);
+        return getPersistenceModule().set(key, value, expiresIn);
     },
     clear: function(key) {
-        getPersistenceModule().clear(key);
+        return getPersistenceModule().clear(key);
     }
 };

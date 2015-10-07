@@ -116,6 +116,9 @@ function purchaseCampaign(campaign_id, product_id, voucher_code, redirect_uri, c
 }
 
 module.exports = {
+    init: function(opts) {
+        config.init(opts);
+    },
     build: build,
     login: login,
     signup: signup,

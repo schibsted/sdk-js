@@ -17,21 +17,6 @@ function globalExport(global) {
 }
 
 function init(opts, callback) {
-    /*
-    _options = util.copy(options, _defaults);
-    if(!_options['server']) {
-        throw new TypeError('[SPiD] server parameter is required');
-    }
-    if(!_options['client_id']) {
-        throw new TypeError('[SPiD] client_id parameter is required');
-    }
-
-    //Set minimum refresh timeout
-    if(_options.refresh_timeout <= 60000) {
-        _options.refresh_timeout = 60000;
-    }
-    */
-
     config.init(opts);
     if(!config.options().noGlobalExport) {
         globalExport(window);
@@ -47,9 +32,7 @@ function hasSession(callback) {
         };
     var that = this,
         respond = function(err, data) {
-            //if(that.EventTrigger) {
             eventTrigger.session(_session, data);
-            //}
             _session = data;
             callback(err, data);
         },
@@ -144,6 +127,11 @@ function logout(callback) {
         if(data.result) {
             persist.clear("Session");
         }
+
+        if(spidEvent && !err && !!data.result) {
+            spidEvent.fire('SPiD.logout', data);
+        }
+
         if(callback) {
             callback(err, data);
         }
@@ -175,10 +163,7 @@ module.exports = {
     coreEndpoint: function() {
         return (config.options().https ? 'https' : 'http') + '://' + config.options().server + '/ajax/hasSession.js';
     },
-    event: function() {
-        // Expose the Event module (specifically for the "global var" distribution)
-        return spidEvent;
-    },
+    event: spidEvent,
     init: init,
     hasSession: hasSession,
     hasProduct: hasProduct,

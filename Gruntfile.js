@@ -1,16 +1,16 @@
 /*global module:false*/
 module.exports = function(grunt) {
 
-  function webpackCfg(target) {
+  function webpackCfg(target, fileName, entryName) {
+    var entry = {};
+    entry[entryName] = './src/' + fileName +'.js';
     return {
-      entry: {
-        'spid-sdk': './src/spid-sdk.js',
-        'spid-uri': './src/spid-uri.js'
-      },
+      entry: entry,
       output: {
+        library: '[name]',
         libraryTarget: target,
         path: './dist/<%= pkg.version %>/',
-        filename: '[name]-<%= pkg.version %>-' + target + '.js'
+        filename: fileName + '-<%= pkg.version %>-' + target + '.js'
       }
     }
   }
@@ -73,10 +73,20 @@ module.exports = function(grunt) {
       }
     },
 
+    /*
     webpack : {
-      var: webpackCfg('var'),
-      amd: webpackCfg('amd'),
-      commonjs: webpackCfg('commonjs2')
+      var: webpackCfg('var', 'SPiD'),
+      amd: webpackCfg('amd', 'SPiD'),
+      commonjs: webpackCfg('commonjs2', 'SPiD')
+    }
+    */
+    webpack : {
+      varSdk: webpackCfg('var', 'spid-sdk', 'SPiD'),
+      varUri: webpackCfg('var', 'spid-uri', 'SPiD_Uri'),
+      amdSdk: webpackCfg('amd', 'spid-sdk', 'SPiD'),
+      amdUri: webpackCfg('amd', 'spid-uri', 'SPiD_Uri'),
+      commonJsSdk: webpackCfg('commonjs2', 'spid-sdk', 'SPiD'),
+      commonJsUri: webpackCfg('commonjs2', 'spid-uri', 'SPiD_Uri')
     }
   });
 
