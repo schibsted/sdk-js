@@ -35,6 +35,13 @@ describe('SPiD.EventTrigger', function() {
             assert.isTrue(eventSpy.calledWithMatch('SPiD.logout', {"result": false}));
         });
 
+        it('SPiD.EventTrigger.session should trigger SPiD.statusChange when the userStatus session property has changed', function() {
+            var eventTrigger = require('../../src/spid-event-trigger');
+            var current = {"result": false, userStatus: "disconnected"};
+            eventTrigger.session({"userId": 10, userStatus:"connected"}, current);
+            assert.isTrue(eventSpy.calledWithMatch('SPiD.statusChange', current));
+        });
+
         it('SPiD.EventTrigger.session should trigger SPiD.userChange and SPiD.login event when user was logged in and another is not logged in', function() {
             eventTrigger.session({"userId": 10}, {"result": true, "userId": 11});
             assert.isTrue(eventSpy.calledWithMatch('SPiD.login'));

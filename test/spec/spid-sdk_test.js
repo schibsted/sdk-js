@@ -201,22 +201,15 @@ describe('SPiD', function() {
             assert.isTrue(cacheGetStub.calledOnce);
         });
 
-        it.skip('SPiD.hasProduct should not call cache when cache disabled', function(done) {
+        it('SPiD.hasProduct should not call cache when cache disabled', function(done) {
             var _setup = setup();
             _setup.cache = false;
-            SPiD.init(_setup, function() {
-                SPiD.Cache.get = function() {
-                    done(new Error('Called SPiD.Cache.get()'));
-                };
-                SPiD.Cache.set = function() {
-                    done(new Error('Called SPiD.Cache.set()'));
-                };
-                SPiD.Talk.request = function(s, p, pm, cb) {
-                    cb(null, {result:true, productId: 10010});
-                };
-                SPiD.hasProduct(10010, function() {
-                    done();
-                });
+            SPiD.init(_setup);
+            talkRequestStub.onFirstCall().callsArgWith(3, null, {result: true, productId: 10010});
+            SPiD.hasProduct(10010, function() {
+                done();
+                assert.isFalse(cacheGetStub.called);
+                assert.isFalse(cacheSetStub.called);
             });
         });
     });
@@ -270,22 +263,15 @@ describe('SPiD', function() {
             assert.equal(cacheGetStub.getCall(0).args[0], 'sub_10010');
         });
 
-        it.skip('SPiD.hasSubscription should not call cache when cache disabled', function(done) {
+        it('SPiD.hasSubscription should not call cache when cache disabled', function(done) {
             var _setup = setup();
             _setup.cache = false;
-            SPiD.init(_setup, function() {
-                SPiD.Cache.get = function() {
-                    done(new Error('Called SPiD.Cache.get()'));
-                };
-                SPiD.Cache.set = function() {
-                    done(new Error('Called SPiD.Cache.set()'));
-                };
-                SPiD.Talk.request = function(s, p, pm, cb) {
-                    cb(null, {result:true, productId: 10010});
-                };
-                SPiD.hasSubscription(10010, function() {
-                    done();
-                });
+            SPiD.init(_setup);
+            talkRequestStub.onFirstCall().callsArgWith(3, null, {result: true, productId: 10010});
+            SPiD.hasSubscription(10010, function() {
+                assert.isFalse(cacheGetStub.called);
+                assert.isFalse(cacheSetStub.called);
+                done();
             });
         });
     });

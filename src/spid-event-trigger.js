@@ -1,7 +1,8 @@
 /*global require:false, module:false*/
 
 var spidEvent = require('./spid-event'),
-    _sessionInitiatedSent = false;
+    _sessionInitiatedSent = false,
+    _userStatus = 'unknown';
 
 function session(previous, current) {
     //Respons contains a visitor
@@ -39,14 +40,16 @@ function session(previous, current) {
         _sessionInitiatedSent = true;
         spidEvent.fire('SPiD.sessionInit', current);
     }
-    // TODO: auth.statusChange / VGS.loginStatus?
-}
 
-function sessionError(err) {
-    spidEvent.fire('SPiD.error', {'type': 'communication', 'description':err});
+    // Triggered when the userStatus flag in the session has changed
+    if(current.userStatus !== _userStatus) {
+        _userStatus = current.userStatus;
+        spidEvent.fire('SPiD.statusChange', current);
+    }
+
+    // TODO: VGS.loginStatus?
 }
 
 module.exports = {
-    session: session,
-    sessionError: sessionError
+    session: session
 };

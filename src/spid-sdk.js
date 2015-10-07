@@ -45,13 +45,11 @@ function hasSession(callback) {
         },
         handleException = function(err, data) {
             if(err && err.type === "LoginException") {
-                //if(spidEvent) {
                 spidEvent.fire('SPiD.loginException');
-                //}
                 //Fallback to core
                 return talk.request(that.coreEndpoint(), null, {autologin: 1}, handleResponse);
-            } else if(err && eventTrigger) {
-                eventTrigger.sessionError(err);
+            } else if(err) {
+                spidEvent.fire('SPiD.error', err);
             }
             handleResponse(err, data);
         };
@@ -80,7 +78,7 @@ function hasProduct(productId, callback) {
             data.refreshed = util.now();
             cache.set('prd_{id}'.replace('{id}', productId), data);
         }
-        if(spidEvent && !err && !!data.result) {
+        if(!err && !!data.result) {
             spidEvent.fire('SPiD.hasProduct', {
                 productId: productId,
                 result: data.result
@@ -105,7 +103,7 @@ function hasSubscription(productId, callback) {
             data.refreshed = util.now();
             cache.set('sub_{id}'.replace('{id}', productId), data);
         }
-        if(spidEvent && !err && !!data.result) {
+        if(!err && !!data.result) {
             spidEvent.fire('SPiD.hasSubscription', {
                 subscriptionId: productId,
                 result: data.result
@@ -128,7 +126,7 @@ function logout(callback) {
             persist.clear("Session");
         }
 
-        if(spidEvent && !err && !!data.result) {
+        if(!err && !!data.result) {
             spidEvent.fire('SPiD.logout', data);
         }
 
