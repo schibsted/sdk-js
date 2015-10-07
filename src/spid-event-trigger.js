@@ -1,58 +1,52 @@
-/*global SPiD:false*/
-;(function(exports) {
+/*global require:false, module:false*/
 
-    if(!exports.Event) {
-        throw new Error('SPiD.Event is not loaded');
+var spidEvent = require('./spid-event'),
+    _sessionInitiatedSent = false;
+
+function session(previous, current) {
+    //Respons contains a visitor
+    if(current.visitor) {
+        spidEvent.fire('SPiD.visitor', current.visitor);
     }
 
-    var _sessionInitiatedSent = false;
-
-    function session(previous, current) {
-        //Respons contains a visitor
-        if(current.visitor) {
-            exports.Event.fire('SPiD.visitor', current.visitor);
-        }
-
-        //User has created a session, or user is no longer the same
-        if(current.userId && previous.userId !== current.userId) {
-            exports.Event.fire('SPiD.login', current);
-        }
-
-        //User is no longer logged in
-        if(previous.userId && !current.userId) {
-            exports.Event.fire('SPiD.logout', current);
-        }
-
-        //One user was logged in, and it is no longer same user
-        if(previous.userId && current.userId && previous.userId !== current.userId) {
-            exports.Event.fire('SPiD.userChange', current);
-        }
-
-        //There is a user now, or there used to be a user
-        if(current.userId || previous.userId) {
-            exports.Event.fire('SPiD.sessionChange', current);
-        }
-
-        // No user neither before nor after
-        if(!(current.userId || previous.userId)) {
-            exports.Event.fire('SPiD.notLoggedin', current);
-        }
-
-        // Fired when the session is successfully initiated for the first time
-        if(current.userId && !_sessionInitiatedSent) {
-            _sessionInitiatedSent = true;
-            exports.Event.fire('SPiD.sessionInit', current);
-        }
-        // TODO: auth.statusChange / VGS.loginStatus?
+    //User has created a session, or user is no longer the same
+    if(current.userId && previous.userId !== current.userId) {
+        spidEvent.fire('SPiD.login', current);
     }
 
-    function sessionError(err) {
-        exports.Event.fire('SPiD.error', {'type': 'communication', 'description':err});
+    //User is no longer logged in
+    if(previous.userId && !current.userId) {
+        spidEvent.fire('SPiD.logout', current);
     }
 
-    exports.EventTrigger = {
-        session: session,
-        sessionError: sessionError
-    };
+    //One user was logged in, and it is no longer same user
+    if(previous.userId && current.userId && previous.userId !== current.userId) {
+        spidEvent.fire('SPiD.userChange', current);
+    }
 
-}(SPiD));
+    //There is a user now, or there used to be a user
+    if(current.userId || previous.userId) {
+        spidEvent.fire('SPiD.sessionChange', current);
+    }
+
+    // No user neither before nor after
+    if(!(current.userId || previous.userId)) {
+        spidEvent.fire('SPiD.notLoggedin', current);
+    }
+
+    // Fired when the session is successfully initiated for the first time
+    if(current.userId && !_sessionInitiatedSent) {
+        _sessionInitiatedSent = true;
+        spidEvent.fire('SPiD.sessionInit', current);
+    }
+    // TODO: auth.statusChange / VGS.loginStatus?
+}
+
+function sessionError(err) {
+    spidEvent.fire('SPiD.error', {'type': 'communication', 'description':err});
+}
+
+module.exports = {
+    session: session,
+    sessionError: sessionError
+};

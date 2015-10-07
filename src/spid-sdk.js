@@ -1,184 +1,188 @@
-;(function(exports) {
+/*global require:false, module:false*/
+var
+    _version = '<%= pkg.version %>',
+    config = require('./spid-config'),
+    _initiated = false,
+    _session = {},
+    util = require('./spid-util.js'),
+    spidEvent = require('./spid-event'),
+    eventTrigger = require('./spid-event-trigger'),
+    persist = require('./spid-persist'),
+    talk = require('./spid-talk');
 
-    var
-        _version = '<%= pkg.version %>',
-        _defaults = {
-            server: null,
-            client_id: null,
 
-            logging: false,
-            useSessionCluster: true,
-            https: true,
-            storage: 'localstorage',
-            timeout: 15000,
-            refresh_timeout: 900000,
-            varnish_expiration: null
-        },
-        _options = {},
-        _initiated = false,
-        _session = {};
+function globalExport(global) {
+    global.SPiD = global.SPiD || this;
+    global.SPiD.Talk = require('./spid-talk');
+}
 
-    function init(options, callback) {
-        _options = this.Util.copy(options, _defaults);
-        if(!_options['server']) { throw new TypeError('[SPiD] server parameter is required'); }
-        if(!_options['client_id']) { throw new TypeError('[SPiD] client_id parameter is required'); }
-
-        //Set minimum refresh timeout
-        if(_options.refresh_timeout <= 60000) {
-            _options.refresh_timeout = 60000;
-        }
-
-        _initiated = true;
-        if(callback) {
-            callback();
-        }
+function init(opts, callback) {
+    /*
+    _options = util.copy(options, _defaults);
+    if(!_options['server']) {
+        throw new TypeError('[SPiD] server parameter is required');
+    }
+    if(!_options['client_id']) {
+        throw new TypeError('[SPiD] client_id parameter is required');
     }
 
-    function hasSession(callback) {
-        callback = callback || function() {};
-        var that = this,
-            respond = function(err, data) {
-                if(that.EventTrigger) {
-                    that.EventTrigger.session(_session, data);
-                }
-                _session = data;
-                callback(err, data);
-            },
-            handleResponse = function(err, data) {
-                if(that.Persist && !err && !!data.result) {
-                    that.Persist.set("Session", data, data.expiresIn);
-                }
-                respond(err, data);
-            },
-            handleException = function(err, data) {
-                if(err && err.type === "LoginException") {
-                    if(that.Event) {
-                        that.Event.fire('SPiD.loginException');
-                    }
-                    //Fallback to core
-                    return that.Talk.request(that.coreEndpoint(), null, {autologin:1}, handleResponse);
-                } else if(err && that.EventTrigger) {
-                    that.EventTrigger.sessionError(err);
-                }
-                handleResponse(err, data);
-            };
-
-        if(this.Persist) {
-            var data = this.Persist.get("Session");
-            if(data) {
-                _session = data;
-                return respond(null, data);
-            }
-        }
-        this.Talk.request(this.sessionEndpoint(), null, {autologin:1}, handleException);
+    //Set minimum refresh timeout
+    if(_options.refresh_timeout <= 60000) {
+        _options.refresh_timeout = 60000;
     }
+    */
 
-    function hasProduct(productId, callback) {
-        var cache = this.Persist,
-            util = this.Util,
-            that = this;
-        callback = callback || function() {};
-        if(cache) {
-            var cacheVal = cache.get('prd_{id}'.replace('{id}', productId));
-            if(cacheVal && (cacheVal.refreshed + _options.refresh_timeout) > util.now()) {
-                return callback(null, cacheVal);
-            }
-        }
-        var cb = function(err, data) {
-            if(cache && !err && !!data.result) {
-                data.refreshed = util.now();
-                cache.set('prd_{id}'.replace('{id}', productId), data);
-            }
-            if(that.Event && !err && !!data.result) {
-                that.Event.fire('SPiD.hasProduct', {
-                    productId: productId,
-                    result: data.result
-                });
-            }
+    config.init(opts);
+    if(!config.options().noGlobalExport) {
+        globalExport(window);
+    }
+    _initiated = true;
+    if(callback) {
+        callback();
+    }
+}
+
+function hasSession(callback) {
+    callback = callback || function() {
+        };
+    var that = this,
+        respond = function(err, data) {
+            //if(that.EventTrigger) {
+            eventTrigger.session(_session, data);
+            //}
+            _session = data;
             callback(err, data);
-        };
-        this.Talk.request(this.server(), 'ajax/hasproduct.js', {product_id: productId}, cb);
-    }
-
-    function hasSubscription(productId, callback) {
-        var cache = this.Persist,
-            util = this.Util,
-            that = this;
-        callback = callback || function() {};
-        if(cache) {
-            var cacheVal = cache.get('sub_{id}'.replace('{id}', productId));
-            if(cacheVal && (cacheVal.refreshed + _options.refresh_timeout) > util.now()) {
-                return callback(null, cacheVal);
+        },
+        handleResponse = function(err, data) {
+            if(persist && !err && !!data.result) {
+                persist.set("Session", data, data.expiresIn);
             }
+            respond(err, data);
+        },
+        handleException = function(err, data) {
+            if(err && err.type === "LoginException") {
+                //if(spidEvent) {
+                spidEvent.fire('SPiD.loginException');
+                //}
+                //Fallback to core
+                return talk.request(that.coreEndpoint(), null, {autologin: 1}, handleResponse);
+            } else if(err && eventTrigger) {
+                eventTrigger.sessionError(err);
+            }
+            handleResponse(err, data);
+        };
+
+    if(persist) {
+        var data = persist.get("Session");
+        if(data) {
+            _session = data;
+            return respond(null, data);
         }
-        var cb = function(err, data) {
-            if(cache && !err && !!data.result) {
-                data.refreshed = util.now();
-                cache.set('sub_{id}'.replace('{id}', productId), data);
-            }
-            if(that.Event && !err && !!data.result) {
-                that.Event.fire('SPiD.hasSubscription', {
-                    subscriptionId: productId,
-                    result: data.result
-                });
-            }
-            callback(err, data);
+    }
+    talk.request(this.sessionEndpoint(), null, {autologin: 1}, handleException);
+}
+
+function hasProduct(productId, callback) {
+    callback = callback || function() {
         };
-        this.Talk.request(this.server(), 'ajax/hassubscription.js', {product_id: productId}, cb);
+    if(persist) {
+        var cacheVal = persist.get('prd_{id}'.replace('{id}', productId));
+        if(cacheVal && (cacheVal.refreshed + config.options().refresh_timeout) > util.now()) {
+            return callback(null, cacheVal);
+        }
     }
-
-    function setTraits(traits, callback) {
-        callback = callback || function() {};
-        this.Talk.request(this.server(), 'ajax/traits.js', {t: traits}, callback);
-    }
-
-    function logout(callback) {
-        var that = this;
-        var cb = function(err, data) {
-            if(data.result) {
-                that.Persist.clear("Session");
-            }
-            if(callback) {
-                callback(err, data);
-            }
-        };
-        this.Talk.request(this.server(), 'ajax/logout.js', {}, cb);
-    }
-
-
-    exports.SPiD = {
-        version: function() {
-            return _version;
-        },
-        options: function() {
-            return _options;
-        },
-        initiated: function() {
-            return _initiated;
-        },
-        server: function() {
-            return (_options.https ? 'https' : 'http')+'://'+_options.server+'/';
-        },
-        sessionEndpoint: function() {
-            return (_options.https ? 'https' : 'http') + '://' + (_options.useSessionCluster ? 'session.'+_options.server+'/rpc/hasSession.js' : _options.server+'/ajax/hasSession.js');
-        },
-        coreEndpoint: function() {
-            return (_options.https ? 'https' : 'http') + '://' + _options.server+'/ajax/hasSession.js';
-        },
-        init: init,
-        hasSession: hasSession,
-        hasProduct: hasProduct,
-        hasSubscription: hasSubscription,
-        setTraits: setTraits,
-        logout: logout
+    var cb = function(err, data) {
+        if(persist && !err && !!data.result) {
+            data.refreshed = util.now();
+            persist.set('prd_{id}'.replace('{id}', productId), data);
+        }
+        if(spidEvent && !err && !!data.result) {
+            spidEvent.fire('SPiD.hasProduct', {
+                productId: productId,
+                result: data.result
+            });
+        }
+        callback(err, data);
     };
+    talk.request(this.server(), 'ajax/hasproduct.js', {product_id: productId}, cb);
+}
 
-    //Async loader
-    window.setTimeout(function() {
-        if (typeof (window.asyncSPiD) === 'function' && !window.asyncSPiD.hasRun) {
-            window.asyncSPiD();
-            window.asyncSPiD.hasRun = true;
+function hasSubscription(productId, callback) {
+    var cache = persist;
+    callback = callback || function() {
+        };
+    if(cache) {
+        var cacheVal = cache.get('sub_{id}'.replace('{id}', productId));
+        if(cacheVal && (cacheVal.refreshed + config.options().refresh_timeout) > util.now()) {
+            return callback(null, cacheVal);
         }
-    }, 0);
+    }
+    var cb = function(err, data) {
+        if(cache && !err && !!data.result) {
+            data.refreshed = util.now();
+            cache.set('sub_{id}'.replace('{id}', productId), data);
+        }
+        if(spidEvent && !err && !!data.result) {
+            spidEvent.fire('SPiD.hasSubscription', {
+                subscriptionId: productId,
+                result: data.result
+            });
+        }
+        callback(err, data);
+    };
+    talk.request(this.server(), 'ajax/hassubscription.js', {product_id: productId}, cb);
+}
 
-}(window));
+function setTraits(traits, callback) {
+    callback = callback || function() {
+        };
+    talk.request(this.server(), 'ajax/traits.js', {t: traits}, callback);
+}
+
+function logout(callback) {
+    var cb = function(err, data) {
+        if(data.result) {
+            persist.clear("Session");
+        }
+        if(callback) {
+            callback(err, data);
+        }
+    };
+    talk.request(this.server(), 'ajax/logout.js', {}, cb);
+}
+
+//Async loader
+window.setTimeout(function() {
+    if(typeof (window.asyncSPiD) === 'function' && !window.asyncSPiD.hasRun) {
+        window.asyncSPiD();
+        window.asyncSPiD.hasRun = true;
+    }
+}, 0);
+
+module.exports = {
+    version: function() {
+        return _version;
+    },
+    initiated: function() {
+        return _initiated;
+    },
+    server: function() {
+        return (config.options().https ? 'https' : 'http') + '://' + config.options().server + '/';
+    },
+    sessionEndpoint: function() {
+        return (config.options().https ? 'https' : 'http') + '://' + (config.options().useSessionCluster ? 'session.' + config.options().server + '/rpc/hasSession.js' : config.options().server + '/ajax/hasSession.js');
+    },
+    coreEndpoint: function() {
+        return (config.options().https ? 'https' : 'http') + '://' + config.options().server + '/ajax/hasSession.js';
+    },
+    event: function() {
+        // Expose the Event module (specifically for the "global var" distribution)
+        return spidEvent;
+    },
+    init: init,
+    hasSession: hasSession,
+    hasProduct: hasProduct,
+    hasSubscription: hasSubscription,
+    setTraits: setTraits,
+    logout: logout
+};

@@ -1,29 +1,25 @@
-/*global SPiD:false*/
-;(function(exports) {
-
-    var noop = function() {
+/*global require:false, module:false*/
+var config = require('./spid-config'),
+    noop = function() {
     };
+function getPersistenceModule() {
+    var storages = {
+        localstorage: require('./spid-localstorage'),
+        cookie: require('./spid-cookie'),
+        cache: require('./spid-cache'),
+        standard: {get: noop, set: noop, clear: noop}
+    };
+    return storages[(config.options().storage || 'standard')];
+}
 
-    function getPersistenceModule() {
-        var storages = {
-            localstorage: exports.LocalStorage,
-            cookie: exports.Cookie,
-            cache: exports.Cache,
-            standard: {get: noop, set: noop, clear: noop}
-        };
-        return storages[(exports.options().storage || 'standard')];
+module.exports = {
+    get: function(key) {
+        getPersistenceModule().get(key);
+    },
+    set: function(key, value, expiresIn) {
+        getPersistenceModule().set(key, value, expiresIn);
+    },
+    clear: function(key) {
+        getPersistenceModule().clear(key);
     }
-
-    exports.Persist = {
-        get: function(key) {
-            getPersistenceModule().get(key);
-        },
-        set: function(key, value, expiresIn) {
-            getPersistenceModule().set(key, value, expiresIn);
-        },
-        clear: function(key) {
-            getPersistenceModule().clear(key);
-        }
-    };
-
-}(SPiD));
+};

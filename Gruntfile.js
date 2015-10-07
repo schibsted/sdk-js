@@ -1,6 +1,20 @@
 /*global module:false*/
 module.exports = function(grunt) {
 
+  function webpackCfg(target) {
+    return {
+      entry: {
+        'spid-sdk': './src/spid-sdk.js',
+        'spid-uri': './src/spid-uri.js'
+      },
+      output: {
+        libraryTarget: target,
+        path: './dist/<%= pkg.version %>/',
+        filename: '[name]-<%= pkg.version %>-' + target + '.js'
+      }
+    }
+  }
+
   // Project configuration.
   grunt.initConfig({
     // Metadata.
@@ -35,53 +49,45 @@ module.exports = function(grunt) {
         ]
       }
     },
-    concat: {
-      options: {
-        stripBanners: true,
-        banner: '<%= banner %>',
-        process: true
-      },
-      sdk: {
-        src: ['<%= jshint.sdk.src %>'],
-        dest: 'dist/spid-sdk-<%= pkg.version %>.js'
-      },
-    },
     uglify: {
       options: {
         banner: '<%= banner %>'
       },
-      sdk: {
-        src: '<%= concat.sdk.dest %>',
-        dest: 'dist/spid-sdk-<%= pkg.version %>.min.js'
-      }
-    },
-    blanket_mocha: {
-      all: [ 'test/index.html' ],
-      options: {
-        threshold: 70
-      }
-    },
-    watch: {
-      gruntfile: {
-        files: '<%= jshint.gruntfile.src %>',
-        tasks: ['jshint:gruntfile']
+      sdkVar: {
+        src: 'dist/<%= pkg.version %>/spid-sdk-<%= pkg.version %>-var.js',
+        dest: 'dist/<%= pkg.version %>/spid-sdk-<%= pkg.version %>-var.min.js'
       },
-      sdk: {
-        files: ['<%= jshint.sdk.src %>', '<%= jshint.tests.src %>'],
-        tasks: ['jshint:sdk', 'jshint:tests', 'blanket_mocha']
+      sdkAmd: {
+        src: 'dist/<%= pkg.version %>/spid-sdk-<%= pkg.version %>-amd.js',
+        dest: 'dist/<%= pkg.version %>/spid-sdk-<%= pkg.version %>-amd.min.js'
+      },
+      sdkCommonJs: {
+        src: 'dist/<%= pkg.version %>/spid-sdk-<%= pkg.version %>-commonjs2.js',
+        dest: 'dist/<%= pkg.version %>/spid-sdk-<%= pkg.version %>-commonjs2.min.js'
       }
+    },
+
+    karma: {
+      unit: {
+        configFile: 'karma.conf.js'
+      }
+    },
+
+    webpack : {
+      var: webpackCfg('var'),
+      amd: webpackCfg('amd'),
+      commonjs: webpackCfg('commonjs2')
     }
   });
 
   // These plugins provide necessary tasks.
+  grunt.loadNpmTasks("grunt-webpack");
   grunt.loadNpmTasks('grunt-contrib-uglify');
-  grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-jshint');
-  grunt.loadNpmTasks('grunt-contrib-watch');
-  grunt.loadNpmTasks('grunt-blanket-mocha');
+  grunt.loadNpmTasks('grunt-karma');
 
   // Default task.
-  grunt.registerTask('default', ['jshint:sdk', 'concat', 'uglify']);
+  grunt.registerTask('default', ['jshint:sdk', 'webpack', 'uglify']);
 
-  grunt.registerTask('test', ['blanket_mocha']);
+  grunt.registerTask('test', ['karma:unit']);
 };

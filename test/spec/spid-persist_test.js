@@ -1,101 +1,89 @@
 /*global chai:false*/
+/*global sinon:false*/
 /*global describe:false*/
 /*global it:false*/
-/*global SPiD:false*/
 
 describe('SPiD.Persist', function() {
 
     var assert = chai.assert;
     var setup = {storage: null, client_id: 'xxx', server: 'payment.schibsted.se'};
+    var SPiD  = require('../../src/spid-sdk'),
+        persist = require('../../src/spid-persist');
 
     describe('SPiD no-storage setup', function() {
         it('SPiD.Persist default should have set/get/clear methods ', function() {
             SPiD.init(setup);
-            assert.isFunction(SPiD.Persist.get);
-            assert.isFunction(SPiD.Persist.set);
-            assert.isFunction(SPiD.Persist.clear);
+            assert.isFunction(persist.get);
+            assert.isFunction(persist.set);
+            assert.isFunction(persist.clear);
         });
     });
 
     describe(' with cookies setup ', function() {
-        var SPiDCookie;
+        var _setup = setup;
         before(function() {
-            var cookieSetup = setup;
-            cookieSetup.storage = 'cookie';
-            SPiD.init(cookieSetup);
-            SPiDCookie = SPiD.Cookie;
+            _setup.storage = 'cookie';
+            SPiD.init(_setup);
         });
 
         it('should have set/get/clear methods ', function() {
-            assert.isFunction(SPiD.Persist.get);
-            assert.isFunction(SPiD.Persist.set);
-            assert.isFunction(SPiD.Persist.clear);
+            assert.isFunction(persist.get);
+            assert.isFunction(persist.set);
+            assert.isFunction(persist.clear);
         });
 
-        it('should have a get method that calls through to SPiD.Cookie ', function(done) {
-            SPiD.Cookie.get = function(key) {
-                assert.equal('some', key);
-                done();
-            };
-            SPiD.Persist.get('some');
+        it('should have a get method that calls through to SPiD.Cookie ', function() {
+            var methodSpy = sinon.spy(require('../../src/spid-cookie'), "get");
+            persist.get('some');
+            assert.equal('some', methodSpy.getCall(0).args[0]);
         });
 
-        it('should have a set method that calls through to SPiD.Cookie ', function(done) {
-            SPiD.Cookie.set = function(key, value) {
-                assert.equal('key', key);
-                assert.equal('value', value);
-                done();
-            };
-            SPiD.Persist.set('key', 'value');
+        it('should have a set method that calls through to SPiD.Cookie ', function() {
+            var methodSpy = sinon.spy(require('../../src/spid-cookie'), "set");
+            persist.set('key','value');
+            assert.equal('key', methodSpy.getCall(0).args[0]);
+            assert.equal('value', methodSpy.getCall(0).args[1]);
         });
 
-        it('should have a clear method that calls through to SPiD.Cookie', function(done) {
-            SPiD.Cookie.clear = function(key) {
-                assert.isUndefined(key);
-                done();
-            };
-            SPiD.Persist.clear();
+        it('should have a clear method that calls through to SPiD.Cookie', function() {
+            var methodSpy = sinon.spy(require('../../src/spid-cookie'), "clear");
+            persist.clear();
+            assert.isTrue(methodSpy.called);
         });
     });
 
     describe(' with local storage setup ', function() {
-        var SPiDLS;
+
+        var _setup = setup;
         before(function() {
-            var lsSetup = setup;
-            lsSetup.storage = 'localstorage';
-            SPiD.init(lsSetup);
-            SPiDLS = SPiD.LocalStorage;
+            _setup.storage = 'localstorage';
+            SPiD.init(_setup);
         });
 
         it('should have set/get/clear methods ', function() {
-            assert.isFunction(SPiD.Persist.get);
-            assert.isFunction(SPiD.Persist.set);
-            assert.isFunction(SPiD.Persist.clear);
+            assert.isFunction(persist.get);
+            assert.isFunction(persist.set);
+            assert.isFunction(persist.clear);
         });
 
-        it('should have a get method that calls through to SPiD.LocalStorage ', function(done) {
-            SPiD.LocalStorage.get = function(key) {
-                assert.equal('some', key);
-                done();
-            };
-            SPiD.Persist.get('some');
+        it('should have a get method that calls through to SPiD.LocalStorage ', function() {
+            var methodSpy = sinon.spy(require('../../src/spid-localstorage'), "get");
+            persist.get('some');
+            assert.equal('some', methodSpy.getCall(0).args[0]);
         });
 
-        it('should have a set method that calls through to SPiD.LocalStorage ', function(done) {
-            SPiD.LocalStorage.set = function(key, value) {
-                assert.equal('key', key);
-                assert.equal('value', value);
-                done();
-            };
-            SPiD.Persist.set('key', 'value');
+        it('should have a set method that calls through to SPiD.LocalStorage ', function() {
+            var methodSpy = sinon.spy(require('../../src/spid-localstorage'), "set");
+            persist.set('key','value');
+            assert.equal('key', methodSpy.getCall(0).args[0]);
+            assert.equal('value', methodSpy.getCall(0).args[1]);
         });
 
-        it('should have a clear method that calls through to SPiD.LocalStorage', function(done) {
-            SPiD.LocalStorage.clear = function(key) {
-                assert.equal('key', key);
-                done();
-            };
-            SPiD.Persist.clear('key');
+        it('should have a clear method that calls through to SPiD.LocalStorage', function() {
+            var methodSpy = sinon.spy(require('../../src/spid-localstorage'), "clear");
+            persist.clear('key');
+            assert.isTrue(methodSpy.called);
+            assert.equal('key', methodSpy.getCall(0).args[0]);
         });
     });
 
@@ -109,34 +97,29 @@ describe('SPiD.Persist', function() {
         });
 
         it('should have set/get/clear methods ', function() {
-            assert.isFunction(SPiD.Persist.get);
-            assert.isFunction(SPiD.Persist.set);
-            assert.isFunction(SPiD.Persist.clear);
+            assert.isFunction(persist.get);
+            assert.isFunction(persist.set);
+            assert.isFunction(persist.clear);
         });
 
-        it('should have a get method that calls through to SPiD.Cache ', function(done) {
-            SPiD.Cache.get = function(key) {
-                assert.equal('some', key);
-                done();
-            };
-            SPiD.Persist.get('some');
+        it('should have a get method that calls through to SPiD.Cache ', function() {
+            var methodSpy = sinon.spy(require('../../src/spid-cache'), "get");
+            persist.get('some');
+            assert.equal('some', methodSpy.getCall(0).args[0]);
         });
 
-        it('should have a set method that calls through to SPiD.Cache ', function(done) {
-            SPiD.Cache.set = function(key, value) {
-                assert.equal('key', key);
-                assert.equal('value', value);
-                done();
-            };
-            SPiD.Persist.set('key', 'value');
+        it('should have a set method that calls through to SPiD.Cache ', function() {
+            var methodSpy = sinon.spy(require('../../src/spid-cache'), "set");
+            persist.set('key','value');
+            assert.equal('key', methodSpy.getCall(0).args[0]);
+            assert.equal('value', methodSpy.getCall(0).args[1]);
         });
 
-        it('should have a clear method that calls through to SPiD.Cache', function(done) {
-            SPiD.Cache.clear = function(key) {
-                assert.equal('key', key);
-                done();
-            };
-            SPiD.Persist.clear('key');
+        it('should have a clear method that calls through to SPiD.Cache', function() {
+            var methodSpy = sinon.spy(require('../../src/spid-cache'), "clear");
+            persist.clear('key');
+            assert.isTrue(methodSpy.called);
+            assert.equal('key', methodSpy.getCall(0).args[0]);
         });
     });
 
