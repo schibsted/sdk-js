@@ -9,8 +9,8 @@ module.exports = function(grunt) {
       output: {
         library: '[name]',
         libraryTarget: target,
-        path: './dist/<%= pkg.version %>/',
-        filename: fileName + '-<%= pkg.version %>-' + target + '.js'
+        path: './dist/',
+        filename: fileName + '-' + target + '.js'
       }
     }
   }
@@ -54,16 +54,30 @@ module.exports = function(grunt) {
         banner: '<%= banner %>'
       },
       sdkVar: {
-        src: 'dist/<%= pkg.version %>/spid-sdk-<%= pkg.version %>-var.js',
-        dest: 'dist/<%= pkg.version %>/spid-sdk-<%= pkg.version %>-var.min.js'
+        src: 'dist/spid-sdk-var.js',
+        dest: 'dist/spid-sdk-var.min.js'
       },
       sdkAmd: {
-        src: 'dist/<%= pkg.version %>/spid-sdk-<%= pkg.version %>-amd.js',
-        dest: 'dist/<%= pkg.version %>/spid-sdk-<%= pkg.version %>-amd.min.js'
+        src: 'dist/spid-sdk-amd.js',
+        dest: 'dist/spid-sdk-amd.min.js'
       },
       sdkCommonJs: {
-        src: 'dist/<%= pkg.version %>/spid-sdk-<%= pkg.version %>-commonjs2.js',
-        dest: 'dist/<%= pkg.version %>/spid-sdk-<%= pkg.version %>-commonjs2.min.js'
+        src: 'dist/spid-sdk-commonjs2.js',
+        dest: 'dist/spid-sdk-commonjs2.min.js'
+      }
+    },
+    template: {
+      options: {
+        data: {
+          pkg : grunt.file.readJSON('package.json')
+        }
+      },
+      all: {
+        files: {
+          'dist/spid-sdk-amd.js': ['dist/spid-sdk-amd.js'],
+          'dist/spid-sdk-commonjs2.js': ['dist/spid-sdk-commonjs2.js'],
+          'dist/spid-sdk-var.js': ['dist/spid-sdk-var.js']
+        }
       }
     },
 
@@ -73,13 +87,6 @@ module.exports = function(grunt) {
       }
     },
 
-    /*
-    webpack : {
-      var: webpackCfg('var', 'SPiD'),
-      amd: webpackCfg('amd', 'SPiD'),
-      commonjs: webpackCfg('commonjs2', 'SPiD')
-    }
-    */
     webpack : {
       varSdk: webpackCfg('var', 'spid-sdk', 'SPiD'),
       varUri: webpackCfg('var', 'spid-uri', 'SPiD_Uri'),
@@ -95,9 +102,11 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-karma');
+  grunt.loadNpmTasks('grunt-template');
 
   // Default task.
-  grunt.registerTask('default', ['jshint:sdk', 'webpack', 'uglify']);
+  grunt.registerTask('default', ['jshint:sdk', 'webpack', 'template', 'uglify']);
+
 
   grunt.registerTask('test', ['karma:unit']);
 };
