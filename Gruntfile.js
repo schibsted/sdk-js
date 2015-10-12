@@ -80,13 +80,11 @@ module.exports = function(grunt) {
         }
       }
     },
-
     karma: {
       unit: {
         configFile: 'karma.conf.js'
       }
     },
-
     webpack : {
       varSdk: webpackCfg('var', 'spid-sdk', 'SPiD'),
       varUri: webpackCfg('var', 'spid-uri', 'SPiD_Uri'),
@@ -103,10 +101,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-karma');
   grunt.loadNpmTasks('grunt-template');
-
   // Default task.
   grunt.registerTask('default', ['jshint:sdk', 'webpack', 'template', 'uglify']);
-
-
   grunt.registerTask('test', ['karma:unit']);
 };

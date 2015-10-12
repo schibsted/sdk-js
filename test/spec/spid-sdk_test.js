@@ -92,9 +92,9 @@ describe('SPiD', function() {
         });
 
         beforeEach(function(){
-            talkRequestStub = sinon.stub(require('../../src/spid-talk'), "request");
-            persistSetStub = sinon.stub(require('../../src/spid-persist'), "set");
-            persistGetStub = sinon.stub(require('../../src/spid-persist'), "get");
+            talkRequestStub = sinon.stub(require('../../src/spid-talk'), 'request');
+            persistSetStub = sinon.stub(require('../../src/spid-persist'), 'set');
+            persistGetStub = sinon.stub(require('../../src/spid-persist'), 'get');
         });
 
         afterEach(function(){
@@ -156,6 +156,46 @@ describe('SPiD', function() {
         });
     });
 
+    describe('SPiD.acceptAgreement', function() {
+        var talkRequestStub, persistClearStub;
+
+        beforeEach(function() {
+            SPiD.init(setup());
+            talkRequestStub = sinon.stub(require('../../src/spid-talk'), 'request');
+            persistClearStub = sinon.stub(require('../../src/spid-persist'), 'clear');
+        });
+        afterEach(function() {
+            talkRequestStub.restore();
+            persistClearStub.restore();
+        });
+
+        it('SPiD.acceptAgreement should call Talk with parameter server, path, callback', function() {
+            SPiD.acceptAgreement(function(){});
+            assert.equal(talkRequestStub.getCall(0).args[0], 'https://identity-pre.schibsted.com/');
+            assert.equal(talkRequestStub.getCall(0).args[1], 'ajax/acceptAgreement.js');
+            assert.isFunction(talkRequestStub.getCall(0).args[3]);
+            assert.isTrue(talkRequestStub.calledOnce);
+        });
+
+        it('SPiD.acceptAgreement should call persist.clear and hasSession on successful talk response', function() {
+            var fakeSession = {
+                "result":true,
+                "expiresIn":7111,
+                "baseDomain":"sdk.dev",
+                "userStatus":"connected",
+                "userId":1844813,
+                "id":"4f1e2ae59caf7c2f4a058b76"
+            };
+            var cbfun = function(){};
+            talkRequestStub.onFirstCall().callsArg(3); // acceptAgreement
+            talkRequestStub.onSecondCall().callsArgWith(3, null, fakeSession);
+            SPiD.acceptAgreement(cbfun);
+            assert.isTrue(talkRequestStub.calledTwice);
+            assert.isTrue(persistClearStub.calledOnce);
+        });
+    });
+
+
     describe('SPiD.hasProduct', function() {
         var talkRequestStub,
             cacheGetStub,
@@ -166,9 +206,9 @@ describe('SPiD', function() {
             SPiD.init(cacheSetup);
         });
         beforeEach(function() {
-            talkRequestStub = sinon.stub(require('../../src/spid-talk'), "request");
-            cacheGetStub = sinon.stub(require('../../src/spid-cache'), "get");
-            cacheSetStub = sinon.stub(require('../../src/spid-cache'), "set");
+            talkRequestStub = sinon.stub(require('../../src/spid-talk'), 'request');
+            cacheGetStub = sinon.stub(require('../../src/spid-cache'), 'get');
+            cacheSetStub = sinon.stub(require('../../src/spid-cache'), 'set');
         });
 
         afterEach(function(){
@@ -224,9 +264,9 @@ describe('SPiD', function() {
             SPiD.init(cacheSetup);
         });
         beforeEach(function() {
-            talkRequestStub = sinon.stub(require('../../src/spid-talk'), "request");
-            cacheGetStub = sinon.stub(require('../../src/spid-cache'), "get");
-            cacheSetStub = sinon.stub(require('../../src/spid-cache'), "set");
+            talkRequestStub = sinon.stub(require('../../src/spid-talk'), 'request');
+            cacheGetStub = sinon.stub(require('../../src/spid-cache'), 'get');
+            cacheSetStub = sinon.stub(require('../../src/spid-cache'), 'set');
         });
         afterEach(function(){
             talkRequestStub.restore();
@@ -280,7 +320,7 @@ describe('SPiD', function() {
         var talkRequestStub;
         beforeEach(function() {
             SPiD.init(setup());
-            talkRequestStub = sinon.stub(require('../../src/spid-talk'), "request");
+            talkRequestStub = sinon.stub(require('../../src/spid-talk'), 'request');
         });
 
         afterEach(function() {
@@ -303,8 +343,8 @@ describe('SPiD', function() {
             cookieClearStub;
         beforeEach(function() {
             SPiD.init(setup());
-            talkRequestStub = sinon.stub(require('../../src/spid-talk'), "request");
-            cookieClearStub = sinon.stub(require('../../src/spid-cookie'), "clear");
+            talkRequestStub = sinon.stub(require('../../src/spid-talk'), 'request');
+            cookieClearStub = sinon.stub(require('../../src/spid-cookie'), 'clear');
         });
 
         afterEach(function() {

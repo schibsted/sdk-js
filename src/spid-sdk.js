@@ -137,6 +137,15 @@ function logout(callback) {
     talk.request(this.server(), 'ajax/logout.js', {}, cb);
 }
 
+function acceptAgreement(callback) {
+    var that = this;
+    var cb = function() {
+        persist.clear("Session");
+        that.hasSession(callback);
+    };
+    talk.request(this.server(),'ajax/acceptAgreement.js', {}, cb);
+}
+
 //Async loader
 window.setTimeout(function() {
     if(typeof (window.asyncSPiD) === 'function' && !window.asyncSPiD.hasRun) {
@@ -161,6 +170,7 @@ module.exports = {
     coreEndpoint: function() {
         return (config.options().https ? 'https' : 'http') + '://' + config.options().server + '/ajax/hasSession.js';
     },
+    acceptAgreement: acceptAgreement,
     event: spidEvent,
     init: init,
     hasSession: hasSession,
