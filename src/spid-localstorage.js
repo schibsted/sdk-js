@@ -37,7 +37,7 @@ function clear(key) {
 }
 
 function isExpired(item) {
-    if(item._expires) {
+    if(item && item._expires) {
         return new Date(item._expires).getTime() < new Date().getTime();
     }
     return false;
