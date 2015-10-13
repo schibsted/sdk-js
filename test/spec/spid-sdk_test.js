@@ -19,6 +19,7 @@ describe('SPiD', function() {
             assert.throws(SPiD.init, TypeError);
         });
     });
+
     describe('SPiD Production Url', function() {
         before(function() {
             SPiD.init(setupProd);
@@ -45,6 +46,7 @@ describe('SPiD', function() {
             );
         });
     });
+
     describe('SPiD Stage Url', function() {
         before(function() {
             SPiD.init(setup());
@@ -70,6 +72,7 @@ describe('SPiD', function() {
             );
         });
     });
+
     describe('SPiD initiated', function() {
         before(function() {
             SPiD.init(setupProd);
@@ -80,6 +83,15 @@ describe('SPiD', function() {
         });
         it('SPiD.initiated should return true', function() {
             assert.isTrue(SPiD.initiated());
+        });
+    });
+
+    describe('SPiD.sessionCache', function() {
+        it('SPiD.sessionCache should exist', function() {
+            assert.isDefined(SPiD.sessionCache);
+            assert.isFunction(SPiD.sessionCache.clear);
+            assert.isFunction(SPiD.sessionCache.get);
+            assert.isFunction(SPiD.sessionCache.set);
         });
     });
 
@@ -120,7 +132,7 @@ describe('SPiD', function() {
             assert.isFunction(talkRequestStub.secondCall.args[3]);
         });
 
-        it('SPiD.hasSession should try to set cookie (or whatever) when successful', function() {
+        it('SPiD.hasSession should try to set cookie (in this case) when successful', function() {
             var fakeSession = {
                 "result":true,
                 "expiresIn":7111,
@@ -131,9 +143,9 @@ describe('SPiD', function() {
             };
             talkRequestStub.onFirstCall().callsArgWith(3, null, fakeSession);
             SPiD.hasSession(function() {});
-            assert.equal('Session',persistSetStub.firstCall.args[0]);
-            assert.equal(fakeSession.userId, persistSetStub.firstCall.args[1].userId);
-            assert.isTrue(persistSetStub.firstCall.args[1].result);
+            assert.equal(fakeSession.userId, persistSetStub.firstCall.args[0].userId);
+            assert.isTrue(persistSetStub.firstCall.args[0].result);
+            assert.equal(7111, persistSetStub.firstCall.args[1]);
         });
 
         it('SPiD.hasSession should try to return persisted data without calling Talk', function(done) {

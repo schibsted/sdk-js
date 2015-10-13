@@ -11,7 +11,6 @@ var
     cache = require('./spid-cache'),
     talk = require('./spid-talk');
 
-
 function globalExport(global) {
     global.SPiD = global.SPiD || this;
     global.SPiD.Talk = require('./spid-talk');
@@ -38,8 +37,8 @@ function hasSession(callback) {
             callback(err, data);
         },
         handleResponse = function(err, data) {
-            if(persist && !err && !!data.result) {
-                persist.set("Session", data, data.expiresIn);
+            if(!err && !!data.result) {
+                persist.set(data, data.expiresIn);
             }
             respond(err, data);
         },
@@ -54,13 +53,12 @@ function hasSession(callback) {
             handleResponse(err, data);
         };
 
-    if(persist) {
-        var data = persist.get("Session");
-        if(data) {
-            _session = data;
-            return respond(null, data);
-        }
+    var data = persist.get();
+    if(data) {
+        _session = data;
+        return respond(null, data);
     }
+
     talk.request(this.sessionEndpoint(), null, {autologin: 1}, handleException);
 }
 
@@ -123,7 +121,7 @@ function setTraits(traits, callback) {
 function logout(callback) {
     var cb = function(err, data) {
         if(data.result) {
-            persist.clear("Session");
+            persist.clear();
         }
 
         if(!err && !!data.result) {
@@ -140,7 +138,7 @@ function logout(callback) {
 function acceptAgreement(callback) {
     var that = this;
     var cb = function() {
-        persist.clear("Session");
+        persist.clear();
         that.hasSession(callback);
     };
     talk.request(this.server(),'ajax/acceptAgreement.js', {}, cb);
@@ -172,6 +170,7 @@ module.exports = {
     },
     acceptAgreement: acceptAgreement,
     event: spidEvent,
+    sessionCache: persist,
     init: init,
     hasSession: hasSession,
     hasProduct: hasProduct,
