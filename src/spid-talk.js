@@ -3,6 +3,7 @@ var _scriptObject,
     _callbacks = {},
     _requestQueue = [],
     _timer = null,
+    _redirectUri = encodeURIComponent(window.location.toString()),
     log = require('./spid-log'),
     util = require('./spid-util');
 
@@ -83,6 +84,7 @@ function request(server, path, params, callback) {
     var id = _createCallback(callback);
     params = params || {};
     params.callback = id;
+    params.redirect_uri = _redirectUri;
     var url = util.buildUri(server, path, params);
     log.info('Request: ' + url);
     _queue(id, url);
