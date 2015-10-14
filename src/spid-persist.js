@@ -1,29 +1,30 @@
-/*global SPiD:false*/
-;(function(exports) {
-
-    var noop = function() {
+/*global require:false, module:false*/
+var config = require('./spid-config'),
+    _key = "Session",
+    noop = function() {
     };
+function getPersistenceModule() {
+    var cookie = require('./spid-cookie');
+    var storages = {
+        localstorage: require('./spid-localstorage'),
+        cookie: {
+            get: cookie.get,
+            set: function(key, value) { cookie.set(value); },
+            clear: cookie.clear
+        },
+        standard: {get: noop, set: noop, clear: noop}
+    };
+    return storages[(config.options().storage || 'standard')];
+}
 
-    function getPersistenceModule() {
-        var storages = {
-            localstorage: exports.LocalStorage,
-            cookie: exports.Cookie,
-            cache: exports.Cache,
-            standard: {get: noop, set: noop, clear: noop}
-        };
-        return storages[(exports.options().storage || 'standard')];
+module.exports = {
+    get: function() {
+        return getPersistenceModule().get(_key);
+    },
+    set: function( value, expiresIn) {
+        return getPersistenceModule().set(_key, value, expiresIn);
+    },
+    clear: function() {
+        return getPersistenceModule().clear(_key);
     }
-
-    exports.Persist = {
-        get: function(key) {
-            getPersistenceModule().get(key);
-        },
-        set: function(key, value, expiresIn) {
-            getPersistenceModule().set(key, value, expiresIn);
-        },
-        clear: function(key) {
-            getPersistenceModule().clear(key);
-        }
-    };
-
-}(SPiD));
+};

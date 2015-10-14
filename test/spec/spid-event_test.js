@@ -1,19 +1,20 @@
 /*global describe:false*/
 /*global it:false*/
-/*global SPiD:false*/
 
 describe('SPiD.Event', function() {
 
+    var spidEvent  = require('../../src/spid-event');
+
     it('SPiD.Event.subscribe once and fire', function(done) {
         var data = {test:true, str:'val'};
-        SPiD.Event.subscribe('custom.event1', function(d) {
+        spidEvent.subscribe('custom.event1', function(d) {
             if(d.test && d.str === data.str) {
                 done();
             } else {
                 done(new Error('Data returned does not match'));
             }
         });
-        SPiD.Event.fire('custom.event1', data);
+        spidEvent.fire('custom.event1', data);
     });
 
     it('SPiD.Event.subscribe twice and fire', function(done) {
@@ -25,13 +26,13 @@ describe('SPiD.Event', function() {
                 done();
             }
         };
-        SPiD.Event.subscribe('custom.event2', function() {
+        spidEvent.subscribe('custom.event2', function() {
             cb();
         });
-        SPiD.Event.subscribe('custom.event2', function() {
+        spidEvent.subscribe('custom.event2', function() {
             cb();
         });
-        SPiD.Event.fire('custom.event2', data);
+        spidEvent.fire('custom.event2', data);
     });
 
     it('SPiD.Event.unsubscribe and fire', function(done) {
@@ -39,12 +40,12 @@ describe('SPiD.Event', function() {
         var cb = function() {
             done(new Error('Callback called even though unsubscribed'));
         };
-        SPiD.Event.subscribe('custom.event2', cb);
-        SPiD.Event.unsubscribe('custom.event2', cb);
-        SPiD.Event.fire('custom.event2', data);
-        SPiD.Event.subscribe('custom.event3', function() {
+        spidEvent.subscribe('custom.event2', cb);
+        spidEvent.unsubscribe('custom.event2', cb);
+        spidEvent.fire('custom.event2', data);
+        spidEvent.subscribe('custom.event3', function() {
             done();
         });
-        SPiD.Event.fire('custom.event3', data);
+        spidEvent.fire('custom.event3', data);
     });
 });
