@@ -10,7 +10,7 @@ module.exports = function(grunt) {
         library: '[name]',
         libraryTarget: target,
         path: './dist/',
-        filename: fileName + '-' + target + '.js'
+        filename: fileName + '-<%= pkg.version %>-' + target + '.js'
       }
     }
   }
@@ -54,16 +54,16 @@ module.exports = function(grunt) {
         banner: '<%= banner %>'
       },
       sdkVar: {
-        src: 'dist/spid-sdk-var.js',
-        dest: 'dist/spid-sdk-var.min.js'
+        src: 'dist/spid-sdk-<%= pkg.version %>-var.js',
+        dest: 'dist/spid-sdk-<%= pkg.version %>-var.min.js'
       },
       sdkAmd: {
-        src: 'dist/spid-sdk-amd.js',
-        dest: 'dist/spid-sdk-amd.min.js'
+        src: 'dist/spid-sdk-<%= pkg.version %>-amd.js',
+        dest: 'dist/spid-sdk-<%= pkg.version %>-amd.min.js'
       },
       sdkCommonJs: {
-        src: 'dist/spid-sdk-commonjs2.js',
-        dest: 'dist/spid-sdk-commonjs2.min.js'
+        src: 'dist/spid-sdk-<%= pkg.version %>-commonjs2.js',
+        dest: 'dist/spid-sdk-<%= pkg.version %>-commonjs2.min.js'
       }
     },
     template: {
@@ -74,9 +74,9 @@ module.exports = function(grunt) {
       },
       all: {
         files: {
-          'dist/spid-sdk-amd.js': ['dist/spid-sdk-amd.js'],
-          'dist/spid-sdk-commonjs2.js': ['dist/spid-sdk-commonjs2.js'],
-          'dist/spid-sdk-var.js': ['dist/spid-sdk-var.js']
+          'dist/spid-sdk-<%= pkg.version %>-amd.js': ['dist/spid-sdk-<%= pkg.version %>-amd.js'],
+          'dist/spid-sdk-<%= pkg.version %>-commonjs2.js': ['dist/spid-sdk-<%= pkg.version %>-commonjs2.js'],
+          'dist/spid-sdk-<%= pkg.version %>-var.js': ['dist/spid-sdk-<%= pkg.version %>-var.js']
         }
       }
     },
