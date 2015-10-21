@@ -5,7 +5,8 @@ var _scriptObject,
     _timer = null,
     _redirectUri = encodeURIComponent(window.location.toString()),
     log = require('./spid-log'),
-    util = require('./spid-util');
+    util = require('./spid-util'),
+    config = require('./spid-config');
 
 function _guid() {
     return 'f' + (Math.random() * (1<<30)).toString(16).replace('.', '');
@@ -85,6 +86,7 @@ function request(server, path, params, callback) {
     params = params || {};
     params.callback = id;
     params.redirect_uri = _redirectUri;
+    params.client_id = config.options().client_id;
     var url = util.buildUri(server, path, params);
     log.info('Request: ' + url);
     _queue(id, url);
