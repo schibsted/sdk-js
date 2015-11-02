@@ -23,7 +23,7 @@
     "grunt-contrib-jshint": "~0.8.0",
     "grunt-contrib-uglify": "~0.3.2",
     "grunt-contrib-compress": "~0.13.0",
-    "grunt-release-it": "~1.0.0",
+    "grunt-contrib-clean": "~0.6.0",
     "grunt-template": "~0.2.3",
     "grunt-webpack": "~1.0.3",
     "karma": "^0.13.9",

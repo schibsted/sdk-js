@@ -93,6 +93,7 @@ module.exports = function(grunt) {
       commonJsSdk: webpackCfg('commonjs2', 'spid-sdk', 'SPiD'),
       commonJsUri: webpackCfg('commonjs2', 'spid-uri', 'SPiD_Uri')
     },
+    clean: ["dist"],
     compress: {
       main: {
         options: {
@@ -105,12 +106,6 @@ module.exports = function(grunt) {
         }
         ]
       }
-    },
-    "release-it": {
-      options: {
-        pkgFiles: ['package.json', 'bower.json'],
-        increment: '<%= pkg.version %>'
-      }
     }
   });
 
@@ -120,16 +115,10 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-karma');
   grunt.loadNpmTasks('grunt-template');
-  grunt.loadNpmTasks('grunt-release-it');
+  grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-compress');
   // Default task.
-  grunt.registerTask('default', ['jshint:sdk', 'webpack', 'template', 'uglify']);
+  grunt.registerTask('default', ['clean', 'jshint:sdk', 'webpack', 'template', 'uglify', 'compress']);
   grunt.registerTask('test', ['karma:unit']);
-  // Release related
-  grunt.registerTask('post-release', function() {
-    grunt.log.subhead("Release created");
-    grunt.log.ok("NOTE: You'll have to upload the archive zip to the GitHub release yourself!");
-  });
-  grunt.registerTask('release', ['uglify','compress','release-it', 'post-release']);
 
 };
