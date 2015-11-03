@@ -1,6 +1,6 @@
 /*global require:false, module:false*/
 
-var _subscribers = {},
+var subscribers = {},
     log = require('./spid-log');
 
 /**
@@ -20,10 +20,10 @@ var _subscribers = {},
  */
 function subscribe(name, cb) {
     log.info('SPiD.Event.subscribe({n})'.replace('{n}', name));
-    if (!_subscribers[name]) {
-        _subscribers[name] = [];
+    if (!subscribers[name]) {
+        subscribers[name] = [];
     }
-    _subscribers[name].push(cb);
+    subscribers[name].push(cb);
 }
 
 /**
@@ -48,7 +48,7 @@ function subscribe(name, cb) {
  */
 function unsubscribe(name, cb) {
     log.info('SPiD.Event.unsubscribe({n})'.replace('{n}', name));
-    var subs = _subscribers[name] || [];
+    var subs = subscribers[name] || [];
     for (var i = 0, l = subs.length; i !== l; i++) {
         if(subs[i] === cb) {
             subs[i] = null;
@@ -67,7 +67,7 @@ function fire(/* polymorphic */) {
     var args = Array.prototype.slice.call(arguments),
         name = args.shift();
     log.info('SPiD.Event.fire({n})'.replace('{n}', name));
-    var subs = _subscribers[name] || [];
+    var subs = subscribers[name] || [];
     for (var i = 0, l = subs.length; i !== l; i++) {
         if (subs[i]) {
             subs[i].apply(this, args);
