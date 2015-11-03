@@ -1,7 +1,3 @@
-/*global describe:false*/
-/*global it:false*/
-/*global before:false*/
-
 describe('SPiD.Talk', function() {
 
     var setup = {client_id : '4d00e8d6bf92fc8648000000', server: 'stage.payment.schibsted.se', useSessionCluster:false, logging:false, timeout: 500};

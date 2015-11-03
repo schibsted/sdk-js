@@ -1,8 +1,3 @@
-/*global chai:false*/
-/*global describe:false*/
-/*global it:false*/
-/*global before:false*/
-
 describe('SPiD.Cookie', function() {
 
     var assert = chai.assert;
@@ -11,7 +6,7 @@ describe('SPiD.Cookie', function() {
     var spidCookie = require('../../src/spid-cookie'),
         SPiD = require('../../src/spid-sdk');
 
-    var cookieDomain = (0 === window.location.host.indexOf("localhost:")) ? "localhost" : window.location.host;
+    var cookieDomain = (0 === window.location.host.indexOf('localhost:')) ? 'localhost' : window.location.host;
 
 
     describe('SPiD.Cookie Prod', function() {

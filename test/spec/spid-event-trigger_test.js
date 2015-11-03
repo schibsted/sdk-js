@@ -1,8 +1,3 @@
-/*global describe:false*/
-/*global sinon:false*/
-/*global it:false*/
-/*global before:false*/
-/*global after:false*/
 describe('SPiD.EventTrigger', function() {
 
     var eventTrigger = require('../../src/spid-event-trigger');
@@ -18,32 +13,32 @@ describe('SPiD.EventTrigger', function() {
 
         it('SPiD.EventTrigger.session should trigger SPiD.visitor event when visitor retrieved', function() {
             eventTrigger.session({}, {
-                "result": true,
-                "visitor": {"uid": "1kr188Xmrf4wxX7ttrcx", "user_id": "2200021"}
+                'result': true,
+                'visitor': {'uid': '1kr188Xmrf4wxX7ttrcx', 'user_id': '2200021'}
             });
-            assert.isTrue(eventSpy.calledWithMatch('SPiD.visitor', {"uid": "1kr188Xmrf4wxX7ttrcx"}));
+            assert.isTrue(eventSpy.calledWithMatch('SPiD.visitor', {'uid': '1kr188Xmrf4wxX7ttrcx'}));
         });
 
         it('SPiD.EventTrigger.session should trigger SPiD.login event when user logs in', function() {
-            eventTrigger.session({}, {"result": true, "userId": 10});
-            assert.isTrue(eventSpy.calledWithMatch('SPiD.login', {"userId": 10, "result": true}));
+            eventTrigger.session({}, {'result': true, 'userId': 10});
+            assert.isTrue(eventSpy.calledWithMatch('SPiD.login', {'userId': 10, 'result': true}));
         });
 
         it('SPiD.EventTrigger.session should trigger SPiD.logout event when user was logged in and is not logged out', function() {
             var eventTrigger = require('../../src/spid-event-trigger');
-            eventTrigger.session({"userId": 10}, {"result": false});
-            assert.isTrue(eventSpy.calledWithMatch('SPiD.logout', {"result": false}));
+            eventTrigger.session({'userId': 10}, {'result': false});
+            assert.isTrue(eventSpy.calledWithMatch('SPiD.logout', {'result': false}));
         });
 
         it('SPiD.EventTrigger.session should trigger SPiD.statusChange when the userStatus session property has changed', function() {
             var eventTrigger = require('../../src/spid-event-trigger');
-            var current = {"result": false, userStatus: "disconnected"};
-            eventTrigger.session({"userId": 10, userStatus:"connected"}, current);
+            var current = {'result': false, userStatus: 'disconnected'};
+            eventTrigger.session({'userId': 10, userStatus:'connected'}, current);
             assert.isTrue(eventSpy.calledWithMatch('SPiD.statusChange', current));
         });
 
         it('SPiD.EventTrigger.session should trigger SPiD.userChange and SPiD.login event when user was logged in and another is not logged in', function() {
-            eventTrigger.session({"userId": 10}, {"result": true, "userId": 11});
+            eventTrigger.session({'userId': 10}, {'result': true, 'userId': 11});
             assert.isTrue(eventSpy.calledWithMatch('SPiD.login'));
             assert.isTrue(eventSpy.calledWithMatch('SPiD.userChange'));
             assert.isTrue(eventSpy.calledWithMatch('SPiD.sessionChange'));

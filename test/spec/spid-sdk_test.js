@@ -1,10 +1,3 @@
-/*global chai:false*/
-/*global sinon:false*/
-/*global describe:false*/
-/*global it:false*/
-/*global before:false*/
-/*global after:false*/
-
 describe('SPiD', function() {
 
     var assert = chai.assert;
@@ -124,7 +117,7 @@ describe('SPiD', function() {
         });
 
         it('SPiD.hasSession should call Talk again if LoginException is returned', function() {
-            talkRequestStub.onFirstCall().callsArgWith(3, {"code":401,"type":"LoginException","description":"Autologin required"}, {result: false});
+            talkRequestStub.onFirstCall().callsArgWith(3, {'code':401,'type':'LoginException','description':'Autologin required'}, {result: false});
             SPiD.hasSession(function() {});
             assert.equal(talkRequestStub.secondCall.args[0], 'https://login.schibsted.com/ajax/hasSession.js');
             assert.equal(talkRequestStub.secondCall.args[1], null);
@@ -134,12 +127,12 @@ describe('SPiD', function() {
 
         it('SPiD.hasSession should try to set cookie (in this case) when successful', function() {
             var fakeSession = {
-                "result":true,
-                "expiresIn":7111,
-                "baseDomain":"sdk.dev",
-                "userStatus":"connected",
-                "userId":1844813,
-                "id":"4f1e2ae59caf7c2f4a058b76"
+                'result':true,
+                'expiresIn':7111,
+                'baseDomain':'sdk.dev',
+                'userStatus':'connected',
+                'userId':1844813,
+                'id':'4f1e2ae59caf7c2f4a058b76'
             };
             talkRequestStub.onFirstCall().callsArgWith(3, null, fakeSession);
             SPiD.hasSession(function() {});
@@ -150,12 +143,12 @@ describe('SPiD', function() {
 
         it('SPiD.hasSession should try to return persisted data without calling Talk', function(done) {
             var storedSession = {
-                "result":true,
-                "expiresIn":7111,
-                "baseDomain":"sdk.dev",
-                "userStatus":"connected",
-                "userId":1844813,
-                "id":"4f1e2ae59caf7c2f4a058b76"
+                'result':true,
+                'expiresIn':7111,
+                'baseDomain':'sdk.dev',
+                'userStatus':'connected',
+                'userId':1844813,
+                'id':'4f1e2ae59caf7c2f4a058b76'
             };
 
             persistGetStub.onFirstCall().returns(storedSession);
@@ -191,12 +184,12 @@ describe('SPiD', function() {
 
         it('SPiD.acceptAgreement should call persist.clear and hasSession on successful talk response', function() {
             var fakeSession = {
-                "result":true,
-                "expiresIn":7111,
-                "baseDomain":"sdk.dev",
-                "userStatus":"connected",
-                "userId":1844813,
-                "id":"4f1e2ae59caf7c2f4a058b76"
+                'result':true,
+                'expiresIn':7111,
+                'baseDomain':'sdk.dev',
+                'userStatus':'connected',
+                'userId':1844813,
+                'id':'4f1e2ae59caf7c2f4a058b76'
             };
             var cbfun = function(){};
             talkRequestStub.onFirstCall().callsArg(3); // acceptAgreement

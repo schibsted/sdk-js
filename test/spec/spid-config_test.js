@@ -1,7 +1,3 @@
-/*global chai:false*/
-/*global describe:false*/
-/*global it:false*/
-
 describe('SPiD.Config', function() {
 
     var assert = chai.assert;

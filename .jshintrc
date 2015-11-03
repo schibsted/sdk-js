@@ -13,5 +13,17 @@
   "browser": true,
   "trailing": true,
   "quotmark": "single",
-  "smarttabs": true
+  "smarttabs": true,
+  "globals": {
+    "require": false,
+    "chai": false,
+    "sinon": false,
+    "assert": false,
+    "describe": false,
+    "it": false,
+    "before": false,
+    "beforeEach": false,
+    "after": false,
+    "afterEach": false
+  }
 }

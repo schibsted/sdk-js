@@ -1,4 +1,4 @@
-/*global require:false*/
+/*global module:false, require:false*/
 var
     _options = {},
     _defaults = {

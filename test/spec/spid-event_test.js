@@ -1,6 +1,3 @@
-/*global describe:false*/
-/*global it:false*/
-
 describe('SPiD.Event', function() {
 
     var spidEvent  = require('../../src/spid-event');

@@ -1,8 +1,3 @@
-/*global chai:false*/
-/*global describe:false*/
-/*global it:false*/
-/*global before:false*/
-
 describe('SPiD.Uri', function() {
 
     var assert = chai.assert;

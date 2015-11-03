@@ -12,7 +12,7 @@ module.exports = function(grunt) {
         path: './dist/',
         filename: fileName + '-<%= pkg.version %>-' + target + '.js'
       }
-    }
+    };
   }
 
   // Project configuration.
@@ -34,19 +34,7 @@ module.exports = function(grunt) {
         src: 'test/spec/*.js'
       },
       sdk: {
-        src: [
-          'src/spid-sdk.js',
-          'src/spid-log.js',
-          'src/spid-util.js',
-          'src/spid-talk.js',
-          'src/spid-cookie.js',
-          'src/spid-cache.js',
-          'src/spid-localstorage.js',
-          'src/spid-persist.js',
-          'src/spid-uri.js',
-          'src/spid-event.js',
-          'src/spid-event-trigger.js'
-        ]
+        src: 'src/*.js'
       }
     },
     uglify: {
@@ -93,7 +81,7 @@ module.exports = function(grunt) {
       commonJsSdk: webpackCfg('commonjs2', 'spid-sdk', 'SPiD'),
       commonJsUri: webpackCfg('commonjs2', 'spid-uri', 'SPiD_Uri')
     },
-    clean: ["dist"],
+    clean: ['dist'],
     compress: {
       main: {
         options: {
@@ -110,7 +98,7 @@ module.exports = function(grunt) {
   });
 
   // These plugins provide necessary tasks.
-  grunt.loadNpmTasks("grunt-webpack");
+  grunt.loadNpmTasks('grunt-webpack');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-karma');
@@ -119,6 +107,6 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-compress');
   // Default task.
   grunt.registerTask('default', ['clean', 'jshint:sdk', 'webpack', 'template', 'uglify', 'compress']);
-  grunt.registerTask('test', ['karma:unit']);
+  grunt.registerTask('test', ['jshint', 'karma:unit']);
 
 };
