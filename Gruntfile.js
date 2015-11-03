@@ -1,6 +1,20 @@
 /*global module:false*/
 module.exports = function(grunt) {
 
+  function webpackCfg(target, fileName, entryName) {
+    var entry = {};
+    entry[entryName] = './src/' + fileName +'.js';
+    return {
+      entry: entry,
+      output: {
+        library: '[name]',
+        libraryTarget: target,
+        path: './dist/',
+        filename: fileName + '-<%= pkg.version %>-' + target + '.js'
+      }
+    }
+  }
+
   // Project configuration.
   grunt.initConfig({
     // Metadata.
@@ -16,79 +30,95 @@ module.exports = function(grunt) {
       gruntfile: {
         src: 'Gruntfile.js'
       },
-      testfile: {
-        src: 'test/test.js'
+      tests: {
+        src: 'test/spec/*.js'
       },
       sdk: {
-        src: 'src/spid-sdk.js'
-      },
-      tracker: {
-        src: 'src/spid-tracker.js'
-      }
-    },
-    concat: {
-      options: {
-        stripBanners: true,
-        banner: '<%= banner %>',
-        process: true
-      },
-      sdk: {
-        src: ['lib/json2.js', '<%= jshint.sdk.src %>'],
-        dest: 'dist/spid-sdk-<%= pkg.version %>.js'
-      },
-      sdktracker: {
-        src: ['lib/json2.js', '<%= jshint.sdk.src %>', '<%= jshint.tracker.src %>'],
-        dest: 'dist/spid-sdk-pulse-<%= pkg.version %>.js'
+        src: [
+          'src/spid-sdk.js',
+          'src/spid-log.js',
+          'src/spid-util.js',
+          'src/spid-talk.js',
+          'src/spid-cookie.js',
+          'src/spid-cache.js',
+          'src/spid-localstorage.js',
+          'src/spid-persist.js',
+          'src/spid-uri.js',
+          'src/spid-event.js',
+          'src/spid-event-trigger.js'
+        ]
       }
     },
     uglify: {
       options: {
         banner: '<%= banner %>'
       },
-      sdk: {
-        src: '<%= concat.sdk.dest %>',
-        dest: 'dist/spid-sdk-<%= pkg.version %>.min.js'
+      sdkVar: {
+        src: 'dist/spid-sdk-<%= pkg.version %>-var.js',
+        dest: 'dist/spid-sdk-<%= pkg.version %>-var.min.js'
       },
-      sdktracker: {
-        src: '<%= concat.sdktracker.dest %>',
-        dest: 'dist/spid-sdk-pulse-<%= pkg.version %>.min.js'
+      sdkAmd: {
+        src: 'dist/spid-sdk-<%= pkg.version %>-amd.js',
+        dest: 'dist/spid-sdk-<%= pkg.version %>-amd.min.js'
+      },
+      sdkCommonJs: {
+        src: 'dist/spid-sdk-<%= pkg.version %>-commonjs2.js',
+        dest: 'dist/spid-sdk-<%= pkg.version %>-commonjs2.min.js'
       }
     },
-    mocha: {
+    template: {
+      options: {
+        data: {
+          pkg : grunt.file.readJSON('package.json')
+        }
+      },
       all: {
-        src: [ 'test/index.html'],
-        options: {
-          mocha: {
-            ignoreLeaks: false
-          },
-          run: true
+        files: {
+          'dist/spid-sdk-<%= pkg.version %>-amd.js': ['dist/spid-sdk-<%= pkg.version %>-amd.js'],
+          'dist/spid-sdk-<%= pkg.version %>-commonjs2.js': ['dist/spid-sdk-<%= pkg.version %>-commonjs2.js'],
+          'dist/spid-sdk-<%= pkg.version %>-var.js': ['dist/spid-sdk-<%= pkg.version %>-var.js']
         }
       }
     },
-    watch: {
-      gruntfile: {
-        files: '<%= jshint.gruntfile.src %>',
-        tasks: ['jshint:gruntfile']
-      },
-      sdkdev: {
-        files: '<%= jshint.sdk.src %>',
-        tasks: ['jshint:sdk', 'jshint:tracker', 'jshint:testfile', 'concat', 'uglify']
-      },
-      sdk: {
-        files: ['<%= jshint.sdk.src %>', 'test/test.js'],
-        tasks: ['jshint:sdk', 'jshint:tracker', 'jshint:testfile', 'mocha']
+    karma: {
+      unit: {
+        configFile: 'karma.conf.js'
+      }
+    },
+    webpack : {
+      varSdk: webpackCfg('var', 'spid-sdk', 'SPiD'),
+      varUri: webpackCfg('var', 'spid-uri', 'SPiD_Uri'),
+      amdSdk: webpackCfg('amd', 'spid-sdk', 'SPiD'),
+      amdUri: webpackCfg('amd', 'spid-uri', 'SPiD_Uri'),
+      commonJsSdk: webpackCfg('commonjs2', 'spid-sdk', 'SPiD'),
+      commonJsUri: webpackCfg('commonjs2', 'spid-uri', 'SPiD_Uri')
+    },
+    clean: ["dist"],
+    compress: {
+      main: {
+        options: {
+          archive: 'dist/spid-sdk-<%= pkg.version %>.zip'
+        },
+        files: [{
+          cwd: 'dist/',
+          src: ['*.js'],
+          expand: true
+        }
+        ]
       }
     }
   });
 
   // These plugins provide necessary tasks.
+  grunt.loadNpmTasks("grunt-webpack");
   grunt.loadNpmTasks('grunt-contrib-uglify');
-  grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-jshint');
-  grunt.loadNpmTasks('grunt-contrib-watch');
-  grunt.loadNpmTasks('grunt-mocha');
-
+  grunt.loadNpmTasks('grunt-karma');
+  grunt.loadNpmTasks('grunt-template');
+  grunt.loadNpmTasks('grunt-contrib-clean');
+  grunt.loadNpmTasks('grunt-contrib-compress');
   // Default task.
-  grunt.registerTask('default', ['jshint:sdk', 'jshint:tracker', 'jshint:testfile', 'concat', 'uglify']);
+  grunt.registerTask('default', ['clean', 'jshint:sdk', 'webpack', 'template', 'uglify', 'compress']);
+  grunt.registerTask('test', ['karma:unit']);
 
 };

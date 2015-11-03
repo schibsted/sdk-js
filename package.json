@@ -1,31 +1,38 @@
 {
   "name": "sdk-js",
-  "version": "1.7.11",
-  "description": "JS SDK of Schibsted Payment AS",
+  "version": "2.0.0",
+  "description": "JS SDK of SPiD",
   "repository": {
     "type": "git",
     "url": "git://github.com/schibsted/sdk-js.git"
   },
   "author": {
-    "name": "Schibsted Payment AS",
-    "email": "info@schibstedpayment.no",
-    "url": "http://schibstedpayment.no"
+    "name": "Schibsted Products and Technology",
+    "email": "tech-identity@schibsted.com",
+    "url": "http://schibsted.com"
   },
   "scripts": {
-    "test": "grunt mocha",
-    "build": "npm install && grunt",
-    "start": "grunt watch"
+    "test": "grunt test",
+    "build": "npm install && grunt"
   },
   "engines": {
     "node": ">= 0.10.0"
   },
   "devDependencies": {
-    "grunt": "~0.4.1",
-    "grunt-contrib-jshint": "~0.4.3",
-    "grunt-contrib-watch": "~0.4.3",
-    "grunt-contrib-uglify": "~0.2.0",
-    "mocha": "~1.8.1",
-    "grunt-mocha": "~0.3.1",
-    "grunt-contrib-concat": "~0.3.0"
+    "grunt": "~0.4.2",
+    "grunt-contrib-jshint": "~0.8.0",
+    "grunt-contrib-uglify": "~0.3.2",
+    "grunt-contrib-compress": "~0.13.0",
+    "grunt-contrib-clean": "~0.6.0",
+    "grunt-template": "~0.2.3",
+    "grunt-webpack": "~1.0.3",
+    "karma": "^0.13.9",
+    "grunt-karma": "^0.12.1",
+    "karma-sinon-chai":"~1.1",
+    "karma-phantomjs-launcher": "~0.2",
+    "karma-mocha": "~0.2",
+    "karma-webpack": "^1.7.0",
+    "karma-coverage": "~0.5.2",
+    "istanbul-instrumenter-loader": "~0.1.3"
   }
 }
