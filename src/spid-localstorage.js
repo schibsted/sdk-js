@@ -1,5 +1,6 @@
 /*global require:false, module:false*/
 var log = require('./spid-log'),
+    config = require('./spid-config'),
     keyPrefix = 'SPiD_',
     enabled = true;
 
@@ -12,7 +13,7 @@ function encode(value) {
 }
 
 function _toKey(key) {
-    return keyPrefix + key;
+    return keyPrefix + config.options().client_id + '_' + key;
 }
 
 function set(key, value, expiresInSeconds) {
