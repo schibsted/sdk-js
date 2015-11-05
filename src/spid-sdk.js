@@ -19,7 +19,7 @@ function globalExport(global) {
 function init(opts, callback) {
     config.init(opts);
     if(!config.options().noGlobalExport) {
-        globalExport(window);
+        globalExport.call(this, window);
     }
     _initiated = true;
     if(callback) {
