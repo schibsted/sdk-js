@@ -1,30 +1,29 @@
 /*global require:false, module:false*/
 var config = require('./spid-config'),
-    _key = 'Session',
-    noop = function() {
-    };
+    noop = function() {};
+
 function getPersistenceModule() {
-    var cookie = require('./spid-cookie');
     var storages = {
         localstorage: require('./spid-localstorage'),
-        cookie: {
-            get: cookie.get,
-            set: function(key, value) { cookie.set(value); },
-            clear: cookie.clear
-        },
+        cookie: require('./spid-cookie'),
         standard: {get: noop, set: noop, clear: noop}
     };
     return storages[(config.options().storage || 'standard')];
 }
 
+function name() {
+    var options = config.options();
+    return 'spid_js_' + options.client_id;
+}
+
 module.exports = {
     get: function() {
-        return getPersistenceModule().get(_key);
+        return getPersistenceModule().get(name());
     },
-    set: function( value, expiresIn) {
-        return getPersistenceModule().set(_key, value, expiresIn);
+    set: function(value, expiresIn) {
+        return getPersistenceModule().set(name(), value, expiresIn);
     },
     clear: function() {
-        return getPersistenceModule().clear(_key);
+        return getPersistenceModule().clear(name());
     }
 };

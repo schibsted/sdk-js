@@ -1,6 +1,5 @@
 /*global require:false, module:false*/
 var log = require('./spid-log'),
-    keyPrefix = 'SPiD_',
     enabled = true;
 
 function decode(value) {
@@ -11,10 +10,6 @@ function encode(value) {
     return JSON.stringify(value);
 }
 
-function _toKey(key) {
-    return keyPrefix + key;
-}
-
 function set(key, value, expiresInSeconds) {
     try {
         if(expiresInSeconds) {
@@ -22,7 +17,7 @@ function set(key, value, expiresInSeconds) {
             date.setTime(date.getTime() + (expiresInSeconds * 1000));
             value._expires = date;
         }
-        window.localStorage.setItem(_toKey(key), encode(value));
+        window.localStorage.setItem(key, encode(value));
     } catch(e) {
         log.info(e);
     }
@@ -30,7 +25,7 @@ function set(key, value, expiresInSeconds) {
 
 function clear(key) {
     try {
-        window.localStorage.clear(_toKey(key));
+        window.localStorage.clear(key);
     } catch(e) {
         log.info(e);
     }
@@ -45,7 +40,7 @@ function isExpired(item) {
 
 function get(key) {
     try {
-        var storedItem = decode(window.localStorage.getItem(_toKey(key)));
+        var storedItem = decode(window.localStorage.getItem(key));
         if (isExpired(storedItem)) {
             clear(key);
             return null;
