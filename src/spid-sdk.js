@@ -27,7 +27,7 @@ function init(opts, callback) {
     }
 }
 
-function hasSession(callback) {
+function hasSession(callback, forceServerReload) {
     callback = callback || function() {
         };
     var that = this,
@@ -52,6 +52,10 @@ function hasSession(callback) {
             }
             handleResponse(err, data);
         };
+
+    if (forceServerReload === true) {
+        persist.clear();
+    }
 
     var data = persist.get();
     if(data) {
@@ -138,8 +142,8 @@ function logout(callback) {
 function acceptAgreement(callback) {
     var that = this;
     var cb = function() {
-        persist.clear();
-        that.hasSession(callback);
+        var forceServerReload = true;
+        that.hasSession(callback, forceServerReload);
     };
     talk.request(this.server(),'ajax/acceptAgreement.js', {}, cb);
 }
