@@ -27,7 +27,7 @@ function init(opts, callback) {
     }
 }
 
-function hasSession(callback) {
+function hasSession(callback, forceServerReload) {
     callback = callback || function() {
         };
     var that = this,
@@ -52,6 +52,10 @@ function hasSession(callback) {
             }
             handleResponse(err, data);
         };
+
+    if (forceServerReload === true) {
+        persist.clear();
+    }
 
     var data = persist.get();
     if(data) {

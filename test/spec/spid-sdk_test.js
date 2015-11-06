@@ -141,23 +141,46 @@ describe('SPiD', function() {
             assert.equal(7111, persistSetStub.firstCall.args[1]);
         });
 
-        it('SPiD.hasSession should try to return persisted data without calling Talk', function(done) {
-            var storedSession = {
-                'result':true,
-                'expiresIn':7111,
-                'baseDomain':'sdk.dev',
-                'userStatus':'connected',
-                'userId':1844813,
-                'id':'4f1e2ae59caf7c2f4a058b76'
-            };
+        describe('when session is in cache', function () {
+            function storedSession() {
+                return {
+                    'result':true,
+                    'expiresIn':7111,
+                    'baseDomain':'sdk.dev',
+                    'userStatus':'connected',
+                    'userId':1844813,
+                    'id':'4f1e2ae59caf7c2f4a058b76'
+                };
+            }
 
-            persistGetStub.onFirstCall().returns(storedSession);
-            SPiD.hasSession(function(err, res) {
-                if(!err && res.result && res.userId === 1844813) {
+            it('SPiD.hasSession should try to return persisted data without calling Talk', function(done) {
+                persistGetStub.onFirstCall().returns(storedSession());
+                SPiD.hasSession(function(err, res) {
+                    if(!err && res.result && res.userId === 1844813) {
+                        assert.isFalse(talkRequestStub.called);
+                        done();
+                    }
+                });
+
+            });
+
+            it('SPiD.hasSession should call Talk when forceFreshReload set', function(done) {
+                var forceFreshReload = true;
+                var newSession = storedSession();
+                newSession.userId = 12313243;
+                talkRequestStub.onFirstCall().callsArgWith(3, null, newSession);
+
+                function assertingCallback(err, res) {
+                    assert.isTrue(talkRequestStub.called);
+                    assert.equal(undefined, err);
+                    assert.equal(newSession.userId, res.userId);
                     done();
                 }
+
+                SPiD.hasSession(assertingCallback, forceFreshReload);
+
             });
-            assert.isFalse(talkRequestStub.called);
+
         });
     });
 
