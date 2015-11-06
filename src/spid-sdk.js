@@ -142,8 +142,8 @@ function logout(callback) {
 function acceptAgreement(callback) {
     var that = this;
     var cb = function() {
-        persist.clear();
-        that.hasSession(callback);
+        var forceServerReload = true;
+        that.hasSession(callback, forceServerReload);
     };
     talk.request(this.server(),'ajax/acceptAgreement.js', {}, cb);
 }
