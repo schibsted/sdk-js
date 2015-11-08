@@ -14,11 +14,6 @@ function encode(value) {
 }
 
 
-function name() {
-    var options = config.options();
-    return 'spid_js_' + options.client_id;
-}
-
 function _setRaw(name, value, expiresIn, domain) {
     var date = new Date();
     date.setTime(date.getTime() + (expiresIn * 1000));
@@ -30,22 +25,22 @@ function _setRaw(name, value, expiresIn, domain) {
     document.cookie = cookie;
 }
 
-function set(session) {
+function set(name, session, expiresInSeconds) {
     var options = config.options();
     if(!session) { return false; }
     _domain = session.baseDomain;
-    _setRaw(name(), encode(session), session.expiresIn, _domain);
-    log.info('SPiD.Cookie.set({n})'.replace('{n}', name()));
+    _setRaw(name, encode(session), expiresInSeconds, _domain);
+    log.info('SPiD.Cookie.set({n})'.replace('{n}', name));
     if(session.sp_id) {
         var expiresIn = options.varnish_expiration || session.expiresIn;
         _setRaw(_varnishCookieName, session.sp_id, expiresIn, _domain);
         log.info('SPiD.Cookie.set({n})'.replace('{n}', _varnishCookieName));
     }
 }
-function get() {
+function get(name) {
     log.info('SPiD.Cookie.get()');
     var cookies = '; ' + document.cookie;
-    var parts = cookies.split('; ' + name() + '=');
+    var parts = cookies.split('; ' + name + '=');
     var cookie = (parts.length === 2) ? parts.pop().split(';').shift() : null;
 
     if (cookie) {
@@ -61,9 +56,9 @@ function get() {
     return null;
 }
 
-function clear() {
+function clear(name) {
     log.info('SPiD.Cookie.clear()');
-    _setRaw(name(), '', 0, _domain);
+    _setRaw(name, '', 0, _domain);
     _setRaw(_varnishCookieName, '', 0, _domain);
 }
 

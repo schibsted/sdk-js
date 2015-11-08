@@ -13,13 +13,6 @@ describe('SPiD.Cookie', function() {
         before(function() {
             SPiD.init(setupProd);
         });
-
-        it('SPiD.Cookie.name should return correct name', function() {
-            assert.equal(
-                spidCookie.name(),
-                'spid_js_'+setup.client_id
-            );
-        });
     });
 
     describe('SPiD.Cookie Stage', function() {
@@ -27,12 +20,6 @@ describe('SPiD.Cookie', function() {
             SPiD.init(setup);
         });
 
-        it('SPiD.Cookie.name should return correct name', function() {
-            assert.equal(
-                spidCookie.name(),
-                'spid_js_'+setup.client_id
-            );
-        });
         it('SPiD.Cookie.encode should return escaped JSON', function() {
             assert.equal(
                 spidCookie.encode({str:'val',test:true}),
@@ -50,37 +37,39 @@ describe('SPiD.Cookie', function() {
         it('SPiD.Cookie.set should set session cookie', function() {
 
             var session = {user:123, expiresIn: 5000, baseDomain: cookieDomain};
-            spidCookie.set(session);
-            assert.notEqual(document.cookie.indexOf(spidCookie.name()), -1);
+            var name = 'name';
+            spidCookie.set(name, session, session.expiresIn);
+
+            assert.notEqual(document.cookie.indexOf(name), -1);
         });
 
         it('SPiD.Cookie.set should set varnish cookie', function() {
             var session = {user:123, sp_id: 123, expiresIn: 5000, baseDomain: cookieDomain};
-            spidCookie.set(session);
+            spidCookie.set('name', session, session.expiresIn);
 
             assert.notEqual(document.cookie.indexOf('SP_ID'), -1);
         });
 
         it('SPiD.Cookie.get should return session', function() {
             var session = {user:123, sp_id: 123, expiresIn: 5000, baseDomain: cookieDomain};
-            spidCookie.set(session);
+            spidCookie.set('name', session, session.expiresIn);
 
-            var cookie = spidCookie.get();
+            var cookie = spidCookie.get('name');
             assert.equal(cookie.user, 123);
             assert.equal(cookie.sp_id, 123);
         });
 
         it('SPiD.Cookie.get should return null if no cookie', function() {
-            spidCookie.clear();
-            var cookie = spidCookie.get();
+            spidCookie.clear('name');
+            var cookie = spidCookie.get('name');
             assert.isNull(cookie);
         });
 
         it('SPiD.Cookie.clear should remove cookies', function() {
             var session = {user:123, sp_id: 123, expiresIn: 5000, baseDomain: cookieDomain};
-            spidCookie.set(session);
-            spidCookie.clear();
-            assert.equal(document.cookie.indexOf(spidCookie.name()), -1);
+            spidCookie.set('name', session, session.expiresIn);
+            spidCookie.clear('name');
+            assert.equal(document.cookie.indexOf('name'), -1);
             assert.equal(document.cookie.indexOf('SP_ID'), -1);
         });
     });
