@@ -11,6 +11,11 @@
     "email": "tech-identity@schibsted.com",
     "url": "http://schibsted.com"
   },
+  "keywords": [
+    "spid",
+    "sdk",
+    "hassession"
+  ],
   "scripts": {
     "test": "grunt test",
     "build": "npm install && grunt"
@@ -35,5 +40,6 @@
     "karma-webpack": "^1.7.0",
     "karma-coverage": "~0.5.2",
     "istanbul-instrumenter-loader": "~0.1.3"
-  }
+  },
+  "license": "MIT"
 }
