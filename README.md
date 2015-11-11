@@ -1,10 +1,12 @@
-# Javascript SDK, version 2.0.0
+# SPiD JS SDK
 
-Version 2.0.0 is the latest version of the Javascript SDK. Use with care as it is not yet considered stable.
+SDK to integrate to the SPiD frontend API.
+Used to check if user is logged in or not, or owns a product or not.
 
 ## Documentation
 
-See the SPiD Tech docs, found elsewhere.
+Documentation is available on http://techdocs.spid.no/sdks/javascript/
+and make sure to read the API docs http://techdocs.spid.no/sdks/js/api-docs/.
 
 ## Notes
 
