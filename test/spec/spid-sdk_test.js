@@ -116,6 +116,15 @@ describe('SPiD', function() {
             persistGetStub.restore();
         });
 
+        it('SPiD.hasSession should use error first callback style', function(done) {
+            talkRequestStub.onFirstCall().callsArgWith(3, null, fakeSession);
+
+            SPiD.hasSession( function(err, session) {
+                assert.isNull(err);
+                assert.equal(session, fakeSession);
+                done();
+            });
+        });
 
         it('SPiD.hasSession should call Talk with parameter server, path, params, callback', function() {
             SPiD.hasSession(function() {});

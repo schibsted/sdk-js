@@ -20,9 +20,9 @@ var sessionCallbacks = (function sessionRequests() {
         register: function (callback) {
             _callbacks.push(callback);
         },
-        invokeAll: function (data) {
+        invokeAll: function (err, data) {
             _callbacks.forEach(function (cb) {
-                cb(data);
+                cb(err, data);
             });
             clear();
         },
@@ -57,7 +57,7 @@ function hasSession(callback) {
         respond = function(err, data) {
             eventTrigger.session(_session, data);
             _session = data;
-            sessionCallbacks.invokeAll(data);
+            sessionCallbacks.invokeAll(err, data);
         },
         handleResponse = function(err, data) {
             if(!err && !!data.result) {
