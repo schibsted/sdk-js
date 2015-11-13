@@ -26,7 +26,7 @@ var sessionCallbacks = (function sessionRequests() {
             });
             clear();
         },
-        isConcurrentRequest : function () {
+        hasPendingRequest : function () {
             return _callbacks.length > 1;
         },
         clear: clear
@@ -82,7 +82,7 @@ function hasSession(callback) {
     if(data) {
         _session = data;
         return respond(null, data);
-    } else if (!sessionCallbacks.isConcurrentRequest()) {
+    } else if (!sessionCallbacks.hasPendingRequest()) {
         talk.request(this.sessionEndpoint(), null, {autologin: 1}, handleException);
     }
 }
