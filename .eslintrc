@@ -1,0 +1,7 @@
+{
+    "extends": [
+        "spt",
+        "spt/env-node",
+        "spt/env-es6-false"
+    ]
+}

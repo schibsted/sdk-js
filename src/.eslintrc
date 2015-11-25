@@ -1,0 +1,10 @@
+{
+    "extends": [
+        "spt",
+        "spt/env-node-false",
+        "spt/env-es6-false"
+    ],
+    "env": {
+        "browser": true
+    }
+}
