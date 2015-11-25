@@ -1,10 +1,11 @@
-describe('SPiD', function() {
+'use strict';
 
+describe('SPiD', function() {
     var assert = chai.assert;
     var setup = function() {
-        return {client_id : '4d00e8d6bf92fc8648000000', server: 'identity-pre.schibsted.com', useSessionCluster:false, logging:false, cache:true, storage: 'cookie'};
+        return { client_id : '4d00e8d6bf92fc8648000000', server: 'identity-pre.schibsted.com', useSessionCluster:false, logging:false, cache:true, storage: 'cookie' };
     };
-    var setupProd = {client_id : '4d00e8d6bf92fc8648000000', server: 'login.schibsted.com', logging:false, refresh_timeout: 100, storage: 'cookie'};
+    var setupProd = { client_id : '4d00e8d6bf92fc8648000000', server: 'login.schibsted.com', logging:false, refresh_timeout: 100, storage: 'cookie' };
     var SPiD = require('../../src/spid-sdk');
 
     describe('SPiD.init', function() {
@@ -96,13 +97,13 @@ describe('SPiD', function() {
             SPiD.init(setupProd);
         });
 
-        beforeEach(function(){
+        beforeEach(function() {
             talkRequestStub = sinon.stub(require('../../src/spid-talk'), 'request');
             persistSetStub = sinon.stub(require('../../src/spid-persist'), 'set');
             persistGetStub = sinon.stub(require('../../src/spid-persist'), 'get');
         });
 
-        afterEach(function(){
+        afterEach(function() {
             talkRequestStub.restore();
             persistSetStub.restore();
             persistGetStub.restore();
@@ -110,14 +111,14 @@ describe('SPiD', function() {
 
         it('SPiD.hasSession should call Talk with parameter server, path, params, callback', function() {
             SPiD.hasSession(function() {});
-            assert.equal(talkRequestStub.getCall(0).args[0],'https://session.login.schibsted.com/rpc/hasSession.js');
-            assert.equal(talkRequestStub.getCall(0).args[1],null);
-            assert.equal(talkRequestStub.getCall(0).args[2].autologin,1);
+            assert.equal(talkRequestStub.getCall(0).args[0], 'https://session.login.schibsted.com/rpc/hasSession.js');
+            assert.equal(talkRequestStub.getCall(0).args[1], null);
+            assert.equal(talkRequestStub.getCall(0).args[2].autologin, 1);
             assert.isFunction(talkRequestStub.getCall(0).args[3]);
         });
 
         it('SPiD.hasSession should call Talk again if LoginException is returned', function() {
-            talkRequestStub.onFirstCall().callsArgWith(3, {'code':401,'type':'LoginException','description':'Autologin required'}, {result: false});
+            talkRequestStub.onFirstCall().callsArgWith(3, { 'code':401, 'type':'LoginException', 'description':'Autologin required' }, { result: false });
             SPiD.hasSession(function() {});
             assert.equal(talkRequestStub.secondCall.args[0], 'https://login.schibsted.com/ajax/hasSession.js');
             assert.equal(talkRequestStub.secondCall.args[1], null);
@@ -153,7 +154,7 @@ describe('SPiD', function() {
 
             persistGetStub.onFirstCall().returns(storedSession);
             SPiD.hasSession(function(err, res) {
-                if(!err && res.result && res.userId === 1844813) {
+                if (!err && res.result && res.userId === 1844813) {
                     done();
                 }
             });
@@ -175,7 +176,7 @@ describe('SPiD', function() {
         });
 
         it('SPiD.acceptAgreement should call Talk with parameter server, path, callback', function() {
-            SPiD.acceptAgreement(function(){});
+            SPiD.acceptAgreement(function() {});
             assert.equal(talkRequestStub.getCall(0).args[0], 'https://identity-pre.schibsted.com/');
             assert.equal(talkRequestStub.getCall(0).args[1], 'ajax/acceptAgreement.js');
             assert.isFunction(talkRequestStub.getCall(0).args[3]);
@@ -191,7 +192,7 @@ describe('SPiD', function() {
                 'userId':1844813,
                 'id':'4f1e2ae59caf7c2f4a058b76'
             };
-            var cbfun = function(){};
+            var cbfun = function() {};
             talkRequestStub.onFirstCall().callsArg(3); // acceptAgreement
             talkRequestStub.onSecondCall().callsArgWith(3, null, fakeSession);
             SPiD.acceptAgreement(cbfun);
@@ -216,7 +217,7 @@ describe('SPiD', function() {
             cacheSetStub = sinon.stub(require('../../src/spid-cache'), 'set');
         });
 
-        afterEach(function(){
+        afterEach(function() {
             talkRequestStub.restore();
             cacheGetStub.restore();
             cacheSetStub.restore();
@@ -232,7 +233,7 @@ describe('SPiD', function() {
         });
 
         it('SPiD.hasProduct should try and set cache on successful return', function() {
-            talkRequestStub.onFirstCall().callsArgWith(3, null, {result: true, productId: 10010});
+            talkRequestStub.onFirstCall().callsArgWith(3, null, { result: true, productId: 10010 });
             SPiD.hasProduct(10010, function() {});
             assert.isTrue(cacheSetStub.calledOnce);
             assert.equal(cacheSetStub.getCall(0).args[0], 'prd_10010');
@@ -250,7 +251,7 @@ describe('SPiD', function() {
             var _setup = setup();
             _setup.cache = false;
             SPiD.init(_setup);
-            talkRequestStub.onFirstCall().callsArgWith(3, null, {result: true, productId: 10010});
+            talkRequestStub.onFirstCall().callsArgWith(3, null, { result: true, productId: 10010 });
             SPiD.hasProduct(10010, function() {
                 done();
                 assert.isFalse(cacheGetStub.called);
@@ -273,7 +274,7 @@ describe('SPiD', function() {
             cacheGetStub = sinon.stub(require('../../src/spid-cache'), 'get');
             cacheSetStub = sinon.stub(require('../../src/spid-cache'), 'set');
         });
-        afterEach(function(){
+        afterEach(function() {
             talkRequestStub.restore();
             cacheGetStub.restore();
             cacheSetStub.restore();
@@ -290,7 +291,7 @@ describe('SPiD', function() {
         });
 
         it('SPiD.hasSubscription should try and set cache on successful return', function() {
-            talkRequestStub.onFirstCall().callsArgWith(3, null, {result: true, productId: 10010});
+            talkRequestStub.onFirstCall().callsArgWith(3, null, { result: true, productId: 10010 });
             SPiD.hasSubscription(10010, function() {});
 
             assert.isTrue(cacheSetStub.calledOnce);
@@ -312,7 +313,7 @@ describe('SPiD', function() {
             var _setup = setup();
             _setup.cache = false;
             SPiD.init(_setup);
-            talkRequestStub.onFirstCall().callsArgWith(3, null, {result: true, productId: 10010});
+            talkRequestStub.onFirstCall().callsArgWith(3, null, { result: true, productId: 10010 });
             SPiD.hasSubscription(10010, function() {
                 assert.isFalse(cacheGetStub.called);
                 assert.isFalse(cacheSetStub.called);
@@ -367,16 +368,16 @@ describe('SPiD', function() {
         });
 
         it('SPiD.logout should call callback with error and response', function(done) {
-            talkRequestStub.onFirstCall().callsArgWith(3, {error:true}, {result:true});
+            talkRequestStub.onFirstCall().callsArgWith(3, { error:true }, { result:true });
             SPiD.logout(function(err, res) {
-                if(err.error && res.result) {
+                if (err.error && res.result) {
                     done();
                 }
             });
         });
 
         it('SPiD.logout should call SPiD.Cookie.clear() when successful', function() {
-            talkRequestStub.onFirstCall().callsArgWith(3, {error:true}, {result:true});
+            talkRequestStub.onFirstCall().callsArgWith(3, { error:true }, { result:true });
             SPiD.logout();
             assert.isTrue(cookieClearStub.calledOnce);
         });

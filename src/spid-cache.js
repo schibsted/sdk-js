@@ -16,18 +16,18 @@ function enabled() {
 }
 
 function set(key, value) {
-    if(enabled()) {
+    if (enabled()) {
         _storage[key] = encode(value);
     }
 }
 
 function get(key) {
-    if(enabled()) {
+    if (enabled()) {
         return _storage[key] ? decode(_storage[key]) : null;
     }
 }
 function clear(key) {
-    if(enabled() && _storage[key]) {
+    if (enabled() && _storage[key]) {
         _storage[key] = null;
     }
 }

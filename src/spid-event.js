@@ -50,7 +50,7 @@ function unsubscribe(name, cb) {
     log.info('SPiD.Event.unsubscribe({n})'.replace('{n}', name));
     var subs = subscribers[name] || [];
     for (var i = 0, l = subs.length; i !== l; i++) {
-        if(subs[i] === cb) {
+        if (subs[i] === cb) {
             subs[i] = null;
         }
     }

@@ -12,13 +12,13 @@ function encode(value) {
 
 function set(key, value, expiresInSeconds) {
     try {
-        if(expiresInSeconds) {
+        if (expiresInSeconds) {
             var date = new Date();
             date.setTime(date.getTime() + (expiresInSeconds * 1000));
             value._expires = date;
         }
         window.localStorage.setItem(key, encode(value));
-    } catch(e) {
+    } catch (e) {
         log.info(e);
     }
 }
@@ -26,13 +26,13 @@ function set(key, value, expiresInSeconds) {
 function clear(key) {
     try {
         window.localStorage.clear(key);
-    } catch(e) {
+    } catch (e) {
         log.info(e);
     }
 }
 
 function isExpired(item) {
-    if(item && item._expires) {
+    if (item && item._expires) {
         return new Date(item._expires).getTime() < new Date().getTime();
     }
     return false;
@@ -46,7 +46,7 @@ function get(key) {
             return null;
         }
         return storedItem;
-    } catch(e) {
+    } catch (e) {
         log.info(e);
     }
     return null;

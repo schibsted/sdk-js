@@ -27,11 +27,11 @@ function _setRaw(name, value, expiresIn, domain) {
 
 function set(name, session, expiresInSeconds) {
     var options = config.options();
-    if(!session) { return false; }
+    if (!session) { return false; }
     _domain = session.baseDomain;
     _setRaw(name, encode(session), expiresInSeconds, _domain);
     log.info('SPiD.Cookie.set({n})'.replace('{n}', name));
-    if(session.sp_id) {
+    if (session.sp_id) {
         var expiresIn = options.varnish_expiration || session.expiresIn;
         _setRaw(_varnishCookieName, session.sp_id, expiresIn, _domain);
         log.info('SPiD.Cookie.set({n})'.replace('{n}', _varnishCookieName));

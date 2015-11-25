@@ -18,18 +18,18 @@ function globalExport(global) {
 
 function init(opts, callback) {
     config.init(opts);
-    if(!config.options().noGlobalExport) {
+    if (!config.options().noGlobalExport) {
         globalExport.call(this, window);
     }
     _initiated = true;
-    if(callback) {
+    if (callback) {
         callback();
     }
 }
 
 function hasSession(callback) {
     callback = callback || function() {
-        };
+    };
     var that = this,
         respond = function(err, data) {
             eventTrigger.session(_session, data);
@@ -37,46 +37,46 @@ function hasSession(callback) {
             callback(err, data);
         },
         handleResponse = function(err, data) {
-            if(!err && !!data.result) {
+            if (!err && !!data.result) {
                 persist.set(data, data.expiresIn);
             }
             respond(err, data);
         },
         handleException = function(err, data) {
-            if(err && err.type === 'LoginException') {
+            if (err && err.type === 'LoginException') {
                 spidEvent.fire('SPiD.loginException');
                 //Fallback to core
-                return talk.request(that.coreEndpoint(), null, {autologin: 1}, handleResponse);
-            } else if(err) {
+                return talk.request(that.coreEndpoint(), null, { autologin: 1 }, handleResponse);
+            } else if (err) {
                 spidEvent.fire('SPiD.error', err);
             }
             handleResponse(err, data);
         };
 
     var data = persist.get();
-    if(data) {
+    if (data) {
         _session = data;
         return respond(null, data);
     }
 
-    talk.request(this.sessionEndpoint(), null, {autologin: 1}, handleException);
+    talk.request(this.sessionEndpoint(), null, { autologin: 1 }, handleException);
 }
 
 function hasProduct(productId, callback) {
     callback = callback || function() {
-        };
-    if(cache.enabled()) {
+    };
+    if (cache.enabled()) {
         var cacheVal = cache.get('prd_{id}'.replace('{id}', productId));
-        if(cacheVal && (cacheVal.refreshed + config.options().refresh_timeout) > util.now()) {
+        if (cacheVal && (cacheVal.refreshed + config.options().refresh_timeout) > util.now()) {
             return callback(null, cacheVal);
         }
     }
     var cb = function(err, data) {
-        if(cache.enabled() && !err && !!data.result) {
+        if (cache.enabled() && !err && !!data.result) {
             data.refreshed = util.now();
             cache.set('prd_{id}'.replace('{id}', productId), data);
         }
-        if(!err && !!data.result) {
+        if (!err && !!data.result) {
             spidEvent.fire('SPiD.hasProduct', {
                 productId: productId,
                 result: data.result
@@ -84,24 +84,24 @@ function hasProduct(productId, callback) {
         }
         callback(err, data);
     };
-    talk.request(this.server(), 'ajax/hasproduct.js', {product_id: productId}, cb);
+    talk.request(this.server(), 'ajax/hasproduct.js', { product_id: productId }, cb);
 }
 
 function hasSubscription(productId, callback) {
     callback = callback || function() {
-        };
-    if(cache.enabled()) {
+    };
+    if (cache.enabled()) {
         var cacheVal = cache.get('sub_{id}'.replace('{id}', productId));
-        if(cacheVal && (cacheVal.refreshed + config.options().refresh_timeout) > util.now()) {
+        if (cacheVal && (cacheVal.refreshed + config.options().refresh_timeout) > util.now()) {
             return callback(null, cacheVal);
         }
     }
     var cb = function(err, data) {
-        if(cache.enabled() && !err && !!data.result) {
+        if (cache.enabled() && !err && !!data.result) {
             data.refreshed = util.now();
             cache.set('sub_{id}'.replace('{id}', productId), data);
         }
-        if(!err && !!data.result) {
+        if (!err && !!data.result) {
             spidEvent.fire('SPiD.hasSubscription', {
                 subscriptionId: productId,
                 result: data.result
@@ -109,26 +109,26 @@ function hasSubscription(productId, callback) {
         }
         callback(err, data);
     };
-    talk.request(this.server(), 'ajax/hassubscription.js', {product_id: productId}, cb);
+    talk.request(this.server(), 'ajax/hassubscription.js', { product_id: productId }, cb);
 }
 
 function setTraits(traits, callback) {
     callback = callback || function() {
-        };
-    talk.request(this.server(), 'ajax/traits.js', {t: traits}, callback);
+    };
+    talk.request(this.server(), 'ajax/traits.js', { t: traits }, callback);
 }
 
 function logout(callback) {
     var cb = function(err, data) {
-        if(data.result) {
+        if (data.result) {
             persist.clear();
         }
 
-        if(!err && !!data.result) {
+        if (!err && !!data.result) {
             spidEvent.fire('SPiD.logout', data);
         }
 
-        if(callback) {
+        if (callback) {
             callback(err, data);
         }
     };
@@ -141,12 +141,12 @@ function acceptAgreement(callback) {
         persist.clear();
         that.hasSession(callback);
     };
-    talk.request(this.server(),'ajax/acceptAgreement.js', {}, cb);
+    talk.request(this.server(), 'ajax/acceptAgreement.js', {}, cb);
 }
 
 //Async loader
 window.setTimeout(function() {
-    if(typeof (window.asyncSPiD) === 'function' && !window.asyncSPiD.hasRun) {
+    if (typeof (window.asyncSPiD) === 'function' && !window.asyncSPiD.hasRun) {
         window.asyncSPiD();
         window.asyncSPiD.hasRun = true;
     }
