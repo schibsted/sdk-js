@@ -1,3 +1,5 @@
+'use strict';
+
 module.exports = function(config) {
     config.set({
         frameworks: [
@@ -11,11 +13,11 @@ module.exports = function(config) {
         ],
         files: [
             'test/spec/*.js',
-             {
-                 pattern: 'test/mock/*.js',
-                 included: false,
-                 served: true
-             }
+            {
+                pattern: 'test/mock/*.js',
+                included: false,
+                served: true
+            }
         ],
         preprocessors: {
             'test/spec/*.js': ['webpack']
@@ -27,7 +29,7 @@ module.exports = function(config) {
         coverageReporter: {
             dir: 'coverage',
             reporters: [
-                {type: 'html'}
+                { type: 'html' }
             ]
         },
         webpack: {

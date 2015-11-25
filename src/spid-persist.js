@@ -1,4 +1,4 @@
-/*global require:false, module:false*/
+/* global require:false, module:false */
 var config = require('./spid-config'),
     noop = function() {};
 
@@ -6,7 +6,7 @@ function getPersistenceModule() {
     var storages = {
         localstorage: require('./spid-localstorage'),
         cookie: require('./spid-cookie'),
-        standard: {get: noop, set: noop, clear: noop}
+        standard: { get: noop, set: noop, clear: noop }
     };
     return storages[(config.options().storage || 'standard')];
 }

@@ -1,0 +1,14 @@
+{
+    "extends": [
+        "spt/env-es6-false"
+    ],
+    "env": {
+        "mocha": true,
+        "browser": true
+    },
+    "globals": {
+        "chai": false,
+        "sinon": false,
+        "assert": false
+    }
+}

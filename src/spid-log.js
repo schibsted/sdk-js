@@ -6,7 +6,7 @@ function enabled() {
 }
 
 function _log(message, level) {
-    if(enabled()) {
+    if (enabled()) {
         window.console[level]('[SPiD] ' + message);
     }
 }

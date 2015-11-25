@@ -21,7 +21,7 @@ function _createCallback(callback) {
 }
 
 function _queue(id, url) {
-    _requestQueue.push({id:id, url:url});
+    _requestQueue.push({ id:id, url:url });
 }
 
 function _isProcessing() {
@@ -29,7 +29,7 @@ function _isProcessing() {
 }
 
 function _removeScriptObject() {
-    if(_scriptObject) {
+    if (_scriptObject) {
         _scriptObject.parentNode.removeChild(_scriptObject);
         _scriptObject = null;
     }
@@ -41,7 +41,7 @@ function _done(id, data) {
     _removeScriptObject();
     _processQueue();
 
-    if(_callbacks[id]) {
+    if (_callbacks[id]) {
         var f = _callbacks[id];
         _callbacks[id] = null;
         var err = data['error'] ? data['error'] : null,
@@ -52,7 +52,7 @@ function _done(id, data) {
 
 function _failure(message, id) {
     log.error(message);
-    _done(id, {'error': {'type': 'communication', 'code': 503, 'description': message}, 'response': {}});
+    _done(id, { 'error': { 'type': 'communication', 'code': 503, 'description': message }, 'response': {} });
 }
 
 function _createScriptObject(node) {
@@ -75,7 +75,7 @@ function _send(node) {
 }
 
 function _processQueue() {
-    if(!_isProcessing() && _requestQueue.length > 0) {
+    if (!_isProcessing() && _requestQueue.length > 0) {
         var node = _requestQueue.shift();
         _send(node);
     }

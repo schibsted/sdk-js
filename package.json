@@ -17,7 +17,7 @@
     "hassession"
   ],
   "scripts": {
-    "test": "grunt test",
+    "test": "./node_modules/.bin/eslint . --ignore-path .gitignore && grunt test",
     "build": "npm install && grunt"
   },
   "engines": {
@@ -28,7 +28,6 @@
     "grunt": "~0.4.2",
     "grunt-contrib-clean": "~0.6.0",
     "grunt-contrib-compress": "~0.13.0",
-    "grunt-contrib-jshint": "~0.8.0",
     "grunt-contrib-uglify": "~0.3.2",
     "grunt-karma": "^0.12.1",
     "grunt-template": "~0.2.3",

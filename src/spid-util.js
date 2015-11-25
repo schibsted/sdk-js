@@ -1,8 +1,8 @@
 /*global require:false, module:false*/
 var log = require('./spid-log.js');
 function copy(target, source) {
-    for(var key in source) {
-        if(target[key] === undefined) {
+    for (var key in source) {
+        if (target[key] === undefined) {
             target[key] = source[key];
         }
     }
@@ -15,8 +15,8 @@ function now() {
 
 function buildUri(server, path, params) {
     var p = [];
-    for(var key in params) {
-        if(params[key]) {
+    for (var key in params) {
+        if (params[key]) {
             p.push(key + '=' + params[key]);
         }
     }

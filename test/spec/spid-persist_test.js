@@ -1,7 +1,8 @@
-describe('SPiD.Persist', function() {
+'use strict';
 
+describe('SPiD.Persist', function() {
     var assert = chai.assert;
-    var setup = {storage: null, client_id: 'xxx', server: 'payment.schibsted.se'};
+    var setup = { storage: null, client_id: 'xxx', server: 'payment.schibsted.se' };
     var SPiD  = require('../../src/spid-sdk'),
         persist = require('../../src/spid-persist');
 
