@@ -25,7 +25,7 @@ function set(key, value, expiresInSeconds) {
 
 function clear(key) {
     try {
-        window.localStorage.clear(key);
+        window.localStorage.removeItem(key);
     } catch(e) {
         log.info(e);
     }
