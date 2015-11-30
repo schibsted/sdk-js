@@ -17,6 +17,20 @@ describe('SPiD.Localstorage', function() {
         assert.isNull(storage.get('test'));
     });
 
+    it(' clear only clears one key', function () {
+
+        var preExistingKey = 'a';
+        var valueStored = 'foo';
+        storage.set(preExistingKey, valueStored);
+
+        storage.set('b');
+        storage.clear('b');
+
+        var preExistingValueRead = storage.get('a');
+
+        assert.equal(valueStored, preExistingValueRead);
+    });
+
     it(' passing an expires parameter should add expires field that\'s in the future', function() {
         var data = {'thought' : 'leader'};
         storage.set('test', data, 100);
@@ -38,6 +52,5 @@ describe('SPiD.Localstorage', function() {
         assert.isNull(storage.get('test'));
         assert.isNull( window.localStorage.getItem('test'));
     });
-
 
 });
