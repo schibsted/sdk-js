@@ -2,8 +2,7 @@
 
 var _domain,
     _varnishCookieName = 'SP_ID',
-    log = require('./spid-log'),
-    config = require('./spid-config');
+    log = require('./spid-log');
 
 function decode(value) {
     return JSON.parse(window.unescape(value));
@@ -25,18 +24,19 @@ function _setRaw(name, value, expiresIn, domain) {
     document.cookie = cookie;
 }
 
+function setVarnishCookie(session, options) {
+    var expiresIn = options.varnish_expiration || session.expiresIn;
+    _setRaw(_varnishCookieName, session.sp_id, expiresIn, session.baseDomain);
+    log.info('SPiD.Cookie.set({n})'.replace('{n}', _varnishCookieName));
+}
+
 function set(name, session, expiresInSeconds) {
-    var options = config.options();
     if(!session) { return false; }
     _domain = session.baseDomain;
     _setRaw(name, encode(session), expiresInSeconds, _domain);
     log.info('SPiD.Cookie.set({n})'.replace('{n}', name));
-    if(session.sp_id) {
-        var expiresIn = options.varnish_expiration || session.expiresIn;
-        _setRaw(_varnishCookieName, session.sp_id, expiresIn, _domain);
-        log.info('SPiD.Cookie.set({n})'.replace('{n}', _varnishCookieName));
-    }
 }
+
 function get(name) {
     log.info('SPiD.Cookie.get()');
     var cookies = '; ' + document.cookie;
@@ -66,6 +66,7 @@ module.exports = {
     decode: decode,
     encode: encode,
     set: set,
+    setVarnishCookie: setVarnishCookie,
     get: get,
     clear: clear,
     name: name

@@ -8,6 +8,7 @@ var
         logging: false,
         useSessionCluster: true,
         https: true,
+        setVarnishCookie: null,
         storage: 'localstorage',
         timeout: 15000,
         refresh_timeout: 900000,

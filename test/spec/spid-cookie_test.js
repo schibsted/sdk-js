@@ -35,7 +35,6 @@ describe('SPiD.Cookie', function() {
         });
 
         it('SPiD.Cookie.set should set session cookie', function() {
-
             var session = {user:123, expiresIn: 5000, baseDomain: cookieDomain};
             var name = 'name';
             spidCookie.set(name, session, session.expiresIn);
@@ -43,9 +42,9 @@ describe('SPiD.Cookie', function() {
             assert.notEqual(document.cookie.indexOf(name), -1);
         });
 
-        it('SPiD.Cookie.set should set varnish cookie', function() {
+        it('SPiD.Cookie.setVarnishCookie should set varnish cookie', function() {
             var session = {user:123, sp_id: 123, expiresIn: 5000, baseDomain: cookieDomain};
-            spidCookie.set('name', session, session.expiresIn);
+            spidCookie.setVarnishCookie(session, session.expiresIn);
 
             assert.notEqual(document.cookie.indexOf('SP_ID'), -1);
         });

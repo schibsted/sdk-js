@@ -5,6 +5,12 @@ describe('SPiD.Persist', function() {
     var SPiD  = require('../../src/spid-sdk'),
         persist = require('../../src/spid-persist');
 
+    var cookieDomain = (0 === window.location.host.indexOf('localhost:')) ? 'localhost' : window.location.host;
+
+    function clearVarnishCookie() {
+        document.cookie = 'SP_ID=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT; domain=.' + cookieDomain;
+    }
+
     describe('SPiD no-storage setup', function() {
         it('SPiD.Persist default should have set/get/clear methods ', function() {
             SPiD.init(setup);
@@ -82,5 +88,99 @@ describe('SPiD.Persist', function() {
             assert.isTrue(methodSpy.called);
             assert.include(methodSpy.getCall(0).args[0], _setup.client_id, 'key should include client id');
         });
+    });
+
+
+    describe(' when varnish cookie option is set to true ', function() {
+
+        var _setup = setup;
+        beforeEach(function() {
+            _setup.setVarnishCookie = true;
+        });
+
+        afterEach(function() {
+            clearVarnishCookie();
+        });
+
+        it('should set varnish cookie even when local storage is used', function() {
+            _setup.storage = 'localstorage';
+            SPiD.init(_setup);
+
+            assert.equal(document.cookie.indexOf('SP_ID'), -1);
+            persist.set({sp_id: 12345, expiresIn: 5000, baseDomain: cookieDomain});
+            assert.notEqual(document.cookie.indexOf('SP_ID'), -1);
+        });
+
+        it('should set varnish cookie when cookies are used', function() {
+            _setup.storage = 'cookie';
+            SPiD.init(_setup);
+
+            assert.equal(document.cookie.indexOf('SP_ID'), -1);
+            persist.set({sp_id: 12345, expiresIn: 5000, baseDomain: cookieDomain});
+            assert.notEqual(document.cookie.indexOf('SP_ID'), -1);
+        });
+
+    });
+
+    describe(' when varnish cookie option is not set ', function() {
+
+        var _setup = setup;
+        beforeEach(function() {
+            delete _setup.setVarnishCookie;
+        });
+
+        afterEach(function() {
+            clearVarnishCookie();
+        });
+
+        it('should not set varnish cookie when local storage is used', function() {
+            _setup.storage = 'localstorage';
+            SPiD.init(_setup);
+
+            assert.equal(document.cookie.indexOf('SP_ID'), -1);
+            persist.set({sp_id: 12345, expiresIn: 5000, baseDomain: cookieDomain});
+            assert.equal(document.cookie.indexOf('SP_ID'), -1);
+        });
+
+        it('should set varnish cookie when cookies are used', function() {
+            _setup.storage = 'cookie';
+            SPiD.init(_setup);
+
+            assert.equal(document.cookie.indexOf('SP_ID'), -1);
+            persist.set({sp_id: 12345, expiresIn: 5000, baseDomain: cookieDomain});
+            assert.notEqual(document.cookie.indexOf('SP_ID'), -1);
+        });
+
+    });
+
+    describe(' when varnish cookie option is set to false ', function() {
+
+        var _setup = setup;
+        beforeEach(function() {
+            _setup.setVarnishCookie = false;
+        });
+
+        afterEach(function() {
+            clearVarnishCookie();
+        });
+
+        it('should not set varnish cookie when local storage is used', function() {
+            _setup.storage = 'localstorage';
+            SPiD.init(_setup);
+
+            assert.equal(document.cookie.indexOf('SP_ID'), -1);
+            persist.set({sp_id: 12345, expiresIn: 5000, baseDomain: cookieDomain});
+            assert.equal(document.cookie.indexOf('SP_ID'), -1);
+        });
+
+        it('should not set varnish cookie even when cookies are used', function() {
+            _setup.storage = 'cookie';
+            SPiD.init(_setup);
+
+            assert.equal(document.cookie.indexOf('SP_ID'), -1);
+            persist.set({sp_id: 12345, expiresIn: 5000, baseDomain: cookieDomain});
+            assert.equal(document.cookie.indexOf('SP_ID'), -1);
+        });
+
     });
 });
