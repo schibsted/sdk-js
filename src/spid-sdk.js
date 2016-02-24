@@ -8,6 +8,7 @@ var
     spidEvent = require('./spid-event'),
     eventTrigger = require('./spid-event-trigger'),
     persist = require('./spid-persist'),
+    cookie = require('./spid-cookie'),
     cache = require('./spid-cache'),
     talk = require('./spid-talk');
 
@@ -27,6 +28,15 @@ function init(opts, callback) {
     }
 }
 
+function tryVarnishCookie(session) {
+    var options = config.options();
+    if(session.sp_id &&
+        (options.setVarnishCookie === true ||
+        (options.storage === 'cookie' && options.setVarnishCookie !== false))) {
+        cookie.setVarnishCookie(session, options);
+    }
+}
+
 function hasSession(callback) {
     callback = callback || function() {
         };
@@ -39,6 +49,7 @@ function hasSession(callback) {
         handleResponse = function(err, data) {
             if(!err && !!data.result) {
                 persist.set(data, data.expiresIn);
+                tryVarnishCookie(data);
             }
             respond(err, data);
         },
