@@ -28,15 +28,6 @@ function init(opts, callback) {
     }
 }
 
-function tryVarnishCookie(session) {
-    var options = config.options();
-    if(session.sp_id &&
-        (options.setVarnishCookie === true ||
-        (options.storage === 'cookie' && options.setVarnishCookie !== false))) {
-        cookie.setVarnishCookie(session, options);
-    }
-}
-
 function hasSession(callback) {
     callback = callback || function() {
         };
@@ -49,7 +40,7 @@ function hasSession(callback) {
         handleResponse = function(err, data) {
             if(!err && !!data.result) {
                 persist.set(data, data.expiresIn);
-                tryVarnishCookie(data);
+                cookie.tryVarnishCookie(data);
             }
             respond(err, data);
         },

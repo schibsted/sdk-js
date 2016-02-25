@@ -2,7 +2,8 @@
 
 var _domain,
     _varnishCookieName = 'SP_ID',
-    log = require('./spid-log');
+    log = require('./spid-log'),
+    config = require('./spid-config');
 
 function decode(value) {
     return JSON.parse(window.unescape(value));
@@ -24,10 +25,19 @@ function _setRaw(name, value, expiresIn, domain) {
     document.cookie = cookie;
 }
 
-function setVarnishCookie(session, options) {
+function _setVarnishCookie(session, options) {
     var expiresIn = options.varnish_expiration || session.expiresIn;
     _setRaw(_varnishCookieName, session.sp_id, expiresIn, session.baseDomain);
     log.info('SPiD.Cookie.set({n})'.replace('{n}', _varnishCookieName));
+}
+
+function tryVarnishCookie(session) {
+    var options = config.options();
+    if(session.sp_id &&
+        (options.setVarnishCookie === true ||
+        (options.storage === 'cookie' && options.setVarnishCookie !== false))) {
+        _setVarnishCookie(session, options);
+    }
 }
 
 function set(name, session, expiresInSeconds) {
@@ -66,7 +76,7 @@ module.exports = {
     decode: decode,
     encode: encode,
     set: set,
-    setVarnishCookie: setVarnishCookie,
+    tryVarnishCookie: tryVarnishCookie,
     get: get,
     clear: clear,
     name: name
