@@ -7,6 +7,12 @@ describe('SPiD', function() {
     var setupProd = {client_id : '4d00e8d6bf92fc8648000000', server: 'login.schibsted.com', logging:false, refresh_timeout: 100, storage: 'cookie'};
     var SPiD = require('../../src/spid-sdk');
 
+    var cookieDomain = (0 === window.location.host.indexOf('localhost:')) ? 'localhost' : window.location.host;
+
+    function clearVarnishCookie() {
+        document.cookie = 'SP_ID=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT; domain=.' + cookieDomain;
+    }
+
     describe('SPiD.init', function() {
         it('SPiD.init should throw error when missing config', function() {
             assert.throws(SPiD.init, TypeError);
@@ -92,9 +98,6 @@ describe('SPiD', function() {
         var talkRequestStub,
             persistSetStub,
             persistGetStub;
-        before(function() {
-            SPiD.init(setupProd);
-        });
 
         beforeEach(function(){
             talkRequestStub = sinon.stub(require('../../src/spid-talk'), 'request');
@@ -106,9 +109,11 @@ describe('SPiD', function() {
             talkRequestStub.restore();
             persistSetStub.restore();
             persistGetStub.restore();
+            clearVarnishCookie();
         });
 
         it('SPiD.hasSession should call Talk with parameter server, path, params, callback', function() {
+            SPiD.init(setupProd);
             SPiD.hasSession(function() {});
             assert.equal(talkRequestStub.getCall(0).args[0],'https://session.login.schibsted.com/rpc/hasSession.js');
             assert.equal(talkRequestStub.getCall(0).args[1],null);
@@ -117,6 +122,7 @@ describe('SPiD', function() {
         });
 
         it('SPiD.hasSession should call Talk again if LoginException is returned', function() {
+            SPiD.init(setupProd);
             talkRequestStub.onFirstCall().callsArgWith(3, {'code':401,'type':'LoginException','description':'Autologin required'}, {result: false});
             SPiD.hasSession(function() {});
             assert.equal(talkRequestStub.secondCall.args[0], 'https://login.schibsted.com/ajax/hasSession.js');
@@ -126,13 +132,15 @@ describe('SPiD', function() {
         });
 
         it('SPiD.hasSession should try to set cookie (in this case) when successful', function() {
+            SPiD.init(setupProd);
             var fakeSession = {
                 'result':true,
                 'expiresIn':7111,
-                'baseDomain':'sdk.dev',
+                'baseDomain':cookieDomain,
                 'userStatus':'connected',
                 'userId':1844813,
-                'id':'4f1e2ae59caf7c2f4a058b76'
+                'id':'4f1e2ae59caf7c2f4a058b76',
+                'sp_id':'4f1e2ae59caf7c2f4a058b76'
             };
             talkRequestStub.onFirstCall().callsArgWith(3, null, fakeSession);
             SPiD.hasSession(function() {});
@@ -142,13 +150,14 @@ describe('SPiD', function() {
         });
 
         it('SPiD.hasSession should try to return persisted data without calling Talk', function(done) {
+            SPiD.init(setupProd);
             var storedSession = {
                 'result':true,
                 'expiresIn':7111,
-                'baseDomain':'sdk.dev',
+                'baseDomain':cookieDomain,
                 'userStatus':'connected',
                 'userId':1844813,
-                'id':'4f1e2ae59caf7c2f4a058b76'
+                'sp_id':'4f1e2ae59caf7c2f4a058b76'
             };
 
             persistGetStub.onFirstCall().returns(storedSession);
@@ -158,6 +167,154 @@ describe('SPiD', function() {
                 }
             });
             assert.isFalse(talkRequestStub.called);
+        });
+
+        it('SPiD.hasSession should set SP_ID cookie when local storage is used and setVarnishCookie option is true', function(done) {
+            var _setup = setup();
+            _setup.setVarnishCookie = true;
+            _setup.storage = 'localstorage';
+            SPiD.init(_setup);
+
+            var fakeSession = {
+                'result':true,
+                'expiresIn':7111,
+                'baseDomain':cookieDomain,
+                'userStatus':'connected',
+                'userId':1844813,
+                'id':'4f1e2ae59caf7c2f4a058b76',
+                'sp_id':'4f1e2ae59caf7c2f4a058b76'
+            };
+
+            talkRequestStub.onFirstCall().callsArgWith(3, null, fakeSession);
+
+            assert.equal(document.cookie.indexOf('SP_ID'), -1);
+            SPiD.hasSession(function() {
+                assert.notEqual(document.cookie.indexOf('SP_ID'), -1);
+                done();
+            });
+        });
+
+        it('SPiD.hasSession should set SP_ID cookie when cookies are used and setVarnishCookie option is true', function(done) {
+            var _setup = setup();
+            _setup.setVarnishCookie = true;
+            _setup.storage = 'cookie';
+            SPiD.init(_setup);
+
+            var fakeSession = {
+                'result':true,
+                'expiresIn':7111,
+                'baseDomain':cookieDomain,
+                'userStatus':'connected',
+                'userId':1844813,
+                'id':'4f1e2ae59caf7c2f4a058b76',
+                'sp_id':'4f1e2ae59caf7c2f4a058b76'
+            };
+
+            talkRequestStub.onFirstCall().callsArgWith(3, null, fakeSession);
+
+            assert.equal(document.cookie.indexOf('SP_ID'), -1);
+            SPiD.hasSession(function() {
+                assert.notEqual(document.cookie.indexOf('SP_ID'), -1);
+                done();
+            });
+        });
+
+        it('SPiD.hasSession should not set SP_ID cookie when local storage is used and setVarnishCookie option is not set', function(done) {
+            var _setup = setup();
+            _setup.storage = 'localstorage';
+            SPiD.init(_setup);
+
+            var fakeSession = {
+                'result': true,
+                'expiresIn': 7111,
+                'baseDomain': cookieDomain,
+                'userStatus': 'connected',
+                'userId': 1844813,
+                'id': '4f1e2ae59caf7c2f4a058b76',
+                'sp_id': '4f1e2ae59caf7c2f4a058b76'
+            };
+
+            talkRequestStub.onFirstCall().callsArgWith(3, null, fakeSession);
+
+            assert.equal(document.cookie.indexOf('SP_ID'), -1);
+            SPiD.hasSession(function () {
+                assert.equal(document.cookie.indexOf('SP_ID'), -1);
+                done();
+            });
+        });
+
+        it('SPiD.hasSession should set SP_ID cookie when cookies are used and setVarnishCookie option is not set', function(done) {
+            var _setup = setup();
+            _setup.storage = 'cookie';
+            SPiD.init(_setup);
+
+            var fakeSession = {
+                'result': true,
+                'expiresIn': 7111,
+                'baseDomain': cookieDomain,
+                'userStatus': 'connected',
+                'userId': 1844813,
+                'id': '4f1e2ae59caf7c2f4a058b76',
+                'sp_id': '4f1e2ae59caf7c2f4a058b76'
+            };
+
+            talkRequestStub.onFirstCall().callsArgWith(3, null, fakeSession);
+
+            assert.equal(document.cookie.indexOf('SP_ID'), -1);
+            SPiD.hasSession(function() {
+                assert.notEqual(document.cookie.indexOf('SP_ID'), -1);
+                done();
+            });
+        });
+
+        it('SPiD.hasSession should not set SP_ID cookie when local storage is used and setVarnishCookie option is false', function(done) {
+            var _setup = setup();
+            _setup.setVarnishCookie = false;
+            _setup.storage = 'localstorage';
+            SPiD.init(_setup);
+
+            var fakeSession = {
+                'result': true,
+                'expiresIn': 7111,
+                'baseDomain': cookieDomain,
+                'userStatus': 'connected',
+                'userId': 1844813,
+                'id': '4f1e2ae59caf7c2f4a058b76',
+                'sp_id': '4f1e2ae59caf7c2f4a058b76'
+            };
+
+            talkRequestStub.onFirstCall().callsArgWith(3, null, fakeSession);
+
+            assert.equal(document.cookie.indexOf('SP_ID'), -1);
+            SPiD.hasSession(function() {
+                assert.equal(document.cookie.indexOf('SP_ID'), -1);
+                done();
+            });
+        });
+
+        it('SPiD.hasSession should not set SP_ID cookie when cookies are used and setVarnishCookie option is false', function(done) {
+            var _setup = setup();
+            _setup.setVarnishCookie = false;
+            _setup.storage = 'cookie';
+            SPiD.init(_setup);
+
+            var fakeSession = {
+                'result': true,
+                'expiresIn': 7111,
+                'baseDomain': cookieDomain,
+                'userStatus': 'connected',
+                'userId': 1844813,
+                'id': '4f1e2ae59caf7c2f4a058b76',
+                'sp_id': '4f1e2ae59caf7c2f4a058b76'
+            };
+
+            talkRequestStub.onFirstCall().callsArgWith(3, null, fakeSession);
+
+            assert.equal(document.cookie.indexOf('SP_ID'), -1);
+            SPiD.hasSession(function() {
+                assert.equal(document.cookie.indexOf('SP_ID'), -1);
+                done();
+            });
         });
     });
 
@@ -186,10 +343,11 @@ describe('SPiD', function() {
             var fakeSession = {
                 'result':true,
                 'expiresIn':7111,
-                'baseDomain':'sdk.dev',
+                'baseDomain':cookieDomain,
                 'userStatus':'connected',
                 'userId':1844813,
-                'id':'4f1e2ae59caf7c2f4a058b76'
+                'id':'4f1e2ae59caf7c2f4a058b76',
+                'sp_id':'4f1e2ae59caf7c2f4a058b76'
             };
             var cbfun = function(){};
             talkRequestStub.onFirstCall().callsArg(3); // acceptAgreement

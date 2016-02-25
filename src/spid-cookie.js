@@ -25,18 +25,28 @@ function _setRaw(name, value, expiresIn, domain) {
     document.cookie = cookie;
 }
 
-function set(name, session, expiresInSeconds) {
+function _setVarnishCookie(session, options) {
+    var expiresIn = options.varnish_expiration || session.expiresIn;
+    _setRaw(_varnishCookieName, session.sp_id, expiresIn, session.baseDomain);
+    log.info('SPiD.Cookie.set({n})'.replace('{n}', _varnishCookieName));
+}
+
+function tryVarnishCookie(session) {
     var options = config.options();
+    if(session.sp_id &&
+        (options.setVarnishCookie === true ||
+        (options.storage === 'cookie' && options.setVarnishCookie !== false))) {
+        _setVarnishCookie(session, options);
+    }
+}
+
+function set(name, session, expiresInSeconds) {
     if(!session) { return false; }
     _domain = session.baseDomain;
     _setRaw(name, encode(session), expiresInSeconds, _domain);
     log.info('SPiD.Cookie.set({n})'.replace('{n}', name));
-    if(session.sp_id) {
-        var expiresIn = options.varnish_expiration || session.expiresIn;
-        _setRaw(_varnishCookieName, session.sp_id, expiresIn, _domain);
-        log.info('SPiD.Cookie.set({n})'.replace('{n}', _varnishCookieName));
-    }
 }
+
 function get(name) {
     log.info('SPiD.Cookie.get()');
     var cookies = '; ' + document.cookie;
@@ -66,6 +76,7 @@ module.exports = {
     decode: decode,
     encode: encode,
     set: set,
+    tryVarnishCookie: tryVarnishCookie,
     get: get,
     clear: clear,
     name: name

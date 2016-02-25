@@ -83,4 +83,5 @@ describe('SPiD.Persist', function() {
             assert.include(methodSpy.getCall(0).args[0], _setup.client_id, 'key should include client id');
         });
     });
+
 });

@@ -8,6 +8,7 @@ var
     spidEvent = require('./spid-event'),
     eventTrigger = require('./spid-event-trigger'),
     persist = require('./spid-persist'),
+    cookie = require('./spid-cookie'),
     cache = require('./spid-cache'),
     talk = require('./spid-talk');
 
@@ -39,6 +40,7 @@ function hasSession(callback) {
         handleResponse = function(err, data) {
             if(!err && !!data.result) {
                 persist.set(data, data.expiresIn);
+                cookie.tryVarnishCookie(data);
             }
             respond(err, data);
         },
