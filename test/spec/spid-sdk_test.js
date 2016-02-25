@@ -92,19 +92,11 @@ describe('SPiD', function() {
         var talkRequestStub,
             persistSetStub,
             persistGetStub;
-
-        var fakeSession = {
-            'result':true,
-            'expiresIn':7111,
-            'baseDomain':'sdk.dev',
-            'userStatus':'connected',
-            'userId':1844813,
-            'id':'4f1e2ae59caf7c2f4a058b76'
-        };
-
+        before(function() {
+            SPiD.init(setupProd);
+        });
 
         beforeEach(function(){
-            SPiD.init(setupProd);
             talkRequestStub = sinon.stub(require('../../src/spid-talk'), 'request');
             persistSetStub = sinon.stub(require('../../src/spid-persist'), 'set');
             persistGetStub = sinon.stub(require('../../src/spid-persist'), 'get');
@@ -114,16 +106,6 @@ describe('SPiD', function() {
             talkRequestStub.restore();
             persistSetStub.restore();
             persistGetStub.restore();
-        });
-
-        it('SPiD.hasSession should use error first callback style', function(done) {
-            talkRequestStub.onFirstCall().callsArgWith(3, null, fakeSession);
-
-            SPiD.hasSession( function(err, session) {
-                assert.isNull(err);
-                assert.equal(session, fakeSession);
-                done();
-            });
         });
 
         it('SPiD.hasSession should call Talk with parameter server, path, params, callback', function() {
@@ -144,7 +126,14 @@ describe('SPiD', function() {
         });
 
         it('SPiD.hasSession should try to set cookie (in this case) when successful', function() {
-
+            var fakeSession = {
+                'result':true,
+                'expiresIn':7111,
+                'baseDomain':'sdk.dev',
+                'userStatus':'connected',
+                'userId':1844813,
+                'id':'4f1e2ae59caf7c2f4a058b76'
+            };
             talkRequestStub.onFirstCall().callsArgWith(3, null, fakeSession);
             SPiD.hasSession(function() {});
             assert.equal(fakeSession.userId, persistSetStub.firstCall.args[0].userId);
@@ -167,38 +156,8 @@ describe('SPiD', function() {
                 if(!err && res.result && res.userId === 1844813) {
                     done();
                 }
-                
-                done();
             });
             assert.isFalse(talkRequestStub.called);
-        });
-
-        describe('When called multiple times before response', function () {
-
-            it('SPiD.hasSession should only call Talk once', function() {
-
-                SPiD.hasSession(function() {});
-                SPiD.hasSession(function() {});
-
-                assert.equal(talkRequestStub.callCount, 1);
-            });
-
-            it('SPiD.hasSession should invoke callback for each invokation', function(done) {
-
-                var cb = sinon.spy();
-                var cbAndAssert = function () {
-                    cb();
-                    assert.equal(cb.callCount, 2);
-                    done();
-                };
-
-                talkRequestStub.callsArgWith(3, null, fakeSession);
-
-                SPiD.hasSession(cb);
-                SPiD.hasSession(cbAndAssert);
-
-            });
-
         });
     });
 

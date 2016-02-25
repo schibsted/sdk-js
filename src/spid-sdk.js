@@ -11,28 +11,6 @@ var
     cache = require('./spid-cache'),
     talk = require('./spid-talk');
 
-var sessionCallbacks = (function sessionRequests() {
-    var _callbacks = [];
-    function clear() {
-        _callbacks = [];
-    }
-    return {
-        register: function (callback) {
-            _callbacks.push(callback);
-        },
-        invokeAll: function (err, data) {
-            _callbacks.forEach(function (cb) {
-                cb(err, data);
-            });
-            clear();
-        },
-        hasPendingRequest : function () {
-            return _callbacks.length > 1;
-        },
-        clear: clear
-    };
-}());
-
 function globalExport(global) {
     global.SPiD = global.SPiD || this;
     global.SPiD.Talk = require('./spid-talk');
@@ -44,20 +22,19 @@ function init(opts, callback) {
         globalExport.call(this, window);
     }
     _initiated = true;
-    sessionCallbacks.clear();
     if(callback) {
         callback();
     }
 }
 
 function hasSession(callback) {
-    callback = callback || function() {};
-
+    callback = callback || function() {
+        };
     var that = this,
         respond = function(err, data) {
             eventTrigger.session(_session, data);
             _session = data;
-            sessionCallbacks.invokeAll(err, data);
+            callback(err, data);
         },
         handleResponse = function(err, data) {
             if(!err && !!data.result) {
@@ -77,14 +54,12 @@ function hasSession(callback) {
         };
 
     var data = persist.get();
-    sessionCallbacks.register(callback);
-
     if(data) {
         _session = data;
         return respond(null, data);
-    } else if (!sessionCallbacks.hasPendingRequest()) {
-        talk.request(this.sessionEndpoint(), null, {autologin: 1}, handleException);
     }
+
+    talk.request(this.sessionEndpoint(), null, {autologin: 1}, handleException);
 }
 
 function hasProduct(productId, callback) {
