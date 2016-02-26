@@ -21,7 +21,7 @@
     "build": "npm install && grunt",
     "preversion": "npm test",
     "version": "npm run build",
-    "postversion": "git push --tags"
+    "postversion": "git push && git push --tags"
   },
   "engines": {
     "node": ">= 0.10.0"

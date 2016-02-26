@@ -81,11 +81,11 @@ module.exports = function(grunt) {
       commonJsSdk: webpackCfg('commonjs2', 'spid-sdk', 'SPiD'),
       commonJsUri: webpackCfg('commonjs2', 'spid-uri', 'SPiD_Uri')
     },
-    clean: ['dist'],
+    clean: ['dist', 'build'],
     compress: {
       main: {
         options: {
-          archive: 'dist/spid-sdk-<%= pkg.version %>.zip'
+          archive: 'build/spid-sdk-pack.zip'
         },
         files: [{
           cwd: 'dist/',
