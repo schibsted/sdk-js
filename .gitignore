@@ -1,6 +1,4 @@
 node_modules/
 coverage/
 dist/
-.project
-.idea
-sdk-js.iml
+build/
