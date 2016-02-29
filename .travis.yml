@@ -10,6 +10,7 @@ deploy:
     secret_access_key:
       secure: VL53BKF6O38D5GE+NCLHbXdtC+lA+XaGg7GWmnObGXRUlaCURtm+fxsOtTRBPFCeFjg0bl/UW1ylQhZFF8UEkzYrH+MDjpcMICZQmBTry7sTxgk8yj8H/Ib+op2Gc7p8CN8PQIaJHth1uKklPEX5t9ELkFFsJkhQpTDqTFpE5/M=
     bucket: cdn.spid.se
+    region: eu-west-1
     detect_encoding: true
     cache_control: "no-transform,public,max-age=31536000"
     local-dir: dist
