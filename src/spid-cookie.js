@@ -40,6 +40,10 @@ function tryVarnishCookie(session) {
     }
 }
 
+function clearVarnishCookie() {
+    _setRaw(_varnishCookieName, '', 0, _domain);
+}
+
 function set(name, session, expiresInSeconds) {
     if(!session) { return false; }
     _domain = session.baseDomain;
@@ -69,7 +73,7 @@ function get(name) {
 function clear(name) {
     log.info('SPiD.Cookie.clear()');
     _setRaw(name, '', 0, _domain);
-    _setRaw(_varnishCookieName, '', 0, _domain);
+    clearVarnishCookie();
 }
 
 module.exports = {
@@ -77,6 +81,7 @@ module.exports = {
     encode: encode,
     set: set,
     tryVarnishCookie: tryVarnishCookie,
+    clearVarnishCookie: clearVarnishCookie,
     get: get,
     clear: clear,
     name: name

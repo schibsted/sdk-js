@@ -120,10 +120,15 @@ function setTraits(traits, callback) {
     talk.request(this.server(), 'ajax/traits.js', {t: traits}, callback);
 }
 
+function clearClientData() {
+    persist.clear();
+    cookie.clearVarnishCookie();
+}
+
 function logout(callback) {
     var cb = function(err, data) {
         if(data.result) {
-            persist.clear();
+            clearClientData();
         }
 
         if(!err && !!data.result) {
@@ -140,7 +145,7 @@ function logout(callback) {
 function acceptAgreement(callback) {
     var that = this;
     var cb = function() {
-        persist.clear();
+        clearClientData();
         that.hasSession(callback);
     };
     talk.request(this.server(),'ajax/acceptAgreement.js', {}, cb);

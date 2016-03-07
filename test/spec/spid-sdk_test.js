@@ -13,6 +13,10 @@ describe('SPiD', function() {
         document.cookie = 'SP_ID=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT; domain=.' + cookieDomain;
     }
 
+    function setVarnishCookie() {
+        document.cookie = 'SP_ID=4f1e2ae59caf7c2f4a058b76; path=/; domain=.' + cookieDomain;
+    }
+
     describe('SPiD.init', function() {
         it('SPiD.init should throw error when missing config', function() {
             assert.throws(SPiD.init, TypeError);
@@ -356,6 +360,24 @@ describe('SPiD', function() {
             assert.isTrue(talkRequestStub.calledTwice);
             assert.isTrue(persistClearStub.calledOnce);
         });
+
+        it('SPiD.acceptAgreement should clear SP_ID cookie on successful talk response', function() {
+            setVarnishCookie();
+            var fakeSession = {
+                'result':true,
+                'expiresIn':7111,
+                'baseDomain':cookieDomain,
+                'userStatus':'connected',
+                'userId':1844813,
+                'id':'4f1e2ae59caf7c2f4a058b76',
+                'sp_id':'4f1e2ae59caf7c2f4a058b76'
+            };
+            var cbfun = function(){};
+            talkRequestStub.onFirstCall().callsArg(3); // acceptAgreement
+            talkRequestStub.onSecondCall().callsArgWith(3, null, fakeSession);
+            SPiD.acceptAgreement(cbfun);
+            assert.isTrue(document.cookie.indexOf('SP_ID') === -1);
+        });
     });
 
 
@@ -537,6 +559,15 @@ describe('SPiD', function() {
             talkRequestStub.onFirstCall().callsArgWith(3, {error:true}, {result:true});
             SPiD.logout();
             assert.isTrue(cookieClearStub.calledOnce);
+        });
+
+        it('SPiD.logout should clear SP_ID cookie', function(done) {
+            talkRequestStub.onFirstCall().callsArgWith(3, {error:true}, {result:true});
+            setVarnishCookie();
+            SPiD.logout(function() {
+                assert.isTrue(document.cookie.indexOf('SP_ID') === -1);
+                done();
+            });
         });
 
 
