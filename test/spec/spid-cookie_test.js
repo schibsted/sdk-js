@@ -49,6 +49,14 @@ describe('SPiD.Cookie', function() {
             assert.notEqual(document.cookie.indexOf('SP_ID'), -1);
         });
 
+        it('SPiD.Cookie.clearVarnishCookie should clear varnish cookie', function() {
+            var session = {user:123, sp_id: 123, expiresIn: 5000, baseDomain: cookieDomain};
+            document.cookie = 'SP_ID=123; domain=' + cookieDomain;
+            spidCookie.clearVarnishCookie(session, session.expiresIn);
+
+            assert.equal(document.cookie.indexOf('SP_ID'), -1);
+        });
+
         it('SPiD.Cookie.get should return session', function() {
             var session = {user:123, sp_id: 123, expiresIn: 5000, baseDomain: cookieDomain};
             spidCookie.set('name', session, session.expiresIn);
