@@ -21,6 +21,16 @@ function login(redirect_uri, client_id) {
     return build('flow/login', params);
 }
 
+function auth(redirect_uri, client_id) {
+    var options = config.options();
+    var params = {
+        'response_type': 'code',
+        'client_id': client_id || options.client_id,
+        'redirect_uri': _encode(redirect_uri)
+    };
+    return build('flow/auth', params);
+}
+
 function signup(redirect_uri, client_id) {
     var options = config.options();
     var params = {
@@ -119,6 +129,7 @@ module.exports = {
     },
     build: build,
     login: login,
+    auth: auth,
     signup: signup,
     logout: logout,
     account: account,
