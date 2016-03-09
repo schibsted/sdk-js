@@ -15,20 +15,22 @@ function login(redirect_uri, client_id) {
     var options = config.options();
     var params = {
         'response_type': 'code',
+        'flow': 'signup',
         'client_id': client_id || options.client_id,
         'redirect_uri': _encode(redirect_uri)
     };
-    return build('flow/login', params);
+    return build('login', params);
 }
 
 function signup(redirect_uri, client_id) {
     var options = config.options();
     var params = {
         'response_type': 'code',
+        'flow': 'signup',
         'client_id': client_id || options.client_id,
         'redirect_uri': _encode(redirect_uri)
     };
-    return build('flow/signup', params);
+    return build('signup', params);
 }
 
 function logout(redirect_uri, client_id) {
@@ -96,7 +98,7 @@ function purchaseProduct(product_id, redirect_uri, client_id) {
         'redirect_uri': _encode(redirect_uri),
         'product_id': product_id || null
     };
-    return build('flow/checkout', params);
+    return build('auth/start', params);
 }
 
 function purchaseCampaign(campaign_id, product_id, voucher_code, redirect_uri, client_id) {
@@ -110,7 +112,7 @@ function purchaseCampaign(campaign_id, product_id, voucher_code, redirect_uri, c
         'product_id': product_id || null,
         'voucher_code': voucher_code || null
     };
-    return build('flow/checkout', params);
+    return build('auth/start', params);
 }
 
 module.exports = {
