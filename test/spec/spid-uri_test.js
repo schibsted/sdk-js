@@ -28,6 +28,21 @@ describe('SPiD.Uri', function() {
         );
     });
 
+    it('SPiD.Uri.auth should return correctly formatted URL for auth', function() {
+        assert.equal(
+            uri.auth('http://random.com', '123' ),
+            uri.build('flow/auth', {'response_type':'code', 'client_id':'123', 'redirect_uri':encodeURIComponent('http://random.com') })
+        );
+        assert.equal(
+            uri.auth(null, '123'),
+            uri.build('flow/auth', {'response_type':'code', 'client_id':'123', 'redirect_uri':encodeURIComponent(window.location.toString()) })
+        );
+        assert.equal(
+            uri.auth(),
+            uri.build('flow/auth', {'response_type':'code', 'client_id':setup.client_id, 'redirect_uri':encodeURIComponent(window.location.toString()) })
+        );
+    });
+
     it('SPiD.Uri.signup should return correctly formatted URL for signup', function() {
         assert.equal(
             uri.signup('http://random.com', '123' ),
