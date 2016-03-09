@@ -16,30 +16,30 @@ describe('SPiD.Uri', function() {
     it('SPiD.Uri.login should return correctly formatted URL for login', function() {
         assert.equal(
             uri.login('http://random.com', '123' ),
-            uri.build('login', {'response_type':'code', 'flow':'signup', 'client_id':'123', 'redirect_uri':encodeURIComponent('http://random.com') })
+            uri.build('flow/login', {'response_type':'code', 'client_id':'123', 'redirect_uri':encodeURIComponent('http://random.com') })
         );
         assert.equal(
             uri.login(null, '123'),
-            uri.build('login', {'response_type':'code', 'flow':'signup', 'client_id':'123', 'redirect_uri':encodeURIComponent(window.location.toString()) })
+            uri.build('flow/login', {'response_type':'code', 'client_id':'123', 'redirect_uri':encodeURIComponent(window.location.toString()) })
         );
         assert.equal(
             uri.login(),
-            uri.build('login', {'response_type':'code', 'flow':'signup', 'client_id':setup.client_id, 'redirect_uri':encodeURIComponent(window.location.toString()) })
+            uri.build('flow/login', {'response_type':'code', 'client_id':setup.client_id, 'redirect_uri':encodeURIComponent(window.location.toString()) })
         );
     });
 
     it('SPiD.Uri.signup should return correctly formatted URL for signup', function() {
         assert.equal(
             uri.signup('http://random.com', '123' ),
-            uri.build('signup', {'response_type': 'code','flow': 'signup','client_id':'123','redirect_uri': encodeURIComponent('http://random.com') })
+            uri.build('flow/signup', {'response_type': 'code', 'client_id':'123','redirect_uri': encodeURIComponent('http://random.com') })
         );
         assert.equal(
             uri.signup(null, '123'),
-            uri.build('signup', {'response_type': 'code','flow': 'signup','client_id':'123','redirect_uri': encodeURIComponent(window.location.toString()) })
+            uri.build('flow/signup', {'response_type': 'code', 'client_id':'123','redirect_uri': encodeURIComponent(window.location.toString()) })
         );
         assert.equal(
             uri.signup(),
-            uri.build('signup', {'response_type': 'code','flow': 'signup','client_id':setup.client_id,'redirect_uri': encodeURIComponent(window.location.toString()) })
+            uri.build('flow/signup', {'response_type': 'code', 'client_id':setup.client_id,'redirect_uri': encodeURIComponent(window.location.toString()) })
         );
     });
 
@@ -135,26 +135,26 @@ describe('SPiD.Uri', function() {
     it('SPiD.Uri.purchaseProduct should return correctly formatted URL for purchase product', function() {
         assert.equal(
             uri.purchaseProduct(10010,'http://random.com', '123' ),
-            uri.build('auth/start', {'response_type': 'code','flow': 'payment','client_id':'123','redirect_uri': encodeURIComponent('http://random.com'), 'product_id': 10010 })
+            uri.build('flow/checkout', {'response_type': 'code','flow': 'payment','client_id':'123','redirect_uri': encodeURIComponent('http://random.com'), 'product_id': 10010 })
         );
         assert.equal(
             uri.purchaseProduct(null, null, '123'),
-            uri.build('auth/start', {'response_type': 'code','flow': 'payment','client_id':'123','redirect_uri': encodeURIComponent(window.location.toString()) })
+            uri.build('flow/checkout', {'response_type': 'code','flow': 'payment','client_id':'123','redirect_uri': encodeURIComponent(window.location.toString()) })
         );
         assert.equal(
             uri.purchaseProduct(),
-            uri.build('auth/start', {'response_type': 'code', 'flow':'payment', 'client_id':setup.client_id, 'redirect_uri':encodeURIComponent(window.location.toString()) })
+            uri.build('flow/checkout', {'response_type': 'code', 'flow':'payment', 'client_id':setup.client_id, 'redirect_uri':encodeURIComponent(window.location.toString()) })
         );
     });
 
     it('SPiD.Uri.purchaseCampaign should return correctly formatted URL for purchase product', function() {
         assert.equal(
             uri.purchaseCampaign(10020, 10010, 'vcode'),
-            uri.build('auth/start', {'response_type': 'code','flow': 'payment','client_id':setup.client_id,'redirect_uri': encodeURIComponent(window.location.toString()), 'campaign_id':10020, 'product_id': 10010, 'voucher_code':'vcode' })
+            uri.build('flow/checkout', {'response_type': 'code','flow': 'payment','client_id':setup.client_id,'redirect_uri': encodeURIComponent(window.location.toString()), 'campaign_id':10020, 'product_id': 10010, 'voucher_code':'vcode' })
         );
         assert.equal(
             uri.purchaseCampaign(10020, 10010),
-            uri.build('auth/start', {'response_type': 'code','flow': 'payment','client_id':setup.client_id,'redirect_uri': encodeURIComponent(window.location.toString()), 'campaign_id':10020, 'product_id': 10010 })
+            uri.build('flow/checkout', {'response_type': 'code','flow': 'payment','client_id':setup.client_id,'redirect_uri': encodeURIComponent(window.location.toString()), 'campaign_id':10020, 'product_id': 10010 })
         );
     });
 });
