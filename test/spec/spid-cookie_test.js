@@ -34,6 +34,13 @@ describe('SPiD.Cookie', function() {
             );
         });
 
+        it('SPiD.Cookie.clearVarnishCookie should work before session data was set', function() {
+            document.cookie = 'SP_ID=123; domain=' + cookieDomain;
+            spidCookie.clearVarnishCookie();
+
+            assert.equal(document.cookie.indexOf('SP_ID'), -1);
+        });
+
         it('SPiD.Cookie.set should set session cookie', function() {
             var session = {user:123, expiresIn: 5000, baseDomain: cookieDomain};
             var name = 'name';
@@ -50,9 +57,8 @@ describe('SPiD.Cookie', function() {
         });
 
         it('SPiD.Cookie.clearVarnishCookie should clear varnish cookie', function() {
-            var session = {user:123, sp_id: 123, expiresIn: 5000, baseDomain: cookieDomain};
             document.cookie = 'SP_ID=123; domain=' + cookieDomain;
-            spidCookie.clearVarnishCookie(session, session.expiresIn);
+            spidCookie.clearVarnishCookie();
 
             assert.equal(document.cookie.indexOf('SP_ID'), -1);
         });

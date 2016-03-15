@@ -1,6 +1,6 @@
 /*global require:false, module:false*/
 
-var _domain,
+var _domain = document.domain, // use document domain by default
     _varnishCookieName = 'SP_ID',
     log = require('./spid-log'),
     config = require('./spid-config');
