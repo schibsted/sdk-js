@@ -76,15 +76,15 @@ describe('SPiD.Uri', function() {
     it('SPiD.Uri.account should return correctly formatted URL for account summary', function() {
         assert.equal(
             uri.account('http://random.com', '123' ),
-            uri.build('account/summary', {'client_id':'123','redirect_uri': encodeURIComponent('http://random.com') })
+            uri.build('account/summary', {'response_type':'code', 'client_id':'123','redirect_uri': encodeURIComponent('http://random.com') })
         );
         assert.equal(
             uri.account(null, '123'),
-            uri.build('account/summary', {'client_id':'123','redirect_uri': encodeURIComponent(window.location.toString()) })
+            uri.build('account/summary', {'response_type':'code', 'client_id':'123','redirect_uri': encodeURIComponent(window.location.toString()) })
         );
         assert.equal(
             uri.account(),
-            uri.build('account/summary', {'client_id':setup.client_id,'redirect_uri': encodeURIComponent(window.location.toString()) })
+            uri.build('account/summary', {'response_type':'code', 'client_id':setup.client_id,'redirect_uri': encodeURIComponent(window.location.toString()) })
         );
     });
 

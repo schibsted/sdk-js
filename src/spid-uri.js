@@ -54,6 +54,7 @@ function logout(redirect_uri, client_id) {
 function account(redirect_uri, client_id) {
     var options = config.options();
     var params = {
+        'response_type': 'code',
         'client_id': client_id || options.client_id,
         'redirect_uri': _encode(redirect_uri)
     };
