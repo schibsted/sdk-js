@@ -1,6 +1,7 @@
 # SPiD JS SDK
 
-[![Build Status](https://travis-ci.org/schibsted/sdk-js.svg?branch=master)](https://travis-ci.org/schibsted/sdk-js)
+[![NPM](https://nodei.co/npm/aws-sdk.svg?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/aws-sdk/)
+[![Version](https://badge.fury.io/js/spid-sdk-js.svg)](http://badge.fury.io/js/spid-sdk-js) [![Build Status](https://travis-ci.org/schibsted/sdk-js.svg?branch=master)](https://travis-ci.org/schibsted/sdk-js)
 
 SDK to integrate to the SPiD frontend API.
 Used to check if user is logged in or not, or owns a product or not.
