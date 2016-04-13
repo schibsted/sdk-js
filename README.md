@@ -1,5 +1,7 @@
 # SPiD JS SDK
 
+[![Build Status](https://travis-ci.org/schibsted/sdk-js.svg?branch=master)](https://travis-ci.org/schibsted/sdk-js)
+
 SDK to integrate to the SPiD frontend API.
 Used to check if user is logged in or not, or owns a product or not.
 
