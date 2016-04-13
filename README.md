@@ -1,6 +1,6 @@
 # SPiD JS SDK
 
-[![NPM](https://nodei.co/npm/aws-sdk.svg?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/aws-sdk/)
+[![NPM](https://nodei.co/npm/spid-sdk-js.svg?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/spid-sdk-js/)
 
 [![Version](https://badge.fury.io/js/spid-sdk-js.svg)](http://badge.fury.io/js/spid-sdk-js) 
 [![Build Status](https://travis-ci.org/schibsted/sdk-js.svg?branch=master)](https://travis-ci.org/schibsted/sdk-js)
