@@ -5,7 +5,7 @@
 [![Version](https://badge.fury.io/js/spid-sdk-js.svg)](http://badge.fury.io/js/spid-sdk-js) 
 [![Build Status](https://travis-ci.org/schibsted/sdk-js.svg?branch=master)](https://travis-ci.org/schibsted/sdk-js)
 [![Dependency Status](https://david-dm.org/schibsted/sdk-js.png)](https://david-dm.org/schibsted/sdk-js) 
-[![devDependency Status](https://david-dm.org/schibsted/sdk-js/dev-status.png)](https://david-dm.org/schibsted/sdk-js#info=devD)
+[![devDependency Status](https://david-dm.org/schibsted/sdk-js/dev-status.png)](https://david-dm.org/schibsted/sdk-js#info=devDependencies&view=table)
 
 SDK to integrate to the SPiD frontend API.
 Used to check if user is logged in or not, or owns a product or not.
