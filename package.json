@@ -21,13 +21,16 @@
     "build": "npm install && grunt",
     "preversion": "npm test",
     "version": "npm run build",
-    "postversion": "git push && git push --tags"
+    "postversion": "git push && git push --tags",
+    "lint": "eslint ."
   },
   "engines": {
     "node": ">= 0.10.0"
   },
   "main": "src/spid-sdk.js",
   "devDependencies": {
+    "eslint": "^2.7.0",
+    "eslint-config-spt": "^2.0.0",
     "grunt": "~0.4.2",
     "grunt-contrib-clean": "~0.6.0",
     "grunt-contrib-compress": "~0.13.0",
