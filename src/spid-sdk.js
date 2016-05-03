@@ -57,7 +57,6 @@ function hasSession(callback) {
 
     var data = persist.get();
     if(data) {
-        _session = data;
         return respond(null, data);
     }
 
