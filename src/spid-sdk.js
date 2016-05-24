@@ -32,11 +32,11 @@ function hasSession(callback) {
     callback = callback || function() {
         };
     var that = this,
-        respond = function(err, data) {
+        respond = util.makeAsync(function(err, data) {
             eventTrigger.session(_session, data);
             _session = data;
             callback(err, data);
-        },
+        }),
         handleResponse = function(err, data) {
             if(!err && !!data.result) {
                 persist.set(data, data.expiresIn);
@@ -64,8 +64,8 @@ function hasSession(callback) {
 }
 
 function hasProduct(productId, callback) {
-    callback = callback || function() {
-        };
+    callback = util.makeAsync(callback || function() {
+        });
     if(cache.enabled()) {
         var cacheVal = cache.get('prd_{id}'.replace('{id}', productId));
         if(cacheVal && (cacheVal.refreshed + config.options().refresh_timeout) > util.now()) {
@@ -89,8 +89,8 @@ function hasProduct(productId, callback) {
 }
 
 function hasSubscription(productId, callback) {
-    callback = callback || function() {
-        };
+    callback = util.makeAsync(callback || function() {
+        });
     if(cache.enabled()) {
         var cacheVal = cache.get('sub_{id}'.replace('{id}', productId));
         if(cacheVal && (cacheVal.refreshed + config.options().refresh_timeout) > util.now()) {
@@ -151,12 +151,12 @@ function acceptAgreement(callback) {
 }
 
 //Async loader
-window.setTimeout(function() {
+util.makeAsync(function() {
     if(typeof (window.asyncSPiD) === 'function' && !window.asyncSPiD.hasRun) {
         window.asyncSPiD();
         window.asyncSPiD.hasRun = true;
     }
-}, 0);
+})();
 
 module.exports = {
     version: function() {

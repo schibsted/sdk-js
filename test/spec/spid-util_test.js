@@ -9,6 +9,18 @@ describe('SPiD.Util', function() {
         SPiD.init(setup);
     });
 
+    it('SPiD.Util.makeAsync should return wrapped asynchronous function', function(done) {
+        var called = false;
+        util.makeAsync(function() {
+            called = true;
+        })();
+        assert.equal(called, false);
+        setTimeout(function() {
+            assert.equal(called, true);
+            done();
+        }, 1);
+    });
+
     it('SPiD.Util.buildUri should return correctly formatted URL', function() {
         assert.equal(util.buildUri('https://google.se/', 'test', {a:1,b:2,c:null}), 'https://google.se/test?a=1&b=2');
         assert.equal(util.buildUri('https://google.se/', null, {a:1,b:2,c:null}), 'https://google.se/?a=1&b=2');

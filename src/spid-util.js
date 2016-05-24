@@ -25,8 +25,18 @@ function buildUri(server, path, params) {
     return url;
 }
 
+function makeAsync(fn) {
+    return function() {
+        var args = arguments;
+        setTimeout(function() {
+            fn.apply(null, args);
+        }, 0);
+    };
+}
+
 module.exports = {
     copy: copy,
     now: now,
-    buildUri: buildUri
+    buildUri: buildUri,
+    makeAsync: makeAsync
 };
