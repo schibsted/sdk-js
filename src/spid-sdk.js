@@ -33,6 +33,9 @@ function hasSession(callback) {
         };
     var that = this,
         respond = util.makeAsync(function(err, data) {
+            if(!err && !!data.result) {
+                cookie.tryVarnishCookie(data);
+            }
             eventTrigger.session(_session, data);
             _session = data;
             callback(err, data);
@@ -40,7 +43,6 @@ function hasSession(callback) {
         handleResponse = function(err, data) {
             if(!err && !!data.result) {
                 persist.set(data, data.expiresIn);
-                cookie.tryVarnishCookie(data);
             }
             respond(err, data);
         },

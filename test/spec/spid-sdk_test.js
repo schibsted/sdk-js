@@ -320,6 +320,31 @@ describe('SPiD', function() {
                 done();
             });
         });
+
+        it('SPiD.hasSession should update SP_ID cookie when data comes from persistence', function(done) {
+            var _setup = setup();
+            _setup.setVarnishCookie = true;
+            _setup.storage = 'localstorage';
+            SPiD.init(_setup);
+
+            var storedSession = {
+                'result':true,
+                'expiresIn':7111,
+                'baseDomain':cookieDomain,
+                'userStatus':'connected',
+                'userId':1844813,
+                'sp_id':'4f1e2ae59caf7c2f4a058b76'
+            };
+
+            persistGetStub.onFirstCall().returns(storedSession);
+            SPiD.hasSession(function(err, res) {
+                if(!err && res.result && res.userId === 1844813) {
+                    assert.notEqual(document.cookie.indexOf('SP_ID'), -1);
+                    done();
+                }
+            });
+            assert.isFalse(talkRequestStub.called);
+        });
     });
 
     describe('SPiD.acceptAgreement', function() {
