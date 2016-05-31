@@ -32,6 +32,18 @@ function hasSession(callback) {
     callback = callback || function() {
         };
     var that = this,
+        shouldCacheData = function(err, data) {
+            return (!err && !!data.result) || (config.options().cache && config.options().cache.hasSession);
+        },
+        getExpiresIn = function(data) {
+            if (config.options().cache &&
+                config.options().cache.hasSession &&
+                config.options().cache.hasSession.ttlSeconds) {
+                return config.options().cache.hasSession.ttlSeconds;
+            } else {
+                return data.expiresIn;
+            }
+        },
         respond = util.makeAsync(function(err, data) {
             if(!err && !!data.result) {
                 cookie.tryVarnishCookie(data);
@@ -41,8 +53,8 @@ function hasSession(callback) {
             callback(err, data);
         }),
         handleResponse = function(err, data) {
-            if(!err && !!data.result) {
-                persist.set(data, data.expiresIn);
+            if(shouldCacheData(err, data)) {
+                persist.set(data, getExpiresIn(data));
             }
             respond(err, data);
         },
