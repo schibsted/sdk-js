@@ -345,6 +345,27 @@ describe('SPiD', function() {
             });
             assert.isFalse(talkRequestStub.called);
         });
+
+        it('SPiD.hasSession should cache data upon erroneously response when cache.hasSession option is set', function(done) {
+            var _setup = setup();
+            _setup.cache = { hasSession: { ttlSeconds: 360 } };
+            _setup.storage = 'localstorage';
+            SPiD.init(_setup);
+
+            var _session = {
+                baseDomain: cookieDomain,
+                expiresIn: null,
+                result: false,
+                serverTime: 1464685017
+            };
+            talkRequestStub.onFirstCall().callsArgWith(3, null, _session);
+
+            SPiD.hasSession(function() {
+                assert.isTrue(persistSetStub.calledOnce);
+                assert.equal(persistSetStub.firstCall.args[1], _setup.cache.hasSession.ttlSeconds);
+                done();
+            });
+        });
     });
 
     describe('SPiD.acceptAgreement', function() {
