@@ -10,7 +10,8 @@ var
     persist = require('./spid-persist'),
     cookie = require('./spid-cookie'),
     cache = require('./spid-cache'),
-    talk = require('./spid-talk');
+    talk = require('./spid-talk'),
+    terms = require('./spid-terms');
 
 function globalExport(global) {
     global.SPiD = global.SPiD || this;
@@ -164,6 +165,10 @@ function acceptAgreement(callback) {
     talk.request(this.server(),'ajax/acceptAgreement.js', {}, cb);
 }
 
+function showTermsPopup(element){
+    terms.showPopup(element);
+}
+
 //Async loader
 util.makeAsync(function() {
     if(typeof (window.asyncSPiD) === 'function' && !window.asyncSPiD.hasRun) {
@@ -196,5 +201,6 @@ module.exports = {
     hasProduct: hasProduct,
     hasSubscription: hasSubscription,
     setTraits: setTraits,
-    logout: logout
+    logout: logout,
+    showTermsPopup: showTermsPopup
 };
