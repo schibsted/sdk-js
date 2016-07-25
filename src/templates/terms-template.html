@@ -1,8 +1,8 @@
-<div>
+<div class = "popup-body">
     <h2 class="terms-header"> {{ header }} </h2>
     <p class="logo-container">
         <img src=" {{ logos }} " alt="client" class="logo">
-        <img src="/images/spid-logo.svg" alt="SPiD" class="spid-logo">
+        <img src="/src/images/spid-logo.svg" alt="SPiD" class="spid-logo">
     </p>
     <div class="terms-container">
         <p class="terms-description">
@@ -17,9 +17,9 @@
         <label for="accept-terms" class="accept-text"> {{ acceptText }} </label>
     </p>
     <div>
-        <button class="btn btn-primary" type="submit"> {{ buttonText }} </button>
+        <button class="btn-primary" type="submit"> {{ buttonText }} </button>
     </div>
-    <p>
-        {{ declineText }}
+    <p class="decline-text">
+        <a href="#" class="terms-link">{{ declineText }}</a>
     </p>
 </div>

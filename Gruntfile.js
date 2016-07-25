@@ -18,7 +18,7 @@ module.exports = function (grunt) {
     // Project configuration.
     grunt.initConfig({
         watch: {
-            files: ['src/**/*.js'],
+            files: ['src/**/*'],
             tasks: ['clean', 'jshint:sdk', 'webpack', 'template', 'uglify', 'compress']
         },
         // Metadata.

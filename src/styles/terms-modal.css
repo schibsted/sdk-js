@@ -1,3 +1,73 @@
-h1 {
-    color: red;
+.popup-body {
+    font-family: 'Open Sans', sans-serif;
+    font-weight: lighter;
+    font-size: 13px;
+    color: #4a4a4a;
+    margin: 20px;
+    padding: 0 5px;
+}
+
+.terms-header {
+    font-weight: normal;
+    font-size: 24px;
+    margin-top: 8px;
+    text-align: center;
+}
+
+.logo-container {
+    text-align: center;
+}
+
+.logo-container .logo {
+    height: 20px;
+}
+
+.logo-container .spid-logo {
+    height: 20px;
+}
+
+.terms-description{
+    margin: 20px 0;
+}
+
+.terms-notice {
+    font-weight: normal;
+    margin: 20px 0;
+}
+
+.terms-link {
+    color: inherit;
+}
+
+.accept-text {
+    display: block;
+    margin-left: 25px;
+}
+
+#accept-terms {
+    float: left;
+}
+
+.btn-primary {
+    font-family: 'Open Sans', sans-serif;
+    font-weight: lighter;
+    font-size: 14px;
+    color: #ffffff;
+    text-decoration: none;
+    line-height: normal;
+    text-align: center;
+    vertical-align: middle;
+    display: inline-block;
+    cursor: pointer;
+    background: #146cc6 none;
+    border: 1px solid #b8d0e9;
+    border-radius: 3px;
+    white-space: nowrap;
+    width: 100%;
+    padding: 13px;
+}
+
+.decline-text {
+    text-align: center;
+    font-size: 10px;
 }
