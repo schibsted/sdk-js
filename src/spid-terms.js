@@ -1,19 +1,19 @@
 /*global module:false, require:false*/
 var log = require('./spid-log'),
     talk = require('./spid-talk');
-require('css!./style.css');
 
 function showPopup(element) {
     var callback = function (err, res) {
         var createPopupElement = function (content) {
+            var htmlContent = require('html!./templates/terms-template.html');
             var popup = document.createElement('div');
-            popup.innerHTML = content;
+            popup.innerHTML = htmlContent;
             element.appendChild(popup);
         };
 
         if (res.showPopup) {
             //load css here
-
+            require('!style!css!./styles/terms-modal.css');
             createPopupElement(res.popupContent);
             window.console.log('Show popup');
         }
