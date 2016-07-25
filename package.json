@@ -29,6 +29,7 @@
   },
   "main": "src/spid-sdk.js",
   "devDependencies": {
+    "css-loader": "^0.23.1",
     "eslint": "^2.7.0",
     "eslint-config-spt": "^2.0.0",
     "grunt": "~0.4.2",
@@ -49,6 +50,7 @@
     "karma-webpack": "^1.7.0",
     "mocha": "^2.3.4",
     "phantomjs-prebuilt": "^2.1.7",
+    "style-loader": "^0.13.1",
     "webpack": "^1.12.6",
     "webpack-dev-server": "^1.12.1"
   },
