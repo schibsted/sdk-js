@@ -1,4 +1,25 @@
 <div>
-    <h1>T&C</h1>
-    <p>agreement form</p>
+    <h2 class="terms-header"> {{ header }} </h2>
+    <p class="logo-container">
+        <img src=" {{ logos }} " alt="client" class="logo">
+        <img src="/images/spid-logo.svg" alt="SPiD" class="spid-logo">
+    </p>
+    <div class="terms-container">
+        <p class="terms-description">
+           {{ description }}
+        </p>
+        <p class="terms-notice">
+           {{ notice }}
+        </p>
+    </div>
+    <p>
+        <input type="checkbox" name="accept-eula" id="accept-terms" value="1">
+        <label for="accept-terms" class="accept-text"> {{ acceptText }} </label>
+    </p>
+    <div>
+        <button class="btn btn-primary" type="submit"> {{ buttonText }} </button>
+    </div>
+    <p>
+        {{ declineText }}
+    </p>
 </div>

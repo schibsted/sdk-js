@@ -4,17 +4,26 @@ var log = require('./spid-log'),
 
 function showPopup(element) {
     var callback = function (err, res) {
-        var createPopupElement = function (content) {
-            var htmlContent = require('html!./templates/terms-template.html');
+        var createPopupElement = function () {
+            var template = require('mustache!./templates/terms-template.html');
+            var htmlContent = template({
+                header: res.popupData.header,
+                logos: res.popupData.logos,
+                description: res.popupData.description,
+                notice: res.popupData.notice,
+                acceptText: res.popupData.acceptText,
+                buttonText: res.popupData.buttonText,
+                declineText: res.popupData.declineText
+            });
+
             var popup = document.createElement('div');
             popup.innerHTML = htmlContent;
             element.appendChild(popup);
         };
 
         if (res.showPopup) {
-            //load css here
             require('!style!css!./styles/terms-modal.css');
-            createPopupElement(res.popupContent);
+            createPopupElement();
             window.console.log('Show popup');
         }
         window.console.log(res, 'callback test');
