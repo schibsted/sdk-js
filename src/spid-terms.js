@@ -5,7 +5,7 @@ var log = require('./spid-log'),
 function showPopup(element) {
     var callback = function (err, res) {
         var createPopupElement = function () {
-            var template = require('mustache!./templates/terms-template.html');
+            var template = require('mustache!./templates/popup.html');
             var htmlContent = template({
                 header: res.popupData.header,
                 logos: res.popupData.logos,
@@ -22,7 +22,7 @@ function showPopup(element) {
         };
 
         if (res.showPopup) {
-            require('!style!css!./styles/terms-modal.css');
+            require('!style!css!./styles/popup.css');
             createPopupElement();
             window.console.log('Show popup');
         }

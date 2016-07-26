@@ -18,11 +18,7 @@
     text-align: center;
 }
 
-.popup__logo-container .popup__logo {
-    height: 20px;
-}
-
-.popup__logo-container .popup__logo_spid {
+.popup__logo {
     height: 20px;
 }
 
@@ -38,7 +34,7 @@
     color: inherit;
 }
 
-.popup__label_accept {
+.popup__label {
     display: block;
     margin-left: 25px;
 }
