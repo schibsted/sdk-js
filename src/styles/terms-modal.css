@@ -1,4 +1,4 @@
-.popup-body {
+.popup {
     font-family: 'Open Sans', sans-serif;
     font-weight: lighter;
     font-size: 13px;
@@ -7,48 +7,48 @@
     padding: 0 5px;
 }
 
-.terms-header {
+.popup__header {
     font-weight: normal;
     font-size: 24px;
     margin-top: 8px;
     text-align: center;
 }
 
-.logo-container {
+.popup__logo-container {
     text-align: center;
 }
 
-.logo-container .logo {
+.popup__logo-container .popup__logo {
     height: 20px;
 }
 
-.logo-container .spid-logo {
+.popup__logo-container .popup__logo_spid {
     height: 20px;
 }
 
-.terms-description{
+.popup__text {
     margin: 20px 0;
 }
 
-.terms-notice {
+.popup__text_notice {
     font-weight: normal;
     margin: 20px 0;
 }
 
-.terms-link {
+.popup__link {
     color: inherit;
 }
 
-.accept-text {
+.popup__label_accept {
     display: block;
     margin-left: 25px;
 }
 
-#accept-terms {
+#popup__checkbox {
     float: left;
 }
 
-.btn-primary {
+.popup__submit {
     font-family: 'Open Sans', sans-serif;
     font-weight: lighter;
     font-size: 14px;
@@ -67,7 +67,7 @@
     padding: 13px;
 }
 
-.decline-text {
+.popup__cancel {
     text-align: center;
     font-size: 10px;
 }

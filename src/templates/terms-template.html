@@ -1,25 +1,25 @@
-<div class = "popup-body">
-    <h2 class="terms-header"> {{ header }} </h2>
-    <p class="logo-container">
-        <img src=" {{ logos }} " alt="client" class="logo">
-        <img src="/src/images/spid-logo.svg" alt="SPiD" class="spid-logo">
+<div class = "popup">
+    <h2 class="popup__header"> {{ header }} </h2>
+    <p class="popup__logo-container">
+        <img src=" {{ logos }} " alt="client" class="popup__logo">
+        <img src="/src/images/spid-logo.svg" alt="SPiD" class="popup__logo_spid">
     </p>
-    <div class="terms-container">
-        <p class="terms-description">
+    <div>
+        <p class="popup__text">
            {{ description }}
         </p>
-        <p class="terms-notice">
+        <p class="popup__text_notice">
            {{ notice }}
         </p>
     </div>
     <p>
-        <input type="checkbox" name="accept-eula" id="accept-terms" value="1">
-        <label for="accept-terms" class="accept-text"> {{ acceptText }} </label>
+        <input type="checkbox" name="accept-eula" id="popup__checkbox" value="1">
+        <label for="popup__checkbox" class="popup__label_accept"> {{ acceptText }} </label>
     </p>
     <div>
-        <button class="btn-primary" type="submit"> {{ buttonText }} </button>
+        <button class="popup__submit" type="submit"> {{ buttonText }} </button>
     </div>
-    <p class="decline-text">
-        <a href="#" class="terms-link">{{ declineText }}</a>
+    <p class="popup__cancel">
+        <a href="#" class="popup__link">{{ declineText }}</a>
     </p>
 </div>
