@@ -16,11 +16,14 @@ function showPopup(element) {
                 declineText: res.popupData.declineText
             });
 
+            var overlay = document.createElement('div');
             var popup = document.createElement('div');
+            overlay.className = 'overlay';
+            popup.className = 'popup';
             popup.innerHTML = htmlContent;
-            var modal = popup.getElementsByClassName('popup')[0];
-            modal.style.top = element.offsetTop + 'px';
-            modal.style.left = element.offsetLeft + 'px';
+            popup.style.top = element.offsetTop + 'px';
+            popup.style.left = element.offsetLeft + 'px';
+            document.body.appendChild(overlay);
             document.body.appendChild(popup);
         };
 
