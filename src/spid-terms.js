@@ -7,8 +7,6 @@ function showPopup(element) {
         var createPopupElement = function () {
             var template = require('mustache!./templates/popup.html');
             var htmlContent = template({
-                offsetTop: element.offsetTop,
-                offsetLeft: element.offsetLeft,
                 header: res.popupData.header,
                 logos: res.popupData.logos,
                 description: res.popupData.description,
@@ -19,9 +17,11 @@ function showPopup(element) {
             });
 
             var popup = document.createElement('div');
-            var body = document.getElementsByTagName('body')[0];
             popup.innerHTML = htmlContent;
-            body.appendChild(popup);
+            var modal = popup.getElementsByClassName('popup')[0];
+            modal.style.top = element.offsetTop + 'px';
+            modal.style.left = element.offsetLeft + 'px';
+            document.body.appendChild(popup);
         };
 
         if (res.showPopup) {
