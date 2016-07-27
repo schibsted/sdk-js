@@ -21,8 +21,10 @@ function showPopup(element) {
             overlay.className = 'overlay';
             popup.className = 'popup';
             popup.innerHTML = htmlContent;
-            popup.style.top = element.offsetTop + 'px';
-            popup.style.left = element.offsetLeft + 'px';
+            var rect = element.getBoundingClientRect();
+            var top = rect.top + rect.height;
+            popup.style.top = top + 'px';
+            popup.style.right = rect.right + 'px';
             document.body.appendChild(overlay);
             document.body.appendChild(popup);
         };

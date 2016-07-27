@@ -15,6 +15,7 @@
     color: #4a4a4a;
     background-color: #ffffff;
     width: 320px;
+    max-width: 320px;
     padding: 20px 30px;
     position: fixed;
     z-index: 11;
