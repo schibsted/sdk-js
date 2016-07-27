@@ -7,6 +7,8 @@ function showPopup(element) {
         var createPopupElement = function () {
             var template = require('mustache!./templates/popup.html');
             var htmlContent = template({
+                offsetTop: element.offsetTop,
+                offsetLeft: element.offsetLeft,
                 header: res.popupData.header,
                 logos: res.popupData.logos,
                 description: res.popupData.description,
@@ -17,8 +19,9 @@ function showPopup(element) {
             });
 
             var popup = document.createElement('div');
+            var body = document.getElementsByTagName('body')[0];
             popup.innerHTML = htmlContent;
-            element.appendChild(popup);
+            body.appendChild(popup);
         };
 
         if (res.showPopup) {
@@ -30,10 +33,8 @@ function showPopup(element) {
     };
 
     if (element != null) {
-        element.onclick = function () {
-            log.info('popup');
-            talk.request('http://localhost:9090/', 'test/mock/spid-talk_response-termsStatus-success.js', {}, callback);
-        };
+        log.info('popup');
+        talk.request('http://localhost:9090/', 'test/mock/spid-talk_response-termsStatus-success.js', {}, callback);
     }
 }
 
