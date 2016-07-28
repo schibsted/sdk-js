@@ -9,6 +9,21 @@
 }
 
 .popup {
+    position: fixed;
+    z-index: 11;
+}
+
+.popup__arrow-up {
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-bottom: 8px solid #ffffff;
+    margin-left: auto;
+    margin-right: 15px;
+}
+
+.popup__content {
     font-family: 'Open Sans', sans-serif;
     font-weight: lighter;
     font-size: 13px;
@@ -17,8 +32,6 @@
     width: 320px;
     max-width: 320px;
     padding: 20px 30px;
-    position: fixed;
-    z-index: 11;
 }
 
 .popup__header {

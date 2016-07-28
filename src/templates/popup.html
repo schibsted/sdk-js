@@ -1,23 +1,26 @@
-<h2 class="popup__header"> {{ header }} </h2>
-<p class="popup__logo-container">
-    <img src=" {{ logos }} " alt="client" class="popup__logo popup__logo_client">
-    <img src="/src/images/spid-logo.svg" alt="SPiD" class="popup__logo popup__logo_spid">
-</p>
-<div>
-    <p class="popup__text">
-        {{ description }}
+<div class="popup__arrow-up"></div>
+<div class="popup__content">
+    <h2 class="popup__header"> {{ header }} </h2>
+    <p class="popup__logo-container">
+        <img src=" {{ logos }} " alt="client" class="popup__logo popup__logo_client">
+        <img src="/src/images/spid-logo.svg" alt="SPiD" class="popup__logo popup__logo_spid">
     </p>
-    <p class="popup__text popup__text_notice">
-        {{ notice }}
+    <div>
+        <p class="popup__text">
+            {{ description }}
+        </p>
+        <p class="popup__text popup__text_notice">
+            {{ notice }}
+        </p>
+    </div>
+    <p>
+        <input type="checkbox" name="accept-eula" id="popup__checkbox" value="1">
+        <label for="popup__checkbox" class="popup__label"> {{ acceptText }} </label>
+    </p>
+    <div>
+        <button class="popup__submit" type="submit"> {{ buttonText }}</button>
+    </div>
+    <p class="popup__cancel">
+        <a href="#" class="popup__link" id="close-popup"> {{ declineText }} </a>
     </p>
 </div>
-<p>
-    <input type="checkbox" name="accept-eula" id="popup__checkbox" value="1">
-    <label for="popup__checkbox" class="popup__label"> {{ acceptText }} </label>
-</p>
-<div>
-    <button class="popup__submit" type="submit"> {{ buttonText }} </button>
-</div>
-<p class="popup__cancel">
-    <a href="#" class="popup__link" id="close-popup"> {{ declineText }} </a>
-</p>
