@@ -37,6 +37,8 @@ function showPopup(element) {
             window.addEventListener('resize', function () {
                 setRightOffset(element, popup);
             });
+
+            addClosingPopupListener(overlay, popup);
         };
 
         if (res.showPopup) {
@@ -51,6 +53,14 @@ function showPopup(element) {
         log.info('popup');
         talk.request('http://localhost:9090/', 'test/mock/spid-talk_response-termsStatus-success.js', {}, callback);
     }
+}
+
+function addClosingPopupListener(overlay, popup){
+    var closingElement = document.getElementById('close-popup');
+    closingElement.onclick = function(){
+        document.body.removeChild(overlay);
+        document.body.removeChild(popup);
+    };
 }
 
 module.exports = {
