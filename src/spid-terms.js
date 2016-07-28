@@ -5,9 +5,9 @@ var log = require('./spid-log'),
 function showPopup(element) {
     var callback = function (err, res) {
 
-        var getRightOffset = function(el){
-            var rect = el.getBoundingClientRect();
-            return window.innerWidth - (rect.left + rect.width);
+        var setRightOffset = function(element, popup){
+            var rect = element.getBoundingClientRect();
+            popup.style.right = window.innerWidth - (rect.left + rect.width) + 'px';
         };
 
         var createPopupElement = function () {
@@ -30,12 +30,12 @@ function showPopup(element) {
             var rect = element.getBoundingClientRect();
             var top = rect.top + rect.height;
             popup.style.top = top + 'px';
-            popup.style.right = getRightOffset(element) + 'px';
+            setRightOffset(element, popup);
             document.body.appendChild(overlay);
             document.body.appendChild(popup);
 
             window.addEventListener('resize', function () {
-                popup.style.right = getRightOffset(element) + 'px';
+                setRightOffset(element, popup);
             });
         };
 
