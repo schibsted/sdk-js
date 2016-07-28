@@ -4,6 +4,12 @@ var log = require('./spid-log'),
 
 function showPopup(element) {
     var callback = function (err, res) {
+
+        var getRightOffset = function(el){
+            var rect = el.getBoundingClientRect();
+            return window.innerWidth - (rect.left + rect.width);
+        };
+
         var createPopupElement = function () {
             var template = require('mustache!./templates/popup.html');
             var htmlContent = template({
@@ -24,9 +30,13 @@ function showPopup(element) {
             var rect = element.getBoundingClientRect();
             var top = rect.top + rect.height;
             popup.style.top = top + 'px';
-            popup.style.right = rect.right + 'px';
+            popup.style.right = getRightOffset(element) + 'px';
             document.body.appendChild(overlay);
             document.body.appendChild(popup);
+
+            window.addEventListener('resize', function () {
+                popup.style.right = getRightOffset(element) + 'px';
+            });
         };
 
         if (res.showPopup) {
