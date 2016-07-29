@@ -5,8 +5,9 @@ function showPopup(element) {
 
     var popup = {
         init: function (res) {
-            var setRightOffset = function(element, popup){
+            var setOffset = function(element, popup){
                 var rect = element.getBoundingClientRect();
+                popup.style.top = rect.top + rect.height + 'px';
                 popup.style.right = window.innerWidth - (rect.left + rect.width) + 'px';
             };
 
@@ -35,15 +36,12 @@ function showPopup(element) {
                 overlay.className = 'overlay';
                 popup.className = 'popup';
                 popup.innerHTML = htmlContent;
-                var rect = element.getBoundingClientRect();
-                var top = rect.top + rect.height;
-                popup.style.top = top + 'px';
-                setRightOffset(element, popup);
+                setOffset(element, popup);
                 document.body.appendChild(overlay);
                 document.body.appendChild(popup);
 
                 window.addEventListener('resize', function () {
-                    setRightOffset(element, popup);
+                    setOffset(element, popup);
                 });
 
                 addClosingPopupListener(overlay, popup);
