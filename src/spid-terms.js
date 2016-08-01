@@ -3,7 +3,7 @@ var talk = require('./spid-talk');
 
 function showPopup(element) {
 
-    var popup = function (res) {
+    var popup = (function () {
             var setOffset = function(element, popup){
                 var rect = element.getBoundingClientRect();
                 popup.style.top = rect.top + rect.height + 'px';
@@ -18,7 +18,7 @@ function showPopup(element) {
                 };
             };
 
-            var init = function () {
+            var init = function (res) {
                 var template = require('mustache!./templates/popup.html');
                 var htmlContent = template({
                     header: res.popupData.header,
@@ -47,15 +47,15 @@ function showPopup(element) {
             };
 
             return {
-                init: init()
+                init: init
             };
 
-    };
+    })();
 
     var callback = function (err, res) {
         if (res.showPopup) {
             require('!style!css!./styles/popup.css');
-            popup(res);
+            popup.init(res);
         }
     };
 
