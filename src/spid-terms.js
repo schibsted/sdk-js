@@ -4,51 +4,62 @@ var talk = require('./spid-talk');
 function showPopup(element) {
 
     var popup = (function () {
-            var setOffset = function(element, popup){
+        var setOffset = function (element, popup, breakpointWindowWidth) {
+            if (window.innerWidth < breakpointWindowWidth) {
+                popup.style.top = 0;
+                popup.style.left = 0;
+                popup.style.right = 0;
+                popup.style.bottom = 0;
+            } else {
                 var rect = element.getBoundingClientRect();
                 popup.style.top = rect.top + rect.height + 'px';
                 popup.style.right = window.innerWidth - (rect.left + rect.width) + 'px';
+                popup.style.left = 'inherit';
+            }
+        };
+
+        var addClosingPopupListener = function (overlay, popup) {
+            var closingElement = document.getElementById('close-popup');
+            closingElement.onclick = function () {
+                document.body.removeChild(overlay);
+                document.body.removeChild(popup);
             };
+        };
 
-            var addClosingPopupListener = function(overlay, popup){
-                var closingElement = document.getElementById('close-popup');
-                closingElement.onclick = function(){
-                    document.body.removeChild(overlay);
-                    document.body.removeChild(popup);
-                };
-            };
+        var init = function (res, breakpointWindowWidth) {
+            if (breakpointWindowWidth === undefined) {
+                breakpointWindowWidth = 380;
+            }
+            var template = require('mustache!./templates/popup.html');
+            var htmlContent = template({
+                header: res.popupData.header,
+                logos: res.popupData.logos,
+                description: res.popupData.description,
+                notice: res.popupData.notice,
+                acceptText: res.popupData.acceptText,
+                buttonText: res.popupData.buttonText,
+                declineText: res.popupData.declineText
+            });
 
-            var init = function (res) {
-                var template = require('mustache!./templates/popup.html');
-                var htmlContent = template({
-                    header: res.popupData.header,
-                    logos: res.popupData.logos,
-                    description: res.popupData.description,
-                    notice: res.popupData.notice,
-                    acceptText: res.popupData.acceptText,
-                    buttonText: res.popupData.buttonText,
-                    declineText: res.popupData.declineText
-                });
+            var overlay = document.createElement('div');
+            var popup = document.createElement('div');
+            overlay.className = 'overlay';
+            popup.className = 'popup';
+            popup.innerHTML = htmlContent;
+            setOffset(element, popup);
+            document.body.appendChild(overlay);
+            document.body.appendChild(popup);
 
-                var overlay = document.createElement('div');
-                var popup = document.createElement('div');
-                overlay.className = 'overlay';
-                popup.className = 'popup';
-                popup.innerHTML = htmlContent;
-                setOffset(element, popup);
-                document.body.appendChild(overlay);
-                document.body.appendChild(popup);
+            window.addEventListener('resize', function () {
+                setOffset(element, popup, breakpointWindowWidth);
+            });
 
-                window.addEventListener('resize', function () {
-                    setOffset(element, popup);
-                });
+            addClosingPopupListener(overlay, popup);
+        };
 
-                addClosingPopupListener(overlay, popup);
-            };
-
-            return {
-                init: init
-            };
+        return {
+            init: init
+        };
 
     })();
 

@@ -11,8 +11,6 @@
 .popup {
     position: fixed;
     z-index: 11;
-    top: 0 !important;
-    left: 0 !important;
 }
 
 .popup__arrow-up {
@@ -104,10 +102,5 @@
 
     .popup__arrow-up {
         display: block;
-    }
-
-    .popup {
-        top: inherit !important;
-        left: inherit !important;
     }
 }
