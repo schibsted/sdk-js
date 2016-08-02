@@ -10,11 +10,14 @@ function showPopup(element) {
                 popup.style.left = 0;
                 popup.style.right = 0;
                 popup.style.bottom = 0;
+                popup.style.width = '100%';
             } else {
                 var rect = element.getBoundingClientRect();
                 popup.style.top = rect.top + rect.height + 'px';
                 popup.style.right = window.innerWidth - (rect.left + rect.width) + 'px';
-                popup.style.left = 'inherit';
+                popup.style.left = 'auto';
+                popup.style.width = breakpointWindowWidth + 'px';
+                popup.style.maxWidth = breakpointWindowWidth + 'px';
             }
         };
 
@@ -27,9 +30,7 @@ function showPopup(element) {
         };
 
         var init = function (res, breakpointWindowWidth) {
-            if (breakpointWindowWidth === undefined) {
-                breakpointWindowWidth = 380;
-            }
+            var breakpointWidth = (typeof breakpointWindowWidth === 'undefined') ? 380 : breakpointWindowWidth;
             var template = require('mustache!./templates/popup.html');
             var htmlContent = template({
                 header: res.popupData.header,
@@ -46,12 +47,12 @@ function showPopup(element) {
             overlay.className = 'overlay';
             popup.className = 'popup';
             popup.innerHTML = htmlContent;
-            setOffset(element, popup);
+            setOffset(element, popup, breakpointWidth);
             document.body.appendChild(overlay);
             document.body.appendChild(popup);
 
             window.addEventListener('resize', function () {
-                setOffset(element, popup, breakpointWindowWidth);
+                setOffset(element, popup, breakpointWidth);
             });
 
             addClosingPopupListener(overlay, popup);
