@@ -4,7 +4,7 @@ var talk = require('./spid-talk');
 function showPopup(element) {
 
     var popup = (function () {
-        var setOffset = function (element, popup, breakpointWindowWidth) {
+        var setPopupPosition = function (element, popup, breakpointWindowWidth) {
             if (window.innerWidth < breakpointWindowWidth) {
                 popup.style.top = 0;
                 popup.style.left = 0;
@@ -47,12 +47,12 @@ function showPopup(element) {
             overlay.className = 'overlay';
             popup.className = 'popup';
             popup.innerHTML = htmlContent;
-            setOffset(element, popup, breakpointWidth);
+            setPopupPosition(element, popup, breakpointWidth);
             document.body.appendChild(overlay);
             document.body.appendChild(popup);
 
             window.addEventListener('resize', function () {
-                setOffset(element, popup, breakpointWidth);
+                setPopupPosition(element, popup, breakpointWidth);
             });
 
             addClosingPopupListener(overlay, popup);
