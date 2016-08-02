@@ -23,10 +23,10 @@ function showPopup(element) {
 
         var addClosingPopupListener = function (overlay) {
             var closingElement = document.getElementById('close-popup');
-            closingElement.onclick = function () {
+            closingElement.addEventListener('click', function () {
                 document.body.removeChild(overlay);
                 document.body.removeChild(popup);
-            };
+            });
         };
 
         var init = function (res, breakpointWindowWidth) {
