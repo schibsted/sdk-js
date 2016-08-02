@@ -33,6 +33,11 @@
     padding: 20px 30px;
 }
 
+.popup__cancel_type_sign {
+    float: right;
+    margin-right: -13px;
+}
+
 .popup__header {
     font-weight: normal;
     font-size: 24px;
@@ -88,7 +93,7 @@
     padding: 13px;
 }
 
-.popup__cancel {
+.popup__cancel_type_text {
     text-align: center;
     font-size: 10px;
 }
