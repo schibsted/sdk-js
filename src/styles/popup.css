@@ -94,6 +94,11 @@
 }
 
 @media (min-width: 380px) {
+    .popup {
+        width: 380px;
+        max-width: 380px;
+    }
+
     .overlay{
         background-color: rgba(160, 160, 160, 0.8);
     }

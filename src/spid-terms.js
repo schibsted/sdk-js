@@ -4,24 +4,24 @@ var talk = require('./spid-talk');
 function showPopup(element) {
 
     var popup = (function () {
-        var setPopupPosition = function (element, popup, breakpointWindowWidth) {
+        var popup;
+        var setPopupPosition = function (element, breakpointWindowWidth) {
             if (window.innerWidth < breakpointWindowWidth) {
                 popup.style.top = 0;
                 popup.style.left = 0;
                 popup.style.right = 0;
                 popup.style.bottom = 0;
                 popup.style.width = '100%';
+                popup.style.maxWidth = '100%';
             } else {
                 var rect = element.getBoundingClientRect();
+                popup.removeAttribute('style');
                 popup.style.top = rect.top + rect.height + 'px';
                 popup.style.right = window.innerWidth - (rect.left + rect.width) + 'px';
-                popup.style.left = 'auto';
-                popup.style.width = breakpointWindowWidth + 'px';
-                popup.style.maxWidth = breakpointWindowWidth + 'px';
             }
         };
 
-        var addClosingPopupListener = function (overlay, popup) {
+        var addClosingPopupListener = function (overlay) {
             var closingElement = document.getElementById('close-popup');
             closingElement.onclick = function () {
                 document.body.removeChild(overlay);
@@ -43,19 +43,19 @@ function showPopup(element) {
             });
 
             var overlay = document.createElement('div');
-            var popup = document.createElement('div');
+            popup = document.createElement('div');
             overlay.className = 'overlay';
             popup.className = 'popup';
             popup.innerHTML = htmlContent;
-            setPopupPosition(element, popup, breakpointWidth);
+            setPopupPosition(element, breakpointWidth);
             document.body.appendChild(overlay);
             document.body.appendChild(popup);
 
             window.addEventListener('resize', function () {
-                setPopupPosition(element, popup, breakpointWidth);
+                setPopupPosition(element, breakpointWidth);
             });
 
-            addClosingPopupListener(overlay, popup);
+            addClosingPopupListener(overlay);
         };
 
         return {
