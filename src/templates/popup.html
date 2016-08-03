@@ -1,6 +1,6 @@
 <div class="popup__arrow-up"></div>
 <div class="popup__content">
-    <div class="popup__cancel popup__cancel_type_sign"><img src="/src/images/x.png"></div>
+    <div class="popup__cancel popup__cancel_type_sign" data-js="close-popup"><img src="/src/images/x.png"></div>
     <h2 class="popup__header"> {{ header }} </h2>
     <p class="popup__logo-container">
         <img src=" {{ logos }} " alt="client" class="popup__logo popup__logo_client">
@@ -22,6 +22,6 @@
         <button class="popup__submit" type="submit"> {{ buttonText }}</button>
     </div>
     <p class="popup__cancel popup__cancel_type_text">
-        <a href="#" class="popup__link" id="close-popup"> {{ declineText }} </a>
+        <a href="#" class="popup__link" data-js="close-popup"> {{ declineText }} </a>
     </p>
 </div>

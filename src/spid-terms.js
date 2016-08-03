@@ -4,33 +4,36 @@ var talk = require('./spid-talk');
 function showPopup(element) {
 
     var popup = (function () {
-        var popup;
-        var setPopupPosition = function (element, breakpointWindowWidth) {
-            if (window.innerWidth < breakpointWindowWidth) {
-                popup.style.top = 0;
-                popup.style.left = 0;
-                popup.style.right = 0;
-                popup.style.bottom = 0;
-                popup.style.width = '100%';
-                popup.style.maxWidth = '100%';
+        var DOMElement, overlay, breakpointWidth;
+
+        var setPopupPosition = function (elementWhichPopupIsPinnedTo) {
+            if (window.innerWidth < breakpointWidth) {
+                DOMElement.style.top = 0;
+                DOMElement.style.left = 0;
+                DOMElement.style.right = 0;
+                DOMElement.style.bottom = 0;
+                DOMElement.style.width = '100%';
+                DOMElement.style.maxWidth = '100%';
             } else {
-                var rect = element.getBoundingClientRect();
-                popup.removeAttribute('style');
-                popup.style.top = rect.top + rect.height + 'px';
-                popup.style.right = window.innerWidth - (rect.left + rect.width) + 'px';
+                var rect = elementWhichPopupIsPinnedTo.getBoundingClientRect();
+                DOMElement.removeAttribute('style');
+                DOMElement.style.top = rect.top + rect.height + 'px';
+                DOMElement.style.right = window.innerWidth - (rect.left + rect.width) + 'px';
             }
         };
 
-        var addClosingPopupListener = function (overlay) {
-            var closingElement = document.getElementById('close-popup');
+        var addClosingPopupListener = function (closingElement) {
             closingElement.addEventListener('click', function () {
                 document.body.removeChild(overlay);
-                document.body.removeChild(popup);
+                document.body.removeChild(DOMElement);
+                window.removeEventListener('resize', function () {
+                    setPopupPosition(element, breakpointWidth);
+                });
             });
         };
 
         var init = function (res, breakpointWindowWidth) {
-            var breakpointWidth = (typeof breakpointWindowWidth === 'undefined') ? 380 : breakpointWindowWidth;
+            breakpointWidth = (typeof breakpointWindowWidth === 'undefined') ? 380 : breakpointWindowWidth;
             var template = require('mustache!./templates/popup.html');
             var htmlContent = template({
                 header: res.popupData.header,
@@ -42,20 +45,20 @@ function showPopup(element) {
                 declineText: res.popupData.declineText
             });
 
-            var overlay = document.createElement('div');
-            popup = document.createElement('div');
+            overlay = document.createElement('div');
+            DOMElement = document.createElement('div');
             overlay.className = 'overlay';
-            popup.className = 'popup';
-            popup.innerHTML = htmlContent;
-            setPopupPosition(element, breakpointWidth);
+            DOMElement.className = 'popup';
+            DOMElement.innerHTML = htmlContent;
+            setPopupPosition(element);
             document.body.appendChild(overlay);
-            document.body.appendChild(popup);
+            document.body.appendChild(DOMElement);
 
             window.addEventListener('resize', function () {
-                setPopupPosition(element, breakpointWidth);
+                setPopupPosition(element);
             });
 
-            addClosingPopupListener(overlay);
+            document.querySelectorAll('[data-js="close-popup"]').forEach(addClosingPopupListener);
         };
 
         return {
