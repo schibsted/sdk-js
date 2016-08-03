@@ -1,7 +1,7 @@
 /*global module:false, require:false*/
 var talk = require('./spid-talk');
 
-function showPopup(element) {
+function showPopup(element, isLastDayToAccept) {
 
     var popup = (function () {
         var DOMElement, overlay, breakpointWidth;
@@ -50,6 +50,10 @@ function showPopup(element) {
             overlay.className = 'overlay';
             DOMElement.className = 'popup';
             DOMElement.innerHTML = htmlContent;
+            if (isLastDayToAccept) {
+                var cancelTextElement = DOMElement.querySelector('[class="popup__cancel popup__cancel_type_text"]');
+                cancelTextElement.style.visibility = 'hidden';
+            }
             setPopupPosition(element);
             document.body.appendChild(overlay);
             document.body.appendChild(DOMElement);
