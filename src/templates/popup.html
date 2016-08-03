@@ -21,4 +21,9 @@
     <div>
         <button class="popup__submit" type="submit"> {{ buttonText }}</button>
     </div>
+    {{#displayCancelPopupLink}}
+        <p class="popup__cancel popup__cancel_type_text">
+            <a href="#" class="popup__link" data-js="close-popup"> {{ declineText }} </a>
+        </p>
+    {{/displayCancelPopupLink}}
 </div>

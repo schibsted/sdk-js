@@ -41,7 +41,9 @@ function showPopup(elementWhichPopupIsPinnedTo, displayCancelPopupLink) {
                 description: res.popupData.description,
                 notice: res.popupData.notice,
                 acceptText: res.popupData.acceptText,
-                buttonText: res.popupData.buttonText
+                buttonText: res.popupData.buttonText,
+                declineText: res.popupData.declineText,
+                displayCancelPopupLink: displayCancelPopupLink
             });
 
             overlay = document.createElement('div');
@@ -49,13 +51,6 @@ function showPopup(elementWhichPopupIsPinnedTo, displayCancelPopupLink) {
             overlay.className = 'overlay';
             DOMElement.className = 'popup';
             DOMElement.innerHTML = htmlContent;
-            if (displayCancelPopupLink) {
-                var cancelTextElement = document.createElement('p');
-                cancelTextElement.className = 'popup__cancel popup__cancel_type_text';
-                cancelTextElement.innerHTML = '<a href="#" class="popup__link" data-js="close-popup">'+res.popupData.declineText+'</a>';
-                DOMElement.lastChild.appendChild(cancelTextElement);
-
-            }
             setPopupPosition();
             document.body.appendChild(overlay);
             document.body.appendChild(DOMElement);
