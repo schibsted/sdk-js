@@ -36,6 +36,7 @@
 .popup__cancel_type_sign {
     float: right;
     margin-right: -13px;
+    cursor: pointer;
 }
 
 .popup__header {
