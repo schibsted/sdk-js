@@ -1,12 +1,14 @@
 /*global module:false, require:false*/
 var talk = require('./spid-talk');
 
-function showPopup(element, isLastDayToAccept) {
+function showPopup(elementWhichPopupIsPinnedTo, displayCancelPopupLink) {
 
     var popup = (function () {
-        var DOMElement, overlay, breakpointWidth;
+        var DOMElement,
+            overlay,
+            breakpointWidth;
 
-        var setPopupPosition = function (elementWhichPopupIsPinnedTo) {
+        var setPopupPosition = function () {
             if (window.innerWidth < breakpointWidth) {
                 DOMElement.style.top = 0;
                 DOMElement.style.left = 0;
@@ -26,9 +28,7 @@ function showPopup(element, isLastDayToAccept) {
             closingElement.addEventListener('click', function () {
                 document.body.removeChild(overlay);
                 document.body.removeChild(DOMElement);
-                window.removeEventListener('resize', function () {
-                    setPopupPosition(element, breakpointWidth);
-                });
+                window.removeEventListener('resize', setPopupPosition);
             });
         };
 
@@ -50,17 +50,15 @@ function showPopup(element, isLastDayToAccept) {
             overlay.className = 'overlay';
             DOMElement.className = 'popup';
             DOMElement.innerHTML = htmlContent;
-            if (isLastDayToAccept) {
+            if (!displayCancelPopupLink) {
                 var cancelTextElement = DOMElement.querySelector('[class="popup__cancel popup__cancel_type_text"]');
                 cancelTextElement.style.visibility = 'hidden';
             }
-            setPopupPosition(element);
+            setPopupPosition();
             document.body.appendChild(overlay);
             document.body.appendChild(DOMElement);
 
-            window.addEventListener('resize', function () {
-                setPopupPosition(element);
-            });
+            window.addEventListener('resize', setPopupPosition);
 
             document.querySelectorAll('[data-js="close-popup"]').forEach(addClosingPopupListener);
         };
@@ -78,7 +76,7 @@ function showPopup(element, isLastDayToAccept) {
         }
     };
 
-    if (element != null) {
+    if (elementWhichPopupIsPinnedTo != null) {
         talk.request('http://localhost:9090/', 'test/mock/spid-talk_response-termsStatus-success.js', {}, callback);
     }
 }

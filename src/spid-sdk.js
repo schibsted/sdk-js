@@ -165,8 +165,8 @@ function acceptAgreement(callback) {
     talk.request(this.server(),'ajax/acceptAgreement.js', {}, cb);
 }
 
-function showTermsPopup(element, isLastDayToAccept){
-    terms.showPopup(element, isLastDayToAccept);
+function showTermsPopup(elementWhichPopupIsPinnedTo, displayCancelPopupLink){
+    terms.showPopup(elementWhichPopupIsPinnedTo, displayCancelPopupLink);
 }
 
 //Async loader
