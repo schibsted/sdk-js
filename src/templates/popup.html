@@ -1,0 +1,29 @@
+<div class="popup__arrow-up"></div>
+<div class="popup__content">
+    <div class="popup__cancel popup__cancel_type_sign" data-js="close-popup"><img src="/src/images/x.png"></div>
+    <h2 class="popup__header"> {{ header }} </h2>
+    <p class="popup__logo-container">
+        <img src=" {{ logos }} " alt="client" class="popup__logo popup__logo_client">
+        <img src="/src/images/spid-logo.svg" alt="SPiD" class="popup__logo popup__logo_spid">
+    </p>
+    <div>
+        <p class="popup__text">
+            {{ description }}
+        </p>
+        <p class="popup__text popup__text_notice">
+            {{ notice }}
+        </p>
+    </div>
+    <p>
+        <input type="checkbox" name="accept-eula" id="popup__checkbox" value="1">
+        <label for="popup__checkbox" class="popup__label"> {{ acceptText }} </label>
+    </p>
+    <div>
+        <button class="popup__submit" type="submit"> {{ buttonText }}</button>
+    </div>
+    {{#displayCancelPopupLink}}
+        <p class="popup__cancel popup__cancel_type_text">
+            <a href="#" class="popup__link" data-js="close-popup"> {{ declineText }} </a>
+        </p>
+    {{/displayCancelPopupLink}}
+</div>

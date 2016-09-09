@@ -6,8 +6,8 @@
 </head>
 <body>
     <div id="content"></div>
-    <script type="text/javascript" src="../../dist/spid-sdk-2.1.5-var.js"></script>
-    <script type="text/javascript" src="../../dist/spid-uri-2.1.5-var.js"></script>
+    <script type="text/javascript" src="../../dist/spid-sdk-2.1.7-var.js"></script>
+    <script type="text/javascript" src="../../dist/spid-uri-2.1.7-var.js"></script>
     <script type="text/javascript">
 
         try {
@@ -15,7 +15,7 @@
                 console.log(session);
                 if (session && session.result && session.userStatus === 'connected') {
                     // logged in and connected user
-                    $("#content").html('Logged in as <a href="'+ SPiD_Uri.account()  +'">'+session.displayName+'</a> | <a href="javascript:;" onclick="SPiD.logout();">Logg ut</a>');
+                    $("#content").html('Logged in as <a href="'+ SPiD_Uri.account()  +'">'+session.displayName+'</a> | <a href="javascript:;" onclick="SPiD.logout();">Logg ut</a> | <a href="javascript:;" id="terms">Terms</a>');
                 } else {
                     // No valid session found
                     $("#content").html('<a href="' + SPiD_Uri.login() + '">Login</a> | <a href="' + SPiD_Uri.signup()+ '">Sign up</a>');
@@ -80,4 +80,3 @@
     </script>
 </body>
 </html>
-
