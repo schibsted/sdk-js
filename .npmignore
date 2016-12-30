@@ -6,7 +6,9 @@ examples/
 .project
 .idea
 .travis.yml
-.jshintrc
+.eslintrc
+.eslintignore
+.editorconfig
 sdk-js.iml
 Gruntfile.js
 karma.conf.js
