@@ -1,12 +1,10 @@
-/*global require:false, module:false*/
-
 function enabled() {
     var config = require('./spid-config');
     return !!window.console && (!!config.options().logging || window.location.toString().indexOf('spid_debug=1') !== -1);
 }
 
 function _log(message, level) {
-    if(enabled()) {
+    if (enabled()) {
         window.console[level]('[SPiD] ' + message);
     }
 }

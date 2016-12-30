@@ -1,6 +1,17 @@
 {
-    "extends": [
-        "spt",
-        "spt/env-es6-false"
-    ]
+    "env": {
+        "browser": true,
+        "amd": true,
+        "commonjs": true
+    },,
+    "extends": "schibsted",
+    "rules": {
+        "strict": "off",
+        "camelcase": ["error", {"properties": "never"}],
+        "consistent-this": ["error", "that"],
+        "indent": ["error", 4],
+        "no-undefined": "off",
+        "no-var": "off",
+        "object-shorthand": "off"
+    }
 }
