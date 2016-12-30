@@ -1,4 +1,3 @@
-/*global module:false*/
 module.exports = function(grunt) {
 
   function webpackCfg(target, fileName, entryName) {

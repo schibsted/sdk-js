@@ -1,7 +1,12 @@
 describe('SPiD.Config', function() {
-
     var assert = chai.assert;
-    var setupProd = {client_id : '4d00e8d6bf92fc8648000000', server: 'login.schibsted.com', logging:false, refresh_timeout: 100, storage: 'cookie'};
+    var setupProd = {
+        client_id: '4d00e8d6bf92fc8648000000',
+        server: 'login.schibsted.com',
+        logging: false,
+        refresh_timeout: 100,
+        storage: 'cookie'
+    };
     var SPiD  = require('../../src/spid-sdk'),
         config = require('../../src/spid-config');
 
@@ -26,5 +31,4 @@ describe('SPiD.Config', function() {
             assert.equal(options.refresh_timeout, 60000);
         });
     });
-
 });
