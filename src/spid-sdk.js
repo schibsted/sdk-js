@@ -188,6 +188,9 @@ module.exports = {
     coreEndpoint: function() {
         return (config.options().https ? 'https' : 'http') + '://' + config.options().server + '/ajax/hasSession.js';
     },
+    hasVarnishCookie: function() {
+        return cookie.hasVarnishCookie();
+    },
     acceptAgreement: acceptAgreement,
     event: spidEvent,
     sessionCache: persist,
