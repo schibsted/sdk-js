@@ -7,6 +7,10 @@ function _encode(redirect_uri) {
     return encodeURIComponent(redirect_uri || window.location.toString());
 }
 
+function globalExport(global) {
+    global.SPiD_Uri = global.SPiD_Uri || this;
+}
+
 function build(path, params) {
     return util.buildUri(config.server(), path, params);
 }
@@ -127,6 +131,10 @@ function purchaseCampaign(campaign_id, product_id, voucher_code, redirect_uri, c
 module.exports = {
     init: function(opts) {
         config.init(opts);
+
+        if(!config.options().noGlobalExport) {
+            globalExport.call(this, window);
+        }
     },
     build: build,
     login: login,
