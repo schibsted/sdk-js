@@ -9,6 +9,18 @@ describe('SPiD.Uri', function() {
         SPiD.init(setup);
     });
 
+    it('SPiD.Uri.init should expose SPiD_Uri to global', function() {
+        uri.init(setup);
+        assert.equal(window.SPiD_Uri, uri);
+        delete window.SPiD_Uri;
+    });
+
+    it('SPiD.Uri.init should NOT expose SPiD_Uri to global when configured so', function() {
+        uri.init({ client_id : '4d00e8d6bf92fc8648000000', server: 'stage.payment.schibsted.se', useSessionCluster:false, logging:false, noGlobalExport: true });
+        assert.equal(window.SPiD_Uri, undefined);
+        delete window.SPiD_Uri;
+    });
+
     it('SPiD.Uri.build should return correctly formatted URL', function() {
         assert.equal(uri.build('test', {a:1,b:2,c:null}), 'https://' + setup.server + '/test?a=1&b=2');
     });
