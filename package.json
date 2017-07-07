@@ -18,14 +18,15 @@
   ],
   "scripts": {
     "test": "grunt test",
-    "build": "npm install && grunt",
+    "build": "grunt",
     "preversion": "npm test",
     "version": "npm run build",
     "postversion": "git push && git push --tags",
     "lint": "eslint ."
   },
   "engines": {
-    "node": ">= 0.10.0"
+    "node": ">=8",
+    "npm": ">5.0.3"
   },
   "main": "src/spid-sdk.js",
   "devDependencies": {
