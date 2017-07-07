@@ -30,3 +30,10 @@ deploy:
     on:
       repo: schibsted/sdk-js
       tags: true
+  - provider: npm
+    email: spt-identity-tech@schibsted.com
+    api_key:
+      secure: Btkd09tCmtLQQuMMeSgRX5WPqK+PMqjsj+5dGTeDWysf2tDCnSmmRlZINJYP2oB/DR/PIra+9qzL3+XaYLEPOkqdPiuRgCo6yxUMzFgmWOfkYK6Pxsyq2p0Atfb1WObI9jOAnUMkeQNUInKYzREwqkNm2Kk0SwoBbmS7L6k4lEc=
+    on:
+      repo: schibsted/sdk-js
+      tags: true
