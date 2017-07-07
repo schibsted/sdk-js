@@ -1,12 +1,3 @@
-coverage/
-dist/
-build/
-test/
-examples/
-.project
-.idea
-.travis.yml
-.jshintrc
-sdk-js.iml
-Gruntfile.js
-karma.conf.js
+*
+!src/
+!dist/
