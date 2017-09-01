@@ -44,6 +44,10 @@ function clearVarnishCookie() {
     _setRaw(_varnishCookieName, '', 0, _domain);
 }
 
+function hasVarnishCookie() {
+    return document.cookie.indexOf(_varnishCookieName + '=') > -1;
+}
+
 function set(name, session, expiresInSeconds) {
     if(!session) { return false; }
     _domain = session.baseDomain;
@@ -82,6 +86,7 @@ module.exports = {
     set: set,
     tryVarnishCookie: tryVarnishCookie,
     clearVarnishCookie: clearVarnishCookie,
+    hasVarnishCookie: hasVarnishCookie,
     get: get,
     clear: clear,
     name: name
