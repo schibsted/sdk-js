@@ -98,7 +98,11 @@ function hasProduct(productId, callback) {
         }
         callback(err, data);
     };
-    talk.request(this.server(), 'ajax/hasproduct.js', {product_id: productId}, cb);
+    var params = {product_id: productId};
+    if (cookie.hasVarnishCookie()) {
+        params.sp_id = cookie.getVarnishCookie();
+    }
+    talk.request(this.server(), 'ajax/hasproduct.js', params, cb);
 }
 
 function hasSubscription(productId, callback) {
@@ -122,7 +126,11 @@ function hasSubscription(productId, callback) {
         }
         callback(err, data);
     };
-    talk.request(this.server(), 'ajax/hassubscription.js', {product_id: productId}, cb);
+    var params = {product_id: productId};
+    if (cookie.hasVarnishCookie()) {
+        params.sp_id = cookie.getVarnishCookie();
+    }
+    talk.request(this.server(), 'ajax/hassubscription.js', params, cb);
 }
 
 function setTraits(traits, callback) {

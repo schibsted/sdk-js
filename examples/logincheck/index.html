@@ -6,8 +6,8 @@
 </head>
 <body>
     <div id="content"></div>
-    <script type="text/javascript" src="../../dist/spid-sdk-2.1.5-var.js"></script>
-    <script type="text/javascript" src="../../dist/spid-uri-2.1.5-var.js"></script>
+    <script type="text/javascript" src="../../dist/spid-sdk-2.2.3-var.js"></script>
+    <script type="text/javascript" src="../../dist/spid-uri-2.2.3-var.js"></script>
     <script type="text/javascript">
 
         try {
@@ -37,7 +37,7 @@
                 SPiD.event.subscribe('SPiD.error', function(data) {
                     getLoggedInUser(data);
                 });
-                var spidCfg = {client_id: '4d00e8d6bf92fc8648000000', server: 'identity-pre.schibsted.com', logging:true, useSessionCluster: false};
+                var spidCfg = {client_id: '59a946b5ee068c0d0c201641', server: 'identity-dev.schibsted.com', logging:true, useSessionCluster: false};
                 SPiD.init(spidCfg);
                 SPiD_Uri.init(spidCfg);
 

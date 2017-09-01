@@ -80,6 +80,16 @@ function clear(name) {
     clearVarnishCookie();
 }
 
+function getVarnishCookie() {
+    log.info('SPiD.Cookie.getVarnishCookie()');
+    var cookies = '; ' + document.cookie;
+    var parts = cookies.split('; ' + _varnishCookieName + '=');
+    if (parts.length === 2) {
+        return window.unescape(parts.pop().split(';').shift());
+    }
+    return null;
+}
+
 module.exports = {
     decode: decode,
     encode: encode,
@@ -87,6 +97,7 @@ module.exports = {
     tryVarnishCookie: tryVarnishCookie,
     clearVarnishCookie: clearVarnishCookie,
     hasVarnishCookie: hasVarnishCookie,
+    getVarnishCookie: getVarnishCookie,
     get: get,
     clear: clear,
     name: name
