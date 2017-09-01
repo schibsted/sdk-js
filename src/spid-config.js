@@ -1,4 +1,3 @@
-/*global module:false, require:false*/
 var
     _options = {},
     _defaults = {
@@ -17,20 +16,20 @@ var
     util = require('./spid-util');
 
 module.exports = {
-    options: function() {
+    options: function () {
         return _options;
     },
-    init: function(opts) {
+    init: function (opts) {
         _options = util.copy(opts, _defaults);
-        if(!_options['server']) {
+        if (!_options.server) {
             throw new TypeError('[SPiD] server parameter is required');
         }
-        if(!_options['client_id']) {
+        if (!_options.client_id) {
             throw new TypeError('[SPiD] client_id parameter is required');
         }
 
-        //Set minimum refresh timeout
-        if(_options.refresh_timeout <= 60000) {
+        // Set minimum refresh timeout
+        if (_options.refresh_timeout <= 60000) {
             _options.refresh_timeout = 60000;
         }
     },

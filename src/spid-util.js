@@ -1,8 +1,8 @@
-/*global require:false, module:false*/
 var log = require('./spid-log.js');
 function copy(target, source) {
-    for(var key in source) {
-        if(target[key] === undefined) {
+    var key;
+    for (key in source) {
+        if (target[key] === undefined) {
             target[key] = source[key];
         }
     }
@@ -14,13 +14,13 @@ function now() {
 }
 
 function buildUri(server, path, params) {
-    var p = [];
-    for(var key in params) {
-        if(params[key]) {
+    var key, url, p = [];
+    for (key in params) {
+        if (params[key]) {
             p.push(key + '=' + params[key]);
         }
     }
-    var url = server + (path || '') + '?' + p.join('&');
+    url = server + (path || '') + '?' + p.join('&');
     log.info('SPiD.Util.buildUri() built {u}'.replace('{u}', url));
     return url;
 }

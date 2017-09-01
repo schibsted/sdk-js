@@ -1,5 +1,3 @@
-/*global require:false, module:false*/
-
 var _domain = document.domain, // use document domain by default
     _varnishCookieName = 'SP_ID',
     log = require('./spid-log'),
@@ -13,11 +11,10 @@ function encode(value) {
     return window.escape(JSON.stringify(value));
 }
 
-
 function _setRaw(name, value, expiresIn, domain) {
-    var date = new Date();
+    var cookie, date = new Date();
     date.setTime(date.getTime() + (expiresIn * 1000));
-    var cookie = '{n}={v}; expires={e}; path=/; domain=.{d}'
+    cookie = '{n}={v}; expires={e}; path=/; domain=.{d}'
         .replace('{n}', name)
         .replace('{v}', value)
         .replace('{e}', date.toUTCString())
@@ -33,7 +30,7 @@ function _setVarnishCookie(session, options) {
 
 function tryVarnishCookie(session) {
     var options = config.options();
-    if(session.sp_id &&
+    if (session.sp_id &&
         (options.setVarnishCookie === true ||
         (options.storage === 'cookie' && options.setVarnishCookie !== false))) {
         _setVarnishCookie(session, options);
@@ -49,21 +46,25 @@ function hasVarnishCookie() {
 }
 
 function set(name, session, expiresInSeconds) {
-    if(!session) { return false; }
+    if (!session) {
+        return false;
+    }
     _domain = session.baseDomain;
     _setRaw(name, encode(session), expiresInSeconds, _domain);
     log.info('SPiD.Cookie.set({n})'.replace('{n}', name));
 }
 
 function get(name) {
+    var session,
+        cookies = '; ' + document.cookie,
+        parts = cookies.split('; ' + name + '='),
+        cookie = (parts.length === 2) ? parts.pop().split(';').shift() : null;
+
     log.info('SPiD.Cookie.get()');
-    var cookies = '; ' + document.cookie;
-    var parts = cookies.split('; ' + name + '=');
-    var cookie = (parts.length === 2) ? parts.pop().split(';').shift() : null;
 
     if (cookie) {
         // url encoded session stored as "sub-cookies"
-        var session = decode(cookie);
+        session = decode(cookie);
         // decodes as a string, convert to a number
         session.expiresIn  = parseInt(session.expiresIn, 10);
         session.clientTime = parseInt(session.clientTime, 10);

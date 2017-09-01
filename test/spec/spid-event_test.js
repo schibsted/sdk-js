@@ -1,11 +1,10 @@
 describe('SPiD.Event', function() {
-
     var spidEvent  = require('../../src/spid-event');
 
     it('SPiD.Event.subscribe once and fire', function(done) {
-        var data = {test:true, str:'val'};
+        var data = { test: true, str: 'val' };
         spidEvent.subscribe('custom.event1', function(d) {
-            if(d.test && d.str === data.str) {
+            if (d.test && d.str === data.str) {
                 done();
             } else {
                 done(new Error('Data returned does not match'));
@@ -15,11 +14,11 @@ describe('SPiD.Event', function() {
     });
 
     it('SPiD.Event.subscribe twice and fire', function(done) {
-        var data = {test:true, str:'val'};
-        var count = 0;
-        var cb = function() {
+        var count, cb, data = { test: true, str: 'val' };
+        count = 0;
+        cb = function() {
             count++;
-            if(count === 2) {
+            if (count === 2) {
                 done();
             }
         };
@@ -33,7 +32,7 @@ describe('SPiD.Event', function() {
     });
 
     it('SPiD.Event.unsubscribe and fire', function(done) {
-        var data = {test:true, str:'val'};
+        var data = { test: true, str: 'val' };
         var cb = function() {
             done(new Error('Callback called even though unsubscribed'));
         };

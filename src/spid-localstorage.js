@@ -1,4 +1,3 @@
-/*global require:false, module:false*/
 var log = require('./spid-log'),
     enabled = true;
 
@@ -11,14 +10,15 @@ function encode(value) {
 }
 
 function set(key, value, expiresInSeconds) {
+    var date;
     try {
-        if(expiresInSeconds) {
-            var date = new Date();
+        if (expiresInSeconds) {
+            date = new Date();
             date.setTime(date.getTime() + (expiresInSeconds * 1000));
             value._expires = date;
         }
         window.localStorage.setItem(key, encode(value));
-    } catch(e) {
+    } catch (e) {
         log.info(e);
     }
 }
@@ -26,27 +26,28 @@ function set(key, value, expiresInSeconds) {
 function clear(key) {
     try {
         window.localStorage.removeItem(key);
-    } catch(e) {
+    } catch (e) {
         log.info(e);
     }
 }
 
 function isExpired(item) {
-    if(item && item._expires) {
+    if (item && item._expires) {
         return new Date(item._expires).getTime() < new Date().getTime();
     }
     return false;
 }
 
 function get(key) {
+    var storedItem;
     try {
-        var storedItem = decode(window.localStorage.getItem(key));
+        storedItem = decode(window.localStorage.getItem(key));
         if (isExpired(storedItem)) {
             clear(key);
             return null;
         }
         return storedItem;
-    } catch(e) {
+    } catch (e) {
         log.info(e);
     }
     return null;

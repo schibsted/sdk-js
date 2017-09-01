@@ -1,5 +1,3 @@
-/*global require:false, module:false*/
-
 var subscribers = {},
     log = require('./spid-log');
 
@@ -47,10 +45,11 @@ function subscribe(name, cb) {
  * @param cb {Function} The handler function.
  */
 function unsubscribe(name, cb) {
+    var subs, i, l;
     log.info('SPiD.Event.unsubscribe({n})'.replace('{n}', name));
-    var subs = subscribers[name] || [];
-    for (var i = 0, l = subs.length; i !== l; i++) {
-        if(subs[i] === cb) {
+    subs = subscribers[name] || [];
+    for (i = 0, l = subs.length; i !== l; i++) {
+        if (subs[i] === cb) {
             subs[i] = null;
         }
     }
@@ -64,11 +63,12 @@ function unsubscribe(name, cb) {
  * @param name {String} the event name
  */
 function fire(/* polymorphic */) {
-    var args = Array.prototype.slice.call(arguments),
+    var subs, i, l,
+        args = Array.prototype.slice.call(arguments),
         name = args.shift();
     log.info('SPiD.Event.fire({n})'.replace('{n}', name));
-    var subs = subscribers[name] || [];
-    for (var i = 0, l = subs.length; i !== l; i++) {
+    subs = subscribers[name] || [];
+    for (i = 0, l = subs.length; i !== l; i++) {
         if (subs[i]) {
             subs[i].apply(this, args);
         }

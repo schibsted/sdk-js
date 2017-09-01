@@ -1,7 +1,10 @@
 describe('SPiD.Persist', function() {
-
     var assert = chai.assert;
-    var setup = {storage: null, client_id: 'xxx', server: 'payment.schibsted.se'};
+    var setup = {
+        storage: null,
+        client_id: 'xxx',
+        server: 'payment.schibsted.se'
+    };
     var SPiD  = require('../../src/spid-sdk'),
         persist = require('../../src/spid-persist');
 
@@ -48,7 +51,6 @@ describe('SPiD.Persist', function() {
     });
 
     describe(' with local storage setup ', function() {
-
         var _setup = setup;
         beforeEach(function() {
             _setup.storage = 'localstorage';
@@ -68,9 +70,9 @@ describe('SPiD.Persist', function() {
         });
 
         it('should have a set method that calls through to SPiD.LocalStorage ', function() {
-            var methodSpy = sinon.spy(require('../../src/spid-localstorage'), 'set');
+            var spyArgs, methodSpy = sinon.spy(require('../../src/spid-localstorage'), 'set');
             persist.set('value', 10000);
-            var spyArgs = methodSpy.getCall(0).args;
+            spyArgs = methodSpy.getCall(0).args;
             assert.include(spyArgs[0], _setup.client_id, 'key should include client id');
             assert.equal('value', spyArgs[1]);
             assert.equal(10000, spyArgs[2]);
@@ -83,5 +85,4 @@ describe('SPiD.Persist', function() {
             assert.include(methodSpy.getCall(0).args[0], _setup.client_id, 'key should include client id');
         });
     });
-
 });

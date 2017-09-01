@@ -17,6 +17,7 @@ and make sure to read the API docs http://techdocs.spid.no/sdks/js/api-docs/.
 
 ## Release
 
+[Read this](https://docs.npmjs.com/misc/developers) if you're new to NPM publishing.
 Bump [Semver](http://semver.org/) version with this command
 
 `$ npm version <patch | minor | major>`
@@ -24,8 +25,8 @@ Bump [Semver](http://semver.org/) version with this command
 `$ npm publish`
 
 `npm version` will bump version, tag the release and push it.
-Once pushed, [Travis CI](https://travis-ci.org/schibsted/sdk-js)
-runs tests and uploads built js files to cdn/s3
+Once published, [Travis CI](https://travis-ci.org/schibsted/sdk-js)
+runs tests and uploads built js files to CDN/s3
 and zip to [Github releases](https://github.com/schibsted/sdk-js/releases).
 
 ## Notes
