@@ -10,7 +10,8 @@ var
     persist = require('./spid-persist'),
     cookie = require('./spid-cookie'),
     cache = require('./spid-cache'),
-    talk = require('./spid-talk');
+    talk = require('./spid-talk'),
+    noop = function () {};
 
 function globalExport(global) {
     global.SPiD = global.SPiD || this;
@@ -29,8 +30,7 @@ function init(opts, callback) {
 }
 
 function hasSession(callback) {
-    callback = callback || function() {
-        };
+    callback = callback || noop;
     var that = this,
         shouldCacheData = function(err, data) {
             return (!err && !!data.result) || (config.options().cache && config.options().cache.hasSession);
@@ -78,8 +78,7 @@ function hasSession(callback) {
 }
 
 function hasProduct(productId, callback) {
-    callback = util.makeAsync(callback || function() {
-        });
+    callback = util.makeAsync(callback || noop);
     if(cache.enabled()) {
         var cacheVal = cache.get('prd_' + productId);
         if(cacheVal && (cacheVal.refreshed + config.options().refresh_timeout) > util.now()) {
@@ -103,8 +102,7 @@ function hasProduct(productId, callback) {
 }
 
 function hasSubscription(productId, callback) {
-    callback = util.makeAsync(callback || function() {
-        });
+    callback = util.makeAsync(callback || noop);
     if(cache.enabled()) {
         var cacheVal = cache.get('sub_' + productId);
         if(cacheVal && (cacheVal.refreshed + config.options().refresh_timeout) > util.now()) {
@@ -128,8 +126,7 @@ function hasSubscription(productId, callback) {
 }
 
 function setTraits(traits, callback) {
-    callback = callback || function() {
-        };
+    callback = callback || noop;
     talk.request(this.server(), 'ajax/traits.js', {t: traits}, callback);
 }
 
