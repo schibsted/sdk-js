@@ -81,7 +81,7 @@ function hasProduct(productId, callback) {
     callback = util.makeAsync(callback || function() {
         });
     if(cache.enabled()) {
-        var cacheVal = cache.get('prd_{id}'.replace('{id}', productId));
+        var cacheVal = cache.get('prd_' + productId);
         if(cacheVal && (cacheVal.refreshed + config.options().refresh_timeout) > util.now()) {
             return callback(null, cacheVal);
         }
@@ -89,7 +89,7 @@ function hasProduct(productId, callback) {
     var cb = function(err, data) {
         if(cache.enabled() && !err && !!data.result) {
             data.refreshed = util.now();
-            cache.set('prd_{id}'.replace('{id}', productId), data);
+            cache.set('prd_' + productId, data);
         }
         if(!err && !!data.result) {
             spidEvent.fire('SPiD.hasProduct', {
@@ -106,7 +106,7 @@ function hasSubscription(productId, callback) {
     callback = util.makeAsync(callback || function() {
         });
     if(cache.enabled()) {
-        var cacheVal = cache.get('sub_{id}'.replace('{id}', productId));
+        var cacheVal = cache.get('sub_' + productId);
         if(cacheVal && (cacheVal.refreshed + config.options().refresh_timeout) > util.now()) {
             return callback(null, cacheVal);
         }
@@ -114,7 +114,7 @@ function hasSubscription(productId, callback) {
     var cb = function(err, data) {
         if(cache.enabled() && !err && !!data.result) {
             data.refreshed = util.now();
-            cache.set('sub_{id}'.replace('{id}', productId), data);
+            cache.set('sub_' + productId, data);
         }
         if(!err && !!data.result) {
             spidEvent.fire('SPiD.hasSubscription', {
