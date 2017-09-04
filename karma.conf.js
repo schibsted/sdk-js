@@ -4,18 +4,18 @@ module.exports = function(config) {
             'mocha',
             'sinon-chai'
         ],
-        port: 9991,
+        port: 9000,
         singleRun: true,
         browsers: [
             'PhantomJS'
         ],
         files: [
             'test/spec/*.js',
-             {
-                 pattern: 'test/mock/*.js',
-                 included: false,
-                 served: true
-             }
+            {
+                pattern: 'test/mock/*.js',
+                included: false,
+                served: true
+            }
         ],
         preprocessors: {
             'test/spec/*.js': ['webpack']
