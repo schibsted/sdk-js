@@ -99,10 +99,16 @@ function hasProduct(productId, callback) {
         callback(err, data);
     };
     var params = {product_id: productId};
-    if (cookie.hasVarnishCookie()) {
-        params.sp_id = cookie.getVarnishCookie();
-    }
-    talk.request(this.server(), 'ajax/hasproduct.js', params, cb);
+    hasSession(function (err, data) {
+        if (err) {
+            callback(err);
+            return;
+        }
+        if (data.sp_id) {
+            params.sp_id = data.sp_id;
+        }
+        talk.request(this.server(), 'ajax/hasproduct.js', params, cb);
+    });
 }
 
 function hasSubscription(productId, callback) {
@@ -127,10 +133,16 @@ function hasSubscription(productId, callback) {
         callback(err, data);
     };
     var params = {product_id: productId};
-    if (cookie.hasVarnishCookie()) {
-        params.sp_id = cookie.getVarnishCookie();
-    }
-    talk.request(this.server(), 'ajax/hassubscription.js', params, cb);
+    hasSession(function (err, data) {
+        if (err) {
+            callback(err);
+            return;
+        }
+        if (data.sp_id) {
+            params.sp_id = data.sp_id;
+        }
+        talk.request(this.server(), 'ajax/hassubscription.js', params, cb);
+    });
 }
 
 function setTraits(traits, callback) {
