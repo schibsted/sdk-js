@@ -52,6 +52,5 @@
     "webpack": "^1.12.6",
     "webpack-dev-server": "^1.12.1"
   },
-  "license": "MIT",
-  "dependencies": {}
+  "license": "MIT"
 }
