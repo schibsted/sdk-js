@@ -25,8 +25,9 @@ function _setRaw(name, value, expiresIn, domain) {
     document.cookie = cookie;
 }
 
-function _clearRaw(name) {
-    document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:00 GMT;';
+function _clearRaw(name, domain) {
+    // Set the expiration time to a second ago just to be sure
+    return _setRaw(name, '', -1, domain);
 }
 
 function _setVarnishCookie(session, options) {
@@ -44,9 +45,9 @@ function tryVarnishCookie(session) {
     }
 }
 
-function clearVarnishCookie() {
+function clearVarnishCookie(domain) {
     log.info('SPiD.Cookie.clearVarnishCookie()');
-    _clearRaw(_varnishCookieName);
+    _clearRaw(_varnishCookieName, domain);
 }
 
 function hasVarnishCookie() {
@@ -79,9 +80,9 @@ function get(name) {
     return null;
 }
 
-function clear(name) {
+function clear(name, domain) {
     log.info('SPiD.Cookie.clear()');
-    _clearRaw(name);
+    _clearRaw(name, domain);
     clearVarnishCookie();
 }
 
