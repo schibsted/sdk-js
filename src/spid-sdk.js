@@ -78,6 +78,7 @@ function hasSession(callback) {
 }
 
 function hasProduct(productId, callback) {
+    var that = this;
     callback = util.makeAsync(callback || noop);
     if(cache.enabled()) {
         var cacheVal = cache.get('prd_' + productId);
@@ -107,11 +108,12 @@ function hasProduct(productId, callback) {
         if (data.sp_id) {
             params.sp_id = data.sp_id;
         }
-        talk.request(this.server(), 'ajax/hasproduct.js', params, cb);
+        talk.request(that.server(), 'ajax/hasproduct.js', params, cb);
     });
 }
 
 function hasSubscription(productId, callback) {
+    var that = this;
     callback = util.makeAsync(callback || noop);
     if(cache.enabled()) {
         var cacheVal = cache.get('sub_' + productId);
@@ -141,7 +143,7 @@ function hasSubscription(productId, callback) {
         if (data.sp_id) {
             params.sp_id = data.sp_id;
         }
-        talk.request(this.server(), 'ajax/hassubscription.js', params, cb);
+        talk.request(that.server(), 'ajax/hassubscription.js', params, cb);
     });
 }
 
