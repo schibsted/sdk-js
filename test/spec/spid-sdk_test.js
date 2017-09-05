@@ -547,28 +547,6 @@ describe('SPiD', function() {
         });
     });
 
-    describe('SPiD.setTraits', function() {
-        var talkRequestStub;
-        beforeEach(function() {
-            SPiD.init(setup());
-            talkRequestStub = sinon.stub(require('../../src/spid-talk'), 'request');
-        });
-
-        afterEach(function() {
-            talkRequestStub.restore();
-        });
-
-        it('SPiD.setTraits should call Talk with parameter server, path, params, callback', function() {
-            SPiD.setTraits('traitObject', function() {});
-            assert.equal(talkRequestStub.getCall(0).args[0], 'https://identity-pre.schibsted.com/');
-            assert.equal(talkRequestStub.getCall(0).args[1], 'ajax/traits.js');
-            assert.equal(talkRequestStub.getCall(0).args[2].t, 'traitObject');
-            assert.isFunction(talkRequestStub.getCall(0).args[3]);
-            assert.isTrue(talkRequestStub.calledOnce);
-        });
-
-    });
-
     describe('SPiD.logout', function() {
         var talkRequestStub,
             cookieClearStub;
