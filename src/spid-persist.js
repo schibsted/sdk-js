@@ -6,9 +6,10 @@ function getPersistenceModule() {
     var storages = {
         localstorage: require('./spid-localstorage'),
         cookie: require('./spid-cookie'),
+        cache: require('./spid-cache'),
         standard: {get: noop, set: noop, clear: noop}
     };
-    return storages[(config.options().storage || 'standard')];
+    return storages[config.options().storage] || storages.standard;
 }
 
 function name() {
