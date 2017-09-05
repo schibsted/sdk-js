@@ -25,6 +25,10 @@ function _setRaw(name, value, expiresIn, domain) {
     document.cookie = cookie;
 }
 
+function _clearRaw(name) {
+    document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:00 GMT;';
+}
+
 function _setVarnishCookie(session, options) {
     var expiresIn = options.varnish_expiration || session.expiresIn;
     _setRaw(_varnishCookieName, session.sp_id, expiresIn, session.baseDomain);
@@ -41,7 +45,8 @@ function tryVarnishCookie(session) {
 }
 
 function clearVarnishCookie() {
-    _setRaw(_varnishCookieName, '', 0, _domain);
+    log.info('SPiD.Cookie.clearVarnishCookie()');
+    _clearRaw(_varnishCookieName);
 }
 
 function hasVarnishCookie() {
@@ -76,7 +81,7 @@ function get(name) {
 
 function clear(name) {
     log.info('SPiD.Cookie.clear()');
-    _setRaw(name, '', 0, _domain);
+    _clearRaw(name);
     clearVarnishCookie();
 }
 
