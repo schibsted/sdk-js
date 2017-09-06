@@ -100,7 +100,7 @@ function hasProduct(productId, callback) {
         callback(err, data);
     };
     var params = {product_id: productId};
-    hasSession(function (err, data) {
+    this.hasSession(function (err, data) {
         if (err) {
             callback(err);
             return;
@@ -135,7 +135,7 @@ function hasSubscription(productId, callback) {
         callback(err, data);
     };
     var params = {product_id: productId};
-    hasSession(function (err, data) {
+    this.hasSession(function (err, data) {
         if (err) {
             callback(err);
             return;
