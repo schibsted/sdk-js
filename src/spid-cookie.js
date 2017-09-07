@@ -41,6 +41,15 @@ function _clearRaw(name, domain) {
     return _setRaw(name, '', 0, domain);
 }
 
+function _getRaw(name) {
+    var cookies = '; ' + document.cookie;
+    var parts = cookies.split('; ' + name + '=');
+    if (parts.length === 2) {
+        return parts.pop().split(';').shift();
+    }
+    return null;
+}
+
 function _setVarnishCookie(session, options) {
     var expiresIn = options.varnish_expiration || session.expiresIn;
     _setRaw(_varnishCookieName, session.sp_id, expiresIn, session.baseDomain);
@@ -74,9 +83,7 @@ function set(name, session, expiresInSeconds) {
 
 function get(name) {
     log.info('SPiD.Cookie.get()');
-    var cookies = '; ' + document.cookie;
-    var parts = cookies.split('; ' + name + '=');
-    var cookie = (parts.length === 2) ? parts.pop().split(';').shift() : null;
+    var cookie = _getRaw(name);
 
     if (cookie) {
         // url encoded session stored as "sub-cookies"
@@ -99,12 +106,7 @@ function clear(name, domain) {
 
 function getVarnishCookie() {
     log.info('SPiD.Cookie.getVarnishCookie()');
-    var cookies = '; ' + document.cookie;
-    var parts = cookies.split('; ' + _varnishCookieName + '=');
-    if (parts.length === 2) {
-        return window.unescape(parts.pop().split(';').shift());
-    }
-    return null;
+    return _getRaw(_varnishCookieName);
 }
 
 module.exports = {
