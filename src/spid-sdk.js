@@ -147,14 +147,6 @@ function hasSubscription(productId, callback) {
     });
 }
 
-<<<<<<< HEAD
-function setTraits(traits, callback) {
-    callback = callback || noop;
-    talk.request(this.server(), 'ajax/traits.js', {t: traits}, callback);
-}
-
-=======
->>>>>>> master
 function clearClientData() {
     persist.clear();
     cookie.clearVarnishCookie();
