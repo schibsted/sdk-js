@@ -16,8 +16,20 @@ function encode(value) {
 
 function _setRaw(name, value, expiresIn, domain) {
     var date = new Date();
-    date.setTime(date.getTime() + (expiresIn * 1000));
-    var cookie = '{n}={v}; expires={e}; path=/; domain=.{d}'
+    if (typeof expiresIn === 'number' && expiresIn > 0) {
+        date.setTime(date.getTime() + (expiresIn * 1000));
+    } else {
+        date.setTime(0);
+    }
+    // If the domain is missing or of the wrong type, assume a good default
+    if (typeof domain !== 'string') {
+        domain = _domain || document.domain;
+    }
+    // To comply with https://tools.ietf.org/html/rfc6265#section-5.2.3 remove the leading dot
+    if (domain.indexOf('.') === 0) {
+        domain = domain.substr(1);
+    }
+    var cookie = '{n}={v}; expires={e}; path=/; domain={d}'
         .replace('{n}', name)
         .replace('{v}', value)
         .replace('{e}', date.toUTCString())
@@ -26,8 +38,7 @@ function _setRaw(name, value, expiresIn, domain) {
 }
 
 function _clearRaw(name, domain) {
-    // Set the expiration time to a second ago just to be sure
-    return _setRaw(name, '', -1, domain);
+    return _setRaw(name, '', 0, domain);
 }
 
 function _setVarnishCookie(session, options) {
@@ -83,7 +94,7 @@ function get(name) {
 function clear(name, domain) {
     log.info('SPiD.Cookie.clear()');
     _clearRaw(name, domain);
-    clearVarnishCookie();
+    clearVarnishCookie(domain);
 }
 
 function getVarnishCookie() {
