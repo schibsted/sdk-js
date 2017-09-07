@@ -127,12 +127,6 @@ function hasSubscription(productId, callback) {
     talk.request(this.server(), 'ajax/hassubscription.js', {product_id: productId}, cb);
 }
 
-function setTraits(traits, callback) {
-    callback = callback || function() {
-        };
-    talk.request(this.server(), 'ajax/traits.js', {t: traits}, callback);
-}
-
 function clearClientData() {
     persist.clear();
     cookie.clearVarnishCookie();
@@ -198,6 +192,5 @@ module.exports = {
     hasSession: hasSession,
     hasProduct: hasProduct,
     hasSubscription: hasSubscription,
-    setTraits: setTraits,
     logout: logout
 };
