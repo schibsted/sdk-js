@@ -5,9 +5,9 @@ module.exports = function(config) {
             'sinon-chai'
         ],
         port: 9000,
-        singleRun: true,
+        singleRun: false,
         browsers: [
-            'PhantomJS'
+            'Chrome'
         ],
         files: [
             'test/spec/*.js',
@@ -21,9 +21,10 @@ module.exports = function(config) {
             'test/spec/*.js': ['webpack']
         },
         reporters: [
-            'coverage',
+            // 'coverage',
             'dots'
         ],
+        /*
         coverageReporter: {
             dir: 'coverage',
             reporters: [
@@ -41,15 +42,17 @@ module.exports = function(config) {
                 ]
             }
         },
+        */
         webpackMiddleware: {
             noInfo: true
         },
         plugins: [
             require('karma-webpack'),
             'karma-phantomjs-launcher',
+            'karma-chrome-launcher',
             'karma-mocha',
             'karma-sinon-chai',
-            'karma-coverage'
+            // 'karma-coverage'
         ]
     });
 };
