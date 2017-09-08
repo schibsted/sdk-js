@@ -10,11 +10,11 @@ describe('SPiD', function() {
     var cookieDomain = (0 === window.location.host.indexOf('localhost:')) ? 'localhost' : window.location.host;
 
     function clearVarnishCookie() {
-        document.cookie = 'SP_ID=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT; domain=' + cookieDomain;
+        document.cookie = 'SP_ID=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT; domain=.' + cookieDomain;
     }
 
     function setVarnishCookie() {
-        document.cookie = 'SP_ID=4f1e2ae59caf7c2f4a058b76; path=/; domain=' + cookieDomain;
+        document.cookie = 'SP_ID=4f1e2ae59caf7c2f4a058b76; path=/; domain=.' + cookieDomain;
     }
 
     describe('SPiD.init', function() {

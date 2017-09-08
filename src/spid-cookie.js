@@ -25,11 +25,7 @@ function _setRaw(name, value, expiresIn, domain) {
     if (typeof domain !== 'string') {
         domain = _domain || document.domain;
     }
-    // To comply with https://tools.ietf.org/html/rfc6265#section-5.2.3 remove the leading dot
-    if (domain.indexOf('.') === 0) {
-        domain = domain.substr(1);
-    }
-    var cookie = '{n}={v}; expires={e}; path=/; domain={d}'
+    var cookie = '{n}={v}; expires={e}; path=/; domain=.{d}'
         .replace('{n}', name)
         .replace('{v}', value)
         .replace('{e}', date.toUTCString())
