@@ -36,7 +36,7 @@ describe('SPiD.Cookie', function() {
 
         it('SPiD.Cookie.clearVarnishCookie should work before session data was set', function() {
             document.cookie = 'SP_ID=123; domain=' + cookieDomain;
-            spidCookie.clearVarnishCookie();
+            spidCookie.clearVarnishCookie(cookieDomain);
 
             assert.equal(document.cookie.indexOf('SP_ID'), -1);
         });
@@ -58,7 +58,7 @@ describe('SPiD.Cookie', function() {
 
         it('SPiD.Cookie.clearVarnishCookie should clear varnish cookie', function() {
             document.cookie = 'SP_ID=123; domain=' + cookieDomain;
-            spidCookie.clearVarnishCookie();
+            spidCookie.clearVarnishCookie(cookieDomain);
 
             assert.equal(document.cookie.indexOf('SP_ID'), -1);
         });
@@ -72,7 +72,7 @@ describe('SPiD.Cookie', function() {
 
         it('SPiD.Cookie.hasVarnishCookie should return false after cookie clearing', function() {
             document.cookie = 'SP_ID=123; domain=' + cookieDomain;
-            spidCookie.clearVarnishCookie();
+            spidCookie.clearVarnishCookie(cookieDomain);
 
             assert.equal(spidCookie.hasVarnishCookie(), false);
         });
@@ -87,7 +87,7 @@ describe('SPiD.Cookie', function() {
         });
 
         it('SPiD.Cookie.get should return null if no cookie', function() {
-            spidCookie.clear('name');
+            spidCookie.clear('name', cookieDomain);
             var cookie = spidCookie.get('name');
             assert.isNull(cookie);
         });
@@ -95,7 +95,7 @@ describe('SPiD.Cookie', function() {
         it('SPiD.Cookie.clear should remove cookies', function() {
             var session = {user:123, sp_id: 123, expiresIn: 5000, baseDomain: cookieDomain};
             spidCookie.set('name', session, session.expiresIn);
-            spidCookie.clear('name');
+            spidCookie.clear('name', cookieDomain);
             assert.equal(document.cookie.indexOf('name'), -1);
             assert.equal(document.cookie.indexOf('SP_ID'), -1);
         });

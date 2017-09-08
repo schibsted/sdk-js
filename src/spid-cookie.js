@@ -16,13 +16,34 @@ function encode(value) {
 
 function _setRaw(name, value, expiresIn, domain) {
     var date = new Date();
-    date.setTime(date.getTime() + (expiresIn * 1000));
+    if (typeof expiresIn === 'number' && expiresIn > 0) {
+        date.setTime(date.getTime() + (expiresIn * 1000));
+    } else {
+        date.setTime(0);
+    }
+    // If the domain is missing or of the wrong type, assume a good default
+    if (typeof domain !== 'string') {
+        domain = _domain || document.domain;
+    }
     var cookie = '{n}={v}; expires={e}; path=/; domain=.{d}'
         .replace('{n}', name)
         .replace('{v}', value)
         .replace('{e}', date.toUTCString())
         .replace('{d}', domain);
     document.cookie = cookie;
+}
+
+function _clearRaw(name, domain) {
+    return _setRaw(name, '', 0, domain);
+}
+
+function _getRaw(name) {
+    var cookies = '; ' + document.cookie;
+    var parts = cookies.split('; ' + name + '=');
+    if (parts.length === 2) {
+        return parts.pop().split(';').shift();
+    }
+    return null;
 }
 
 function _setVarnishCookie(session, options) {
@@ -40,8 +61,9 @@ function tryVarnishCookie(session) {
     }
 }
 
-function clearVarnishCookie() {
-    _setRaw(_varnishCookieName, '', 0, _domain);
+function clearVarnishCookie(domain) {
+    log.info('SPiD.Cookie.clearVarnishCookie()');
+    _clearRaw(_varnishCookieName, domain);
 }
 
 function hasVarnishCookie() {
@@ -57,9 +79,7 @@ function set(name, session, expiresInSeconds) {
 
 function get(name) {
     log.info('SPiD.Cookie.get()');
-    var cookies = '; ' + document.cookie;
-    var parts = cookies.split('; ' + name + '=');
-    var cookie = (parts.length === 2) ? parts.pop().split(';').shift() : null;
+    var cookie = _getRaw(name);
 
     if (cookie) {
         // url encoded session stored as "sub-cookies"
@@ -74,10 +94,15 @@ function get(name) {
     return null;
 }
 
-function clear(name) {
+function clear(name, domain) {
     log.info('SPiD.Cookie.clear()');
-    _setRaw(name, '', 0, _domain);
-    clearVarnishCookie();
+    _clearRaw(name, domain);
+    clearVarnishCookie(domain);
+}
+
+function getVarnishCookie() {
+    log.info('SPiD.Cookie.getVarnishCookie()');
+    return _getRaw(_varnishCookieName);
 }
 
 module.exports = {
@@ -87,6 +112,7 @@ module.exports = {
     tryVarnishCookie: tryVarnishCookie,
     clearVarnishCookie: clearVarnishCookie,
     hasVarnishCookie: hasVarnishCookie,
+    getVarnishCookie: getVarnishCookie,
     get: get,
     clear: clear,
     name: name

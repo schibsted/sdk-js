@@ -10,7 +10,8 @@ var
     persist = require('./spid-persist'),
     cookie = require('./spid-cookie'),
     cache = require('./spid-cache'),
-    talk = require('./spid-talk');
+    talk = require('./spid-talk'),
+    noop = function () {};
 
 function globalExport(global) {
     global.SPiD = global.SPiD || this;
@@ -29,8 +30,7 @@ function init(opts, callback) {
 }
 
 function hasSession(callback) {
-    callback = callback || function() {
-        };
+    callback = callback || noop;
     var that = this,
         shouldCacheData = function(err, data) {
             return (!err && !!data.result) || (config.options().cache && config.options().cache.hasSession);
@@ -78,10 +78,10 @@ function hasSession(callback) {
 }
 
 function hasProduct(productId, callback) {
-    callback = util.makeAsync(callback || function() {
-        });
+    var that = this;
+    callback = util.makeAsync(callback || noop);
     if(cache.enabled()) {
-        var cacheVal = cache.get('prd_{id}'.replace('{id}', productId));
+        var cacheVal = cache.get('prd_' + productId);
         if(cacheVal && (cacheVal.refreshed + config.options().refresh_timeout) > util.now()) {
             return callback(null, cacheVal);
         }
@@ -89,7 +89,7 @@ function hasProduct(productId, callback) {
     var cb = function(err, data) {
         if(cache.enabled() && !err && !!data.result) {
             data.refreshed = util.now();
-            cache.set('prd_{id}'.replace('{id}', productId), data);
+            cache.set('prd_' + productId, data);
         }
         if(!err && !!data.result) {
             spidEvent.fire('SPiD.hasProduct', {
@@ -99,14 +99,24 @@ function hasProduct(productId, callback) {
         }
         callback(err, data);
     };
-    talk.request(this.server(), 'ajax/hasproduct.js', {product_id: productId}, cb);
+    var params = {product_id: productId};
+    this.hasSession(function (err, data) {
+        if (err) {
+            callback(err);
+            return;
+        }
+        if (data.sp_id) {
+            params.sp_id = data.sp_id;
+        }
+        talk.request(that.server(), 'ajax/hasproduct.js', params, cb);
+    });
 }
 
 function hasSubscription(productId, callback) {
-    callback = util.makeAsync(callback || function() {
-        });
+    var that = this;
+    callback = util.makeAsync(callback || noop);
     if(cache.enabled()) {
-        var cacheVal = cache.get('sub_{id}'.replace('{id}', productId));
+        var cacheVal = cache.get('sub_' + productId);
         if(cacheVal && (cacheVal.refreshed + config.options().refresh_timeout) > util.now()) {
             return callback(null, cacheVal);
         }
@@ -114,7 +124,7 @@ function hasSubscription(productId, callback) {
     var cb = function(err, data) {
         if(cache.enabled() && !err && !!data.result) {
             data.refreshed = util.now();
-            cache.set('sub_{id}'.replace('{id}', productId), data);
+            cache.set('sub_' + productId, data);
         }
         if(!err && !!data.result) {
             spidEvent.fire('SPiD.hasSubscription', {
@@ -124,7 +134,17 @@ function hasSubscription(productId, callback) {
         }
         callback(err, data);
     };
-    talk.request(this.server(), 'ajax/hassubscription.js', {product_id: productId}, cb);
+    var params = {product_id: productId};
+    this.hasSession(function (err, data) {
+        if (err) {
+            callback(err);
+            return;
+        }
+        if (data.sp_id) {
+            params.sp_id = data.sp_id;
+        }
+        talk.request(that.server(), 'ajax/hassubscription.js', params, cb);
+    });
 }
 
 function clearClientData() {

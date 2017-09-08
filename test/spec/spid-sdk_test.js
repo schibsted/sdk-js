@@ -399,36 +399,22 @@ describe('SPiD', function() {
                 'id':'4f1e2ae59caf7c2f4a058b76',
                 'sp_id':'4f1e2ae59caf7c2f4a058b76'
             };
-            var cbfun = function(){};
             talkRequestStub.onFirstCall().callsArg(3); // acceptAgreement
             talkRequestStub.onSecondCall().callsArgWith(3, null, fakeSession);
-            SPiD.acceptAgreement(cbfun);
-            assert.isTrue(talkRequestStub.calledTwice);
-            assert.isTrue(persistClearStub.calledOnce);
+            SPiD.acceptAgreement(function(err, data) {
+                delete data.clientTime;
+                assert.deepEqual(data, fakeSession, 'hassession callback is called');
+                assert.isTrue(persistClearStub.calledOnce, 'persistence is cleard');
+            });
         });
 
-        it('SPiD.acceptAgreement should clear SP_ID cookie on successful talk response', function() {
-            setVarnishCookie();
-            var fakeSession = {
-                'result':true,
-                'expiresIn':7111,
-                'baseDomain':cookieDomain,
-                'userStatus':'connected',
-                'userId':1844813,
-                'id':'4f1e2ae59caf7c2f4a058b76',
-                'sp_id':'4f1e2ae59caf7c2f4a058b76'
-            };
-            var cbfun = function(){};
-            talkRequestStub.onFirstCall().callsArg(3); // acceptAgreement
-            talkRequestStub.onSecondCall().callsArgWith(3, null, fakeSession);
-            SPiD.acceptAgreement(cbfun);
-            assert.isTrue(document.cookie.indexOf('SP_ID') === -1);
-        });
+        // Note: removed this test case: SPiD.acceptAgreement should clear SP_ID cookie on successful talk response
     });
 
 
     describe('SPiD.hasProduct', function() {
         var talkRequestStub,
+            hasSessionStub,
             cacheGetStub,
             cacheSetStub;
         before(function() {
@@ -438,6 +424,17 @@ describe('SPiD', function() {
         });
         beforeEach(function() {
             talkRequestStub = sinon.stub(require('../../src/spid-talk'), 'request');
+            talkRequestStub.callsArgWith(3, null, {productId: 10013, result:true});
+            hasSessionStub = sinon.stub(SPiD, 'hasSession');
+            hasSessionStub.callsArgWith(0, null, {
+                'result':true,
+                'expiresIn':7111,
+                'baseDomain':cookieDomain,
+                'userStatus':'connected',
+                'userId':1844813,
+                'id':'4f1e2ae59caf7c2f4a058b76',
+                'sp_id':'4f1e2ae59caf7c2f4a058b76'
+            });
             cacheGetStub = sinon.stub(require('../../src/spid-cache'), 'get');
             cacheSetStub = sinon.stub(require('../../src/spid-cache'), 'set');
         });
@@ -446,30 +443,60 @@ describe('SPiD', function() {
             talkRequestStub.restore();
             cacheGetStub.restore();
             cacheSetStub.restore();
+            hasSessionStub.restore();
         });
 
-        it('SPiD.hasProduct should call Talk with parameter server, path, params, callback', function() {
-            SPiD.hasProduct(10010, function() {});
-            assert.equal(talkRequestStub.getCall(0).args[0], 'https://identity-pre.schibsted.com/');
-            assert.equal(talkRequestStub.getCall(0).args[1], 'ajax/hasproduct.js');
-            assert.equal(talkRequestStub.getCall(0).args[2].product_id, 10010);
-            assert.isFunction(talkRequestStub.getCall(0).args[3]);
-            assert.isTrue(talkRequestStub.calledOnce);
+        it('SPiD.hasProduct should call Talk with parameter server, path, params, callback', function(done) {
+            SPiD.hasProduct(10010, function() {
+                assert.ok(hasSessionStub.called, 'hasProduct callback is called');
+                assert.equal(talkRequestStub.firstCall.args[0], 'https://identity-pre.schibsted.com/');
+                assert.equal(talkRequestStub.firstCall.args[1], 'ajax/hasproduct.js');
+                assert.equal(talkRequestStub.firstCall.args[2].product_id, 10010);
+                assert.isFunction(talkRequestStub.firstCall.args[3]);
+                done();
+            });
         });
 
-        it('SPiD.hasProduct should try and set cache on successful return', function() {
-            talkRequestStub.onFirstCall().callsArgWith(3, null, {result: true, productId: 10010});
-            SPiD.hasProduct(10010, function() {});
-            assert.isTrue(cacheSetStub.calledOnce);
-            assert.equal(cacheSetStub.getCall(0).args[0], 'prd_10010');
-            assert.equal(cacheSetStub.getCall(0).args[1].result, true);
-            assert.equal(cacheSetStub.getCall(0).args[1].productId, 10010);
-            assert.isNumber(cacheSetStub.getCall(0).args[1].refreshed);
+        it('SPiD.hasProduct sends the sp_id if it exists', function(done) {
+            SPiD.hasProduct(10015, function() {
+                // The second call is to the hasProduct endpoint
+                assert.equal(talkRequestStub.firstCall.args[2].sp_id, '4f1e2ae59caf7c2f4a058b76');
+                done();
+            });
         });
 
-        it('SPiD.hasProduct should try and get from cache', function() {
-            SPiD.hasProduct(10010, function() {});
-            assert.isTrue(cacheGetStub.calledOnce);
+        it('SPiD.hasProduct does not send the sp_id when it does not exist', function(done) {
+            hasSessionStub.onFirstCall().callsArgWith(0, null, {
+                'result':true,
+                'expiresIn':7111,
+                'baseDomain':cookieDomain,
+                'userStatus':'connected',
+                'userId':1844813,
+                'id':'4f1e2ae59caf7c2f4a058b76'
+            });
+            SPiD.hasProduct(10016, function() {
+                // The second call is to the hasProduct endpoint
+                assert.equal(talkRequestStub.firstCall.args[2].sp_id, undefined);
+                done();
+            });
+        });
+
+        it('SPiD.hasProduct should try and set cache on successful return', function(done) {
+            SPiD.hasProduct(10013, function() {
+                assert.isTrue(cacheSetStub.called); // once for hasSession and once for hasProduct
+                assert.equal(cacheSetStub.firstCall.args[0], 'prd_10013');
+                assert.equal(cacheSetStub.firstCall.args[1].result, true);
+                assert.equal(cacheSetStub.firstCall.args[1].productId, 10013);
+                assert.isNumber(cacheSetStub.firstCall.args[1].refreshed);
+                done();
+            });
+        });
+        
+        it('SPiD.hasProduct should try and get from cache', function(done) {
+            SPiD.hasProduct(10010, function() {
+                assert.isTrue(cacheGetStub.called);
+                done();
+            });
         });
 
         it('SPiD.hasProduct should not call cache when cache disabled', function(done) {
@@ -487,6 +514,7 @@ describe('SPiD', function() {
 
     describe('SPiD.hasSubscription', function() {
         var talkRequestStub,
+            hasSessionStub,
             cacheGetStub,
             cacheSetStub;
         before(function() {
@@ -496,6 +524,17 @@ describe('SPiD', function() {
         });
         beforeEach(function() {
             talkRequestStub = sinon.stub(require('../../src/spid-talk'), 'request');
+            talkRequestStub.callsArgWith(3, null, {});
+            hasSessionStub = sinon.stub(SPiD, 'hasSession');
+            hasSessionStub.callsArgWith(0, null, {
+                'result':true,
+                'expiresIn':7111,
+                'baseDomain':cookieDomain,
+                'userStatus':'connected',
+                'userId':1844813,
+                'id':'4f1e2ae59caf7c2f4a058b76',
+                'sp_id':'4f1e2ae59caf7c2f4a058b76'
+            });
             cacheGetStub = sinon.stub(require('../../src/spid-cache'), 'get');
             cacheSetStub = sinon.stub(require('../../src/spid-cache'), 'set');
         });
@@ -503,45 +542,58 @@ describe('SPiD', function() {
             talkRequestStub.restore();
             cacheGetStub.restore();
             cacheSetStub.restore();
+            hasSessionStub.restore();
         });
 
-        it('SPiD.hasSubscription should call Talk with parameter server, path, params, callback', function() {
-            SPiD.hasSubscription(10010, function() {});
-            assert.equal(talkRequestStub.getCall(0).args[0], 'https://identity-pre.schibsted.com/');
-            assert.equal(talkRequestStub.getCall(0).args[1], 'ajax/hassubscription.js');
-            assert.equal(talkRequestStub.getCall(0).args[2].product_id, 10010);
-            assert.isFunction(talkRequestStub.getCall(0).args[3]);
-            assert.isTrue(talkRequestStub.calledOnce);
-
-        });
-
-        it('SPiD.hasSubscription should try and set cache on successful return', function() {
-            talkRequestStub.onFirstCall().callsArgWith(3, null, {result: true, productId: 10010});
-            SPiD.hasSubscription(10010, function() {});
-
-            assert.isTrue(cacheSetStub.calledOnce);
-            assert.equal(cacheSetStub.getCall(0).args[0], 'sub_10010');
-            assert.equal(cacheSetStub.getCall(0).args[1].result, true);
-            assert.equal(cacheSetStub.getCall(0).args[1].productId, 10010);
-            assert.isNumber(cacheSetStub.getCall(0).args[1].refreshed);
-
+        it('SPiD.hasSubscription should call Talk with parameter server, path, params, callback', function(done) {
+            SPiD.hasSubscription(10010, function() {
+                assert.isTrue(hasSessionStub.called, 'hasSession() is called');
+                assert.equal(talkRequestStub.firstCall.args[0], 'https://identity-pre.schibsted.com/');
+                assert.equal(talkRequestStub.firstCall.args[1], 'ajax/hassubscription.js');
+                assert.equal(talkRequestStub.firstCall.args[2].product_id, 10010);
+                assert.isFunction(talkRequestStub.firstCall.args[3]);
+                done();
+            });
 
         });
 
-        it('SPiD.hasSubscription should try and get from cache', function() {
-            SPiD.hasSubscription(10010, function() {});
-            assert.isTrue(cacheGetStub.calledOnce);
-            assert.equal(cacheGetStub.getCall(0).args[0], 'sub_10010');
+        it('SPiD.hasSubscription should try and set cache on successful return', function(done) {
+            talkRequestStub.onFirstCall().callsArgWith(3, null, {result: true, productId: 10011});
+            SPiD.hasSubscription(10011, function() {
+                assert.isTrue(hasSessionStub.called, 'hasSession() is called');
+                assert.isTrue(cacheSetStub.called);
+                assert.equal(cacheSetStub.firstCall.args[0], 'sub_10011');
+                assert.equal(cacheSetStub.firstCall.args[1].result, true);
+                assert.equal(cacheSetStub.firstCall.args[1].productId, 10011);
+                assert.isNumber(cacheSetStub.firstCall.args[1].refreshed);
+                done();
+            });
+        });
+
+        it('SPiD.hasSubscription should try and get from cache', function(done) {
+            SPiD.hasSubscription(10012, function() {
+                assert.isTrue(hasSessionStub.called, 'hasSession() is called');
+                assert.isTrue(cacheGetStub.called);
+                assert.equal(cacheGetStub.getCall(0).args[0], 'sub_10012');
+                done();
+            });
         });
 
         it('SPiD.hasSubscription should not call cache when cache disabled', function(done) {
             var _setup = setup();
             _setup.cache = false;
             SPiD.init(_setup);
-            talkRequestStub.onFirstCall().callsArgWith(3, null, {result: true, productId: 10010});
-            SPiD.hasSubscription(10010, function() {
+            talkRequestStub.onFirstCall().callsArgWith(3, null, {result: true, productId: 10013});
+            SPiD.hasSubscription(10013, function() {
                 assert.isFalse(cacheGetStub.called);
                 assert.isFalse(cacheSetStub.called);
+                done();
+            });
+        });
+
+        it('SPiD.hasSubscription should send the sp_id parameter when it exists', function(done) {
+            SPiD.hasSubscription(10012, function() {
+                assert.equal(talkRequestStub.firstCall.args[2].sp_id, '4f1e2ae59caf7c2f4a058b76');
                 done();
             });
         });
