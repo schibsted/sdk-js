@@ -4,15 +4,15 @@ var
     _defaults = {
         server: null,
         client_id: null,
-        cache: false,
+        cache: true,
         logging: false,
         useSessionCluster: true,
         https: true,
         setVarnishCookie: null,
         storage: 'localstorage',
-        timeout: 15000,
-        refresh_timeout: 900000,
-        varnish_expiration: null
+        timeout: 5000,
+        refresh_timeout: 12*60*60*1000,
+        varnish_expiration: 12*60*60*1000
     },
     util = require('./spid-util');
 
