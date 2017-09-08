@@ -4,15 +4,15 @@ var
     _defaults = {
         server: null,
         client_id: null,
-        cache: false,
+        cache: true,
         logging: false,
         useSessionCluster: true,
         https: true,
         setVarnishCookie: null,
         storage: 'localstorage',
-        timeout: 15000,
-        refresh_timeout: 900000,
-        varnish_expiration: null
+        timeout: 5000,
+        refresh_timeout: 12*60*60*1000,
+        varnish_expiration: 12*60*60*1000
     },
     util = require('./spid-util');
 
@@ -33,6 +33,9 @@ module.exports = {
         if(_options.refresh_timeout <= 60000) {
             _options.refresh_timeout = 60000;
         }
+
+        // Disallow setting to storag to false
+        _options.storage = opts.storage || _defaults.storage;
     },
     server: function() {
         return (_options.https ? 'https' : 'http') + '://' + _options.server + '/';

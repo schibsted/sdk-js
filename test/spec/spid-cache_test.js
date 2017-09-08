@@ -2,7 +2,7 @@ describe('SPiD.Cache', function() {
 
     var assert = chai.assert;
     var setupEnabled = {client_id: '4d00e8d6bf92fc8648000000', cache: true, server: 'identity-pre.schibsted.com', useSessionCluster: false};
-    var setupDisabled = {client_id: '4d00e8d6bf92fc8648000000', server: 'identity-pre.schibsted.com', useSessionCluster: false};
+    var setupDisabled = {client_id: '4d00e8d6bf92fc8648000000', cache: false, server: 'identity-pre.schibsted.com', useSessionCluster: false, storage: 'standard'};
     var cache = require('../../src/spid-cache'),
         SPiD = require('../../src/spid-sdk');
 

@@ -205,6 +205,9 @@ module.exports = {
     hasVarnishCookie: function() {
         return cookie.hasVarnishCookie();
     },
+    options: function() {
+        return config.options();
+    },
     acceptAgreement: acceptAgreement,
     event: spidEvent,
     sessionCache: persist,

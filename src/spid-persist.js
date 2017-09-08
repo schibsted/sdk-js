@@ -9,7 +9,7 @@ function getPersistenceModule() {
         cache: require('./spid-cache'),
         standard: {get: noop, set: noop, clear: noop}
     };
-    return storages[config.options().storage] || storages.standard;
+    return storages[config.options().storage] || storages.localstorage;
 }
 
 function name() {
