@@ -33,6 +33,9 @@ module.exports = {
         if(_options.refresh_timeout <= 60000) {
             _options.refresh_timeout = 60000;
         }
+
+        // Disallow setting to storag to false
+        _options.storage = opts.storage || _defaults.storage;
     },
     server: function() {
         return (_options.https ? 'https' : 'http') + '://' + _options.server + '/';
