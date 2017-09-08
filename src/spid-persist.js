@@ -12,19 +12,20 @@ function getPersistenceModule() {
     return storages[config.options().storage] || storages.localstorage;
 }
 
-function name() {
+function name(key) {
     var options = config.options();
-    return 'spid_js_' + options.client_id;
+    key = key ? '_' + key : '';
+    return 'spid_js_' + options.client_id + key;
 }
 
 module.exports = {
-    get: function() {
-        return getPersistenceModule().get(name());
+    get: function(key) {
+        return getPersistenceModule().get(name(key));
     },
-    set: function(value, expiresIn) {
-        return getPersistenceModule().set(name(), value, expiresIn);
+    set: function(value, expiresIn, key) {
+        return getPersistenceModule().set(name(key), value, expiresIn);
     },
-    clear: function() {
-        return getPersistenceModule().clear(name());
+    clear: function(key) {
+        return getPersistenceModule().clear(name(key));
     }
 };
