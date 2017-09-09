@@ -9,7 +9,6 @@ var
     eventTrigger = require('./spid-event-trigger'),
     persist = require('./spid-persist'),
     cookie = require('./spid-cookie'),
-    cache = require('./spid-cache'),
     talk = require('./spid-talk'),
     noop = function () {};
 
@@ -78,32 +77,30 @@ function hasSession(callback) {
 }
 
 function hasProduct(productId, callback) {
-    var that = this;
     callback = util.makeAsync(callback || noop);
-    if(cache.enabled()) {
-        var cacheVal = cache.get('prd_' + productId);
-        if(cacheVal && (cacheVal.refreshed + config.options().refresh_timeout) > util.now()) {
-            return callback(null, cacheVal);
-        }
-    }
-    var cb = function(err, data) {
-        if(cache.enabled() && !err && !!data.result) {
-            data.refreshed = util.now();
-            cache.set('prd_' + productId, data);
-        }
-        if(!err && !!data.result) {
+    var that = this,
+        respond = util.makeAsync(function(err, data) {
             spidEvent.fire('SPiD.hasProduct', {
                 productId: productId,
                 result: data.result
             });
-        }
-        callback(err, data);
-    };
-    var params = {product_id: productId};
+            return callback(null, data);
+        }),
+        cb = function(err, data) {
+            if(!err && !!data.result) {
+                persist.set(data, config.options().refresh_timeout, 'prd' + productId);
+            }
+            respond(err, data);
+        };
+
+    var params = { product_id: productId };
     this.hasSession(function (err, data) {
         if (err) {
-            callback(err);
-            return;
+            return callback(err);
+        }
+        var cached = persist.get('prd' + productId);
+        if (cached && cached.uuid === data.uuid) {
+            return respond(null, cached);
         }
         if (data.sp_id) {
             params.sp_id = data.sp_id;
@@ -113,32 +110,31 @@ function hasProduct(productId, callback) {
 }
 
 function hasSubscription(productId, callback) {
-    var that = this;
     callback = util.makeAsync(callback || noop);
-    if(cache.enabled()) {
-        var cacheVal = cache.get('sub_' + productId);
-        if(cacheVal && (cacheVal.refreshed + config.options().refresh_timeout) > util.now()) {
-            return callback(null, cacheVal);
-        }
-    }
-    var cb = function(err, data) {
-        if(cache.enabled() && !err && !!data.result) {
-            data.refreshed = util.now();
-            cache.set('sub_' + productId, data);
-        }
-        if(!err && !!data.result) {
+    var that = this,
+        respond = util.makeAsync(function(err, data) {
             spidEvent.fire('SPiD.hasSubscription', {
-                subscriptionId: productId,
+                subscriptionId: productId, // Kept for legacy reasons
+                productId: productId,
                 result: data.result
             });
-        }
-        callback(err, data);
-    };
-    var params = {product_id: productId};
+            return callback(null, data);
+        }),
+        cb = function(err, data) {
+            if(!err && !!data.result) {
+                persist.set(data, config.options().refresh_timeout, 'prd' + productId);
+            }
+            respond(err, data);
+        };
+
+    var params = { product_id: productId };
     this.hasSession(function (err, data) {
         if (err) {
-            callback(err);
-            return;
+            return callback(err);
+        }
+        var cached = persist.get('prd' + productId);
+        if (cached && cached.uuid === data.uuid) {
+            return respond(null, cached);
         }
         if (data.sp_id) {
             params.sp_id = data.sp_id;
