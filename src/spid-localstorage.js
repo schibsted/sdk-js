@@ -1,6 +1,5 @@
 /*global require:false, module:false*/
-var log = require('./spid-log'),
-    enabled = true;
+var log = require('./spid-log');
 
 function decode(value) {
     return JSON.parse(value);
@@ -55,6 +54,5 @@ function get(key) {
 module.exports = {
     set: set,
     get: get,
-    clear: clear,
-    enabled: enabled
+    clear: clear
 };

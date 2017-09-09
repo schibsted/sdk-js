@@ -88,21 +88,19 @@ function hasProduct(productId, callback) {
         }),
         cb = function(err, data) {
             if(!err && !!data.result) {
-                persist.set(data, config.options.refresh_timeout, 'prd' + productId);
+                persist.set(data, config.options().refresh_timeout, 'prd' + productId);
             }
             respond(err, data);
         };
-
-    // Check cache and early return
-    var data = persist.get('prd' + productId);
-    if (data) {
-        return respond(null, data);
-    }
 
     var params = { product_id: productId };
     this.hasSession(function (err, data) {
         if (err) {
             return callback(err);
+        }
+        var cached = persist.get('prd' + productId);
+        if (cached && cached.uuid === data.uuid) {
+            return respond(null, cached);
         }
         if (data.sp_id) {
             params.sp_id = data.sp_id;
@@ -116,28 +114,27 @@ function hasSubscription(productId, callback) {
     var that = this,
         respond = util.makeAsync(function(err, data) {
             spidEvent.fire('SPiD.hasSubscription', {
-                subscriptionId: productId,
+                subscriptionId: productId, // Kept for legacy reasons
+                productId: productId,
                 result: data.result
             });
             return callback(null, data);
         }),
         cb = function(err, data) {
             if(!err && !!data.result) {
-                persist.set(data, config.options.refresh_timeout, 'prd' + productId);
+                persist.set(data, config.options().refresh_timeout, 'prd' + productId);
             }
             respond(err, data);
         };
-
-    // Check cache and early return
-    var data = persist.get('prd' + productId);
-    if (data) {
-        return respond(null, data);
-    }
 
     var params = { product_id: productId };
     this.hasSession(function (err, data) {
         if (err) {
             return callback(err);
+        }
+        var cached = persist.get('prd' + productId);
+        if (cached && cached.uuid === data.uuid) {
+            return respond(null, cached);
         }
         if (data.sp_id) {
             params.sp_id = data.sp_id;
