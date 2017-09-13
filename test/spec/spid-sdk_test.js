@@ -1,3 +1,5 @@
+var pkgJson = require('json-loader!../../package.json');
+
 describe('SPiD', function() {
 
     var assert = chai.assert;
@@ -80,12 +82,19 @@ describe('SPiD', function() {
         before(function() {
             SPiD.init(setupProd);
         });
-        it('SPiD.version should return string', function() {
+        it('SPiD.initiated should return true', function() {
+            assert.isTrue(SPiD.initiated());
+        });
+    });
+
+    describe('SPiD.version', function() {
+        it('should return string', function() {
             var version = SPiD.version();
             assert.isString(version);
         });
-        it('SPiD.initiated should return true', function() {
-            assert.isTrue(SPiD.initiated());
+        it('should be equal to the version from package.json', function() {
+            var version = SPiD.version();
+            assert.equal(version, pkgJson.version, 'SDK.version and package.json version');
         });
     });
 
