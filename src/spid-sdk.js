@@ -1,6 +1,6 @@
 /*global require:false, module:false*/
 var
-    _version = '<%= pkg.version %>',
+    _version = '2.5.0',
     config = require('./spid-config'),
     _initiated = false,
     _session = {},
@@ -26,6 +26,10 @@ function init(opts, callback) {
     if(callback) {
         callback();
     }
+}
+
+function version() {
+    return _version;
 }
 
 function hasSession(callback) {
@@ -61,7 +65,7 @@ function hasSession(callback) {
             if(err && err.type === 'LoginException') {
                 spidEvent.fire('SPiD.loginException');
                 //Fallback to core
-                return talk.request(that.coreEndpoint(), null, {autologin: 1}, handleResponse);
+                return talk.request(that.coreEndpoint(), null, {autologin: 1, v: version()}, handleResponse);
             } else if(err) {
                 spidEvent.fire('SPiD.error', err);
             }
@@ -73,7 +77,7 @@ function hasSession(callback) {
         return respond(null, data);
     }
 
-    talk.request(this.sessionEndpoint(), null, {autologin: 1}, handleException);
+    talk.request(this.sessionEndpoint(), null, {autologin: 1, v: version()}, handleException);
 }
 
 function hasProduct(productId, callback) {
@@ -95,7 +99,7 @@ function hasProduct(productId, callback) {
             respond(err, data);
         };
 
-    var params = { product_id: productId };
+    var params = { product_id: productId, v: version() };
     this.hasSession(function (err, data) {
         if (err) {
             return callback(err);
@@ -131,7 +135,7 @@ function hasSubscription(productId, callback) {
             respond(err, data);
         };
 
-    var params = { product_id: productId };
+    var params = { product_id: productId, v: version() };
     this.hasSession(function (err, data) {
         if (err) {
             return callback(err);
@@ -187,9 +191,6 @@ util.makeAsync(function() {
 })();
 
 module.exports = {
-    version: function() {
-        return _version;
-    },
     initiated: function() {
         return _initiated;
     },
@@ -208,6 +209,7 @@ module.exports = {
     options: function() {
         return config.options();
     },
+    version: version,
     acceptAgreement: acceptAgreement,
     event: spidEvent,
     sessionCache: persist,
