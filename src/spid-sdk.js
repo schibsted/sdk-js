@@ -158,7 +158,7 @@ function logout(callback) {
             clearClientData();
         }
 
-        if(!err && !!data.result) {
+        if(!err && data.result) {
             spidEvent.fire('SPiD.logout', data);
         }
 
