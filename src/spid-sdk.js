@@ -32,7 +32,7 @@ function hasSession(callback) {
     callback = callback || noop;
     var that = this,
         shouldCacheData = function(err, data) {
-            return (!err && !!data.result) || (config.options().cache && config.options().cache.hasSession);
+            return (!err && data.result) || (config.options().cache && config.options().cache.hasSession);
         },
         getExpiresIn = function(data) {
             if (config.options().cache &&
@@ -44,7 +44,7 @@ function hasSession(callback) {
             }
         },
         respond = util.makeAsync(function(err, data) {
-            if(!err && !!data.result) {
+            if(!err && data.result) {
                 cookie.tryVarnishCookie(data);
             }
             eventTrigger.session(_session, data);
@@ -89,7 +89,7 @@ function hasProduct(productId, callback) {
         cb = function(err, data) {
             if(!err) {
                 var opts = config.options();
-                var cacheTime = !!data.result ? opts.refresh_timeout : opts.cache_time_no_asset;
+                var cacheTime = data.result ? opts.refresh_timeout : opts.cache_time_no_asset;
                 persist.set(data, cacheTime, 'prd' + productId);
             }
             respond(err, data);
@@ -125,7 +125,7 @@ function hasSubscription(productId, callback) {
         cb = function(err, data) {
             if(!err) {
                 var opts = config.options();
-                var cacheTime = !!data.result ? opts.refresh_timeout : opts.cache_time_no_asset;
+                var cacheTime = data.result ? opts.refresh_timeout : opts.cache_time_no_asset;
                 persist.set(data, cacheTime, 'prd' + productId);
             }
             respond(err, data);
