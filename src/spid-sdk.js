@@ -87,8 +87,10 @@ function hasProduct(productId, callback) {
             return callback(null, data);
         }),
         cb = function(err, data) {
-            if(!err && !!data.result) {
-                persist.set(data, config.options().refresh_timeout, 'prd' + productId);
+            if(!err) {
+                var opts = config.options();
+                var cacheTime = !!data.result ? opts.refresh_timeout : opts.cache_time_no_asset;
+                persist.set(data, cacheTime, 'prd' + productId);
             }
             respond(err, data);
         };
@@ -121,8 +123,10 @@ function hasSubscription(productId, callback) {
             return callback(null, data);
         }),
         cb = function(err, data) {
-            if(!err && !!data.result) {
-                persist.set(data, config.options().refresh_timeout, 'prd' + productId);
+            if(!err) {
+                var opts = config.options();
+                var cacheTime = !!data.result ? opts.refresh_timeout : opts.cache_time_no_asset;
+                persist.set(data, cacheTime, 'prd' + productId);
             }
             respond(err, data);
         };

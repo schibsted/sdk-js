@@ -11,8 +11,9 @@ var
         setVarnishCookie: null,
         storage: 'localstorage',
         timeout: 5000,
-        refresh_timeout: 12*60*60*1000,
-        varnish_expiration: 12*60*60*1000
+        refresh_timeout: 12*60*60, // sec
+        varnish_expiration: 12*60*60, // sec
+        cache_time_no_asset: 10 // sec
     },
     util = require('./spid-util');
 
