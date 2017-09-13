@@ -32,7 +32,7 @@ function hasSession(callback) {
     callback = callback || noop;
     var that = this,
         shouldCacheData = function(err, data) {
-            return (!err && !!data.result) || (config.options().cache && config.options().cache.hasSession);
+            return (!err && data.result) || (config.options().cache && config.options().cache.hasSession);
         },
         getExpiresIn = function(data) {
             if (config.options().cache &&
@@ -44,7 +44,7 @@ function hasSession(callback) {
             }
         },
         respond = util.makeAsync(function(err, data) {
-            if(!err && !!data.result) {
+            if(!err && data.result) {
                 cookie.tryVarnishCookie(data);
             }
             eventTrigger.session(_session, data);
@@ -87,8 +87,10 @@ function hasProduct(productId, callback) {
             return callback(null, data);
         }),
         cb = function(err, data) {
-            if(!err && !!data.result) {
-                persist.set(data, config.options().refresh_timeout, 'prd' + productId);
+            if(!err) {
+                var opts = config.options();
+                var cacheTime = data.result ? opts.refresh_timeout : opts.cache_time_no_asset;
+                persist.set(data, cacheTime, 'prd' + productId);
             }
             respond(err, data);
         };
@@ -121,8 +123,10 @@ function hasSubscription(productId, callback) {
             return callback(null, data);
         }),
         cb = function(err, data) {
-            if(!err && !!data.result) {
-                persist.set(data, config.options().refresh_timeout, 'prd' + productId);
+            if(!err) {
+                var opts = config.options();
+                var cacheTime = data.result ? opts.refresh_timeout : opts.cache_time_no_asset;
+                persist.set(data, cacheTime, 'prd' + productId);
             }
             respond(err, data);
         };
@@ -154,7 +158,7 @@ function logout(callback) {
             clearClientData();
         }
 
-        if(!err && !!data.result) {
+        if(!err && data.result) {
             spidEvent.fire('SPiD.logout', data);
         }
 
