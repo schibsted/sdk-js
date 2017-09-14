@@ -41,6 +41,14 @@ function _createCallback(callback) {
     return id;
 }
 
+function _getPendingRequest(url) {
+    for (var i = 0; i < _requestQueue; i++) {
+        if (_requestQueue[i].url === url) {
+            return _requestQueue[i].id;
+        }
+    }
+}
+
 function _queue(id, url) {
     _requestQueue.push({id:id, url:url});
 }
@@ -64,6 +72,7 @@ function _done(id, data) {
 
     if(_callbackFunctions[id]) {
         _callAllCallbacks(id, data['error'] || null, data['response'] || data);
+        delete _callbackFunctions[id];
     }
 }
 
@@ -106,7 +115,12 @@ function request(server, path, params, callback) {
     params.client_id = config.options().client_id;
     var url = util.buildUri(server, path, params);
     log.info('Request: ' + url);
-    _queue(id, url);
+    var existingRequest = _getPendingRequest(url);
+    if (existingRequest) {
+        _callbackFunctions[existingRequest].push(callback);
+    } else {
+        _queue(id, url);
+    }
     _processQueue();
 }
 
