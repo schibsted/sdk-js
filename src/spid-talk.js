@@ -1,6 +1,6 @@
 /*global require:false, module:false, _processQueue*/
 var _scriptObject,
-    _callbacks = {},
+    _callbackFunctions = {},
     _requestQueue = [],
     _timer = null,
     _redirectUri = encodeURIComponent(window.location.toString()),
@@ -12,11 +12,32 @@ function _guid() {
     return 'f' + (Math.random() * (1<<30)).toString(16).replace('.', '');
 }
 
+function _isArray(arg) {
+    // Polyfill from MDN: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/isArray
+    return Object.prototype.toString.call(arg) === '[object Array]';
+}
+
+function _callAllCallbacks(id, err, res) {
+    var callbackArr = _callbackFunctions[id];
+    if (_isArray(callbackArr)) {
+        for (var i = 0; i < callbackArr.length; i++) {
+            try {
+                callbackArr[i](err, res);
+            } catch (e) {
+                log.error('Failed to run a callback' + e);
+            }
+        }
+    } else {
+        log.error('No callback is registered for callback id ' + id);
+    }
+}
+
 function _createCallback(callback) {
     var id = _guid();
-    _callbacks[id] = function(err, res) {
-        callback(err, res);
-    };
+    if (!_isArray(_callbackFunctions[id])) {
+        _callbackFunctions[id] = [];
+    }
+    _callbackFunctions[id].push(callback);
     return id;
 }
 
@@ -41,12 +62,8 @@ function _done(id, data) {
     _removeScriptObject();
     _processQueue();
 
-    if(_callbacks[id]) {
-        var f = _callbacks[id];
-        _callbacks[id] = null;
-        var err = data['error'] ? data['error'] : null,
-            res = data['response'] ? data['response'] : data;
-        f(err, res);
+    if(_callbackFunctions[id]) {
+        _callAllCallbacks(id, data['error'] || null, data['response'] || data);
     }
 }
 
