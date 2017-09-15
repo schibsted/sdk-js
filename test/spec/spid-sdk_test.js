@@ -414,7 +414,6 @@ describe('SPiD', function() {
 
     describe('SPiD.hasProduct', function() {
         var talkRequestStub,
-            hasSessionStub,
             persistGetStub,
             persistSetStub;
         before(function() {
@@ -425,30 +424,29 @@ describe('SPiD', function() {
         beforeEach(function() {
             talkRequestStub = sinon.stub(require('../../src/spid-talk'), 'request');
             talkRequestStub.callsArgWith(3, null, {productId: 10013, result:true});
-            hasSessionStub = sinon.stub(SPiD, 'hasSession');
-            hasSessionStub.callsArgWith(0, null, {
+            persistGetStub = sinon.stub(require('../../src/spid-persist'), 'get');
+            persistSetStub = sinon.stub(require('../../src/spid-persist'), 'set');
+            persistGetStub.onFirstCall().returns({
                 'result':true,
                 'expiresIn':7111,
                 'baseDomain':cookieDomain,
                 'userStatus':'connected',
                 'userId':1844813,
                 'id':'4f1e2ae59caf7c2f4a058b76',
+                'uuid':'4f1e-2ae5-9caf-7c2f-4a05-8b76',
                 'sp_id':'4f1e2ae59caf7c2f4a058b76'
             });
-            persistGetStub = sinon.stub(require('../../src/spid-persist'), 'get');
-            persistSetStub = sinon.stub(require('../../src/spid-persist'), 'set');
         });
 
         afterEach(function(){
             talkRequestStub.restore();
             persistGetStub.restore();
             persistSetStub.restore();
-            hasSessionStub.restore();
         });
 
         it('SPiD.hasProduct should call Talk with parameter server, path, params, callback', function(done) {
             SPiD.hasProduct(10010, function() {
-                assert.ok(hasSessionStub.called, 'hasProduct callback is called');
+                assert.ok(persistGetStub.called, 'persist.get is called');
                 assert.equal(talkRequestStub.firstCall.args[0], 'https://identity-pre.schibsted.com/');
                 assert.equal(talkRequestStub.firstCall.args[1], 'ajax/hasproduct.js');
                 assert.equal(talkRequestStub.firstCall.args[2].product_id, 10010);
@@ -466,13 +464,14 @@ describe('SPiD', function() {
         });
 
         it('SPiD.hasProduct does not send the sp_id when it does not exist', function(done) {
-            hasSessionStub.onFirstCall().callsArgWith(0, null, {
+            persistGetStub.onFirstCall().returns({
                 'result':true,
                 'expiresIn':7111,
                 'baseDomain':cookieDomain,
                 'userStatus':'connected',
                 'userId':1844813,
-                'id':'4f1e2ae59caf7c2f4a058b76'
+                'uuid':'4f1e-2ae5-9caf-7c2f-4a05-8b76',
+                'id':'4f1e2ae59caf7c2f4a058b76',
             });
             SPiD.hasProduct(10016, function() {
                 // The second call is to the hasProduct endpoint
@@ -502,7 +501,6 @@ describe('SPiD', function() {
 
     describe('SPiD.hasSubscription', function() {
         var talkRequestStub,
-            hasSessionStub,
             persistGetStub,
             persistSetStub;
         before(function() {
@@ -513,29 +511,28 @@ describe('SPiD', function() {
         beforeEach(function() {
             talkRequestStub = sinon.stub(require('../../src/spid-talk'), 'request');
             talkRequestStub.callsArgWith(3, null, {});
-            hasSessionStub = sinon.stub(SPiD, 'hasSession');
-            hasSessionStub.callsArgWith(0, null, {
+            persistGetStub = sinon.stub(require('../../src/spid-persist'), 'get');
+            persistSetStub = sinon.stub(require('../../src/spid-persist'), 'set');
+            persistGetStub.onFirstCall().returns({
                 'result':true,
                 'expiresIn':7111,
                 'baseDomain':cookieDomain,
                 'userStatus':'connected',
                 'userId':1844813,
                 'id':'4f1e2ae59caf7c2f4a058b76',
+                'uuid':'4f1e-2ae5-9caf-7c2f-4a05-8b76',
                 'sp_id':'4f1e2ae59caf7c2f4a058b76'
             });
-            persistGetStub = sinon.stub(require('../../src/spid-persist'), 'get');
-            persistSetStub = sinon.stub(require('../../src/spid-persist'), 'set');
         });
         afterEach(function(){
             talkRequestStub.restore();
             persistGetStub.restore();
             persistSetStub.restore();
-            hasSessionStub.restore();
         });
 
         it('SPiD.hasSubscription should call Talk with parameter server, path, params, callback', function(done) {
             SPiD.hasSubscription(10010, function() {
-                assert.isTrue(hasSessionStub.called, 'hasSession() is called');
+                assert.isTrue(persistGetStub.called, 'persist.get is called');
                 assert.equal(talkRequestStub.firstCall.args[0], 'https://identity-pre.schibsted.com/');
                 assert.equal(talkRequestStub.firstCall.args[1], 'ajax/hassubscription.js');
                 assert.equal(talkRequestStub.firstCall.args[2].product_id, 10010);
@@ -548,7 +545,6 @@ describe('SPiD', function() {
         it('SPiD.hasSubscription should try and set cache on successful return', function(done) {
             talkRequestStub.onFirstCall().callsArgWith(3, null, {result: true, productId: 10011});
             SPiD.hasSubscription(10011, function() {
-                assert.isTrue(hasSessionStub.called, 'hasSession() is called');
                 assert.isTrue(persistSetStub.called);
                 assert.equal(persistSetStub.firstCall.args[2], 'prd10011');
                 assert.equal(persistSetStub.firstCall.args[1], SPiD.options().refresh_timeout);
@@ -560,9 +556,8 @@ describe('SPiD', function() {
 
         it('SPiD.hasSubscription should try and get from cache', function(done) {
             SPiD.hasSubscription(10012, function() {
-                assert.isTrue(hasSessionStub.called, 'hasSession() is called');
                 assert.isTrue(persistGetStub.called);
-                assert.equal(persistGetStub.getCall(0).args[0], 'prd10012');
+                assert.equal(persistGetStub.getCall(1).args[0], 'prd10012');
                 done();
             });
         });
