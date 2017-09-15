@@ -99,20 +99,21 @@ function hasProduct(productId, callback) {
             respond(err, data);
         };
 
+    var session = persist.get();
+    if (!session || !session.uuid) {
+        return callback('No logged in user in cache. Make sure to call hasSession first.');
+    }
+
+    var cached =  persist.get('prd' + productId);
+    if (cached && cached.uuid === session.uuid) {
+        return respond(null, cached);
+    }
+
     var params = { product_id: productId, v: version() };
-    this.hasSession(function (err, data) {
-        if (err) {
-            return callback(err);
-        }
-        var cached = persist.get('prd' + productId);
-        if (cached && cached.uuid === data.uuid) {
-            return respond(null, cached);
-        }
-        if (data.sp_id) {
-            params.sp_id = data.sp_id;
-        }
-        talk.request(that.server(), 'ajax/hasproduct.js', params, cb);
-    });
+    if (session.sp_id) {
+        params.sp_id = session.sp_id;
+    }
+    talk.request(that.server(), 'ajax/hasproduct.js', params, cb);
 }
 
 function hasSubscription(productId, callback) {
@@ -135,20 +136,21 @@ function hasSubscription(productId, callback) {
             respond(err, data);
         };
 
+    var session = persist.get();
+    if (!session || !session.uuid) {
+        return callback('No logged in user in cache. Make sure to call hasSession first.');
+    }
+
+    var cached =  persist.get('prd' + productId);
+    if (cached && cached.uuid === session.uuid) {
+        return respond(null, cached);
+    }
+
     var params = { product_id: productId, v: version() };
-    this.hasSession(function (err, data) {
-        if (err) {
-            return callback(err);
-        }
-        var cached = persist.get('prd' + productId);
-        if (cached && cached.uuid === data.uuid) {
-            return respond(null, cached);
-        }
-        if (data.sp_id) {
-            params.sp_id = data.sp_id;
-        }
-        talk.request(that.server(), 'ajax/hassubscription.js', params, cb);
-    });
+    if (session.sp_id) {
+        params.sp_id = session.sp_id;
+    }
+    talk.request(that.server(), 'ajax/hassubscription.js', params, cb);
 }
 
 function clearClientData() {
