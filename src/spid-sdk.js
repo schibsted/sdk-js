@@ -10,6 +10,7 @@ var
     persist = require('./spid-persist'),
     cookie = require('./spid-cookie'),
     talk = require('./spid-talk'),
+    cbs = require('./spid-callbacks'),
     noop = function () {};
 
 function globalExport(global) {
@@ -18,14 +19,13 @@ function globalExport(global) {
 }
 
 function init(opts, callback) {
+    callback = util.makeAsync(callback || noop);
     config.init(opts);
     if(!config.options().noGlobalExport) {
         globalExport.call(this, window);
     }
     _initiated = true;
-    if(callback) {
-        callback();
-    }
+     callback();
 }
 
 function version() {
@@ -33,7 +33,12 @@ function version() {
 }
 
 function hasSession(callback) {
-    callback = callback || noop;
+    var key = 'session';
+    callback = util.makeAsync(callback || noop);
+    cbs.register(key, callback);
+    if (cbs.hasPending(key)) {
+        return;
+    }
     var that = this,
         shouldCacheData = function(err, data) {
             return (!err && data.result) || (config.options().cache && config.options().cache.hasSession);
@@ -53,7 +58,7 @@ function hasSession(callback) {
             }
             eventTrigger.session(_session, data);
             _session = data;
-            callback(err, data);
+            cbs.invokeAll(key, err, data);
         }),
         handleResponse = function(err, data) {
             if(shouldCacheData(err, data)) {
@@ -81,20 +86,25 @@ function hasSession(callback) {
 }
 
 function hasProduct(productId, callback) {
+    var key = 'prd' + productId;
     callback = util.makeAsync(callback || noop);
+    cbs.register(key, callback);
+    if (cbs.hasPending(key)) {
+        return;
+    }
     var that = this,
         respond = util.makeAsync(function(err, data) {
             spidEvent.fire('SPiD.hasProduct', {
                 productId: productId,
                 result: data.result
             });
-            return callback(null, data);
+            return cbs.invokeAll(key, null, data);
         }),
         cb = function(err, data) {
             if(!err) {
                 var opts = config.options();
                 var cacheTime = data.result ? opts.refresh_timeout : opts.cache_time_no_asset;
-                persist.set(data, cacheTime, 'prd' + productId);
+                persist.set(data, cacheTime, key);
             }
             respond(err, data);
         };
@@ -102,9 +112,9 @@ function hasProduct(productId, callback) {
     var params = { product_id: productId, v: version() };
     this.hasSession(function (err, data) {
         if (err) {
-            return callback(err);
+            return cbs.invokeAll(key, err);
         }
-        var cached = persist.get('prd' + productId);
+        var cached = persist.get(key);
         if (cached && cached.uuid === data.uuid) {
             return respond(null, cached);
         }
@@ -116,21 +126,26 @@ function hasProduct(productId, callback) {
 }
 
 function hasSubscription(productId, callback) {
+    var key = 'sub' + productId;
     callback = util.makeAsync(callback || noop);
+    cbs.register(key, callback);
+    if (cbs.hasPending(key)) {
+        return;
+    }
     var that = this,
         respond = util.makeAsync(function(err, data) {
             spidEvent.fire('SPiD.hasSubscription', {
-                subscriptionId: productId, // Kept for legacy reasons
+                subscriptionId: subscriptionId,
                 productId: productId,
                 result: data.result
             });
-            return callback(null, data);
+            return cbs.invokeAll(key, null, data);
         }),
         cb = function(err, data) {
             if(!err) {
                 var opts = config.options();
                 var cacheTime = data.result ? opts.refresh_timeout : opts.cache_time_no_asset;
-                persist.set(data, cacheTime, 'prd' + productId);
+                persist.set(data, cacheTime, key);
             }
             respond(err, data);
         };
@@ -138,9 +153,9 @@ function hasSubscription(productId, callback) {
     var params = { product_id: productId, v: version() };
     this.hasSession(function (err, data) {
         if (err) {
-            return callback(err);
+            return cbs.invokeAll(key, err);
         }
-        var cached = persist.get('prd' + productId);
+        var cached = persist.get(key);
         if (cached && cached.uuid === data.uuid) {
             return respond(null, cached);
         }
@@ -157,6 +172,7 @@ function clearClientData() {
 }
 
 function logout(callback) {
+    callback = util.makeAsync(callback || noop);
     var cb = function(err, data) {
         if(data.result) {
             clearClientData();
@@ -166,9 +182,7 @@ function logout(callback) {
             spidEvent.fire('SPiD.logout', data);
         }
 
-        if(callback) {
-            callback(err, data);
-        }
+        callback(err, data);
     };
     talk.request(this.server(), 'ajax/logout.js', {}, cb);
 }

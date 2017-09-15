@@ -550,7 +550,7 @@ describe('SPiD', function() {
             SPiD.hasSubscription(10011, function() {
                 assert.isTrue(hasSessionStub.called, 'hasSession() is called');
                 assert.isTrue(persistSetStub.called);
-                assert.equal(persistSetStub.firstCall.args[2], 'prd10011');
+                assert.equal(persistSetStub.firstCall.args[2], 'sub10011');
                 assert.equal(persistSetStub.firstCall.args[1], SPiD.options().refresh_timeout);
                 assert.equal(persistSetStub.firstCall.args[0].result, true);
                 assert.equal(persistSetStub.firstCall.args[0].productId, 10011);
@@ -562,7 +562,7 @@ describe('SPiD', function() {
             SPiD.hasSubscription(10012, function() {
                 assert.isTrue(hasSessionStub.called, 'hasSession() is called');
                 assert.isTrue(persistGetStub.called);
-                assert.equal(persistGetStub.getCall(0).args[0], 'prd10012');
+                assert.equal(persistGetStub.getCall(0).args[0], 'sub10012');
                 done();
             });
         });
