@@ -7,10 +7,6 @@ function ensureArray(key) {
     }
 }
 
-function clear(key) {
-    delete _callbacks[key];
-}
-
 function register(key, cb) {
     ensureArray(key);
     _callbacks[key].push(cb);
@@ -21,7 +17,7 @@ function invokeAll(key, err, data) {
     _callbacks[key].forEach(function (cb) {
         cb(err, data);
     });
-    clear(key);
+    delete _callbacks[key];
 }
 
 function hasPending(key) {

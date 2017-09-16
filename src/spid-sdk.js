@@ -52,14 +52,14 @@ function hasSession(callback) {
                 return data.expiresIn;
             }
         },
-        respond = util.makeAsync(function(err, data) {
+        respond = function(err, data) {
             if(!err && data.result) {
                 cookie.tryVarnishCookie(data);
             }
-            eventTrigger.session(_session, data);
+            util.makeAsync(eventTrigger.session)(_session, data);
             _session = data;
             cbs.invokeAll(key, err, data);
-        }),
+        },
         handleResponse = function(err, data) {
             if(shouldCacheData(err, data)) {
                 persist.set(data, getExpiresIn(data));
@@ -95,7 +95,7 @@ function hasProduct(productId, callback) {
     var that = this,
         respond = util.makeAsync(function(err, data) {
             spidEvent.fire('SPiD.hasProduct', {
-                productId: productId,
+                productId: data.productId,
                 result: data.result
             });
             return cbs.invokeAll(key, null, data);
@@ -135,8 +135,8 @@ function hasSubscription(productId, callback) {
     var that = this,
         respond = util.makeAsync(function(err, data) {
             spidEvent.fire('SPiD.hasSubscription', {
-                subscriptionId: subscriptionId,
-                productId: productId,
+                subscriptionId: data.subscriptionId,
+                productId: data.productId,
                 result: data.result
             });
             return cbs.invokeAll(key, null, data);

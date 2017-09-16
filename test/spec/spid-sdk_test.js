@@ -101,7 +101,16 @@ describe('SPiD', function() {
     describe('SPiD.hasSession', function() {
         var talkRequestStub,
             persistSetStub,
-            persistGetStub;
+            persistGetStub
+            fakeSession = {
+                'result':true,
+                'expiresIn':7111,
+                'baseDomain':cookieDomain,
+                'userStatus':'connected',
+                'userId':1844813,
+                'id':'4f1e2ae59caf7c2f4a058b76',
+                'sp_id':'4f1e2ae59caf7c2f4a058b76'
+            };
 
         beforeEach(function(){
             talkRequestStub = sinon.stub(require('../../src/spid-talk'), 'request');
@@ -119,15 +128,17 @@ describe('SPiD', function() {
         it('SPiD.hasSession should call Talk with parameter server, path, params, callback', function() {
             SPiD.init(setupProd);
             SPiD.hasSession(function() {});
-            assert.equal(talkRequestStub.getCall(0).args[0],'https://session.login.schibsted.com/rpc/hasSession.js');
-            assert.equal(talkRequestStub.getCall(0).args[1],null);
-            assert.equal(talkRequestStub.getCall(0).args[2].autologin,1);
+            assert.equal(talkRequestStub.getCall(0).args[0], 'https://session.login.schibsted.com/rpc/hasSession.js');
+            assert.equal(talkRequestStub.getCall(0).args[1], null);
+            assert.equal(talkRequestStub.getCall(0).args[2].autologin, 1);
             assert.isFunction(talkRequestStub.getCall(0).args[3]);
+            talkRequestStub.getCall(0).args[3](null, fakeSession);
         });
 
         it('SPiD.hasSession should call Talk again if LoginException is returned', function() {
             SPiD.init(setupProd);
             talkRequestStub.onFirstCall().callsArgWith(3, {'code':401,'type':'LoginException','description':'Autologin required'}, {result: false});
+            talkRequestStub.onSecondCall().callsArgWith(3, null, fakeSession);
             SPiD.hasSession(function() {});
             assert.equal(talkRequestStub.secondCall.args[0], 'https://login.schibsted.com/ajax/hasSession.js');
             assert.equal(talkRequestStub.secondCall.args[1], null);
@@ -137,15 +148,6 @@ describe('SPiD', function() {
 
         it('SPiD.hasSession should try to set cookie (in this case) when successful', function() {
             SPiD.init(setupProd);
-            var fakeSession = {
-                'result':true,
-                'expiresIn':7111,
-                'baseDomain':cookieDomain,
-                'userStatus':'connected',
-                'userId':1844813,
-                'id':'4f1e2ae59caf7c2f4a058b76',
-                'sp_id':'4f1e2ae59caf7c2f4a058b76'
-            };
             talkRequestStub.onFirstCall().callsArgWith(3, null, fakeSession);
             SPiD.hasSession(function() {});
             assert.equal(fakeSession.userId, persistSetStub.firstCall.args[0].userId);
@@ -179,16 +181,6 @@ describe('SPiD', function() {
             _setup.storage = 'localstorage';
             SPiD.init(_setup);
 
-            var fakeSession = {
-                'result':true,
-                'expiresIn':7111,
-                'baseDomain':cookieDomain,
-                'userStatus':'connected',
-                'userId':1844813,
-                'id':'4f1e2ae59caf7c2f4a058b76',
-                'sp_id':'4f1e2ae59caf7c2f4a058b76'
-            };
-
             talkRequestStub.onFirstCall().callsArgWith(3, null, fakeSession);
 
             assert.equal(document.cookie.indexOf('SP_ID'), -1);
@@ -204,16 +196,6 @@ describe('SPiD', function() {
             _setup.storage = 'cookie';
             SPiD.init(_setup);
 
-            var fakeSession = {
-                'result':true,
-                'expiresIn':7111,
-                'baseDomain':cookieDomain,
-                'userStatus':'connected',
-                'userId':1844813,
-                'id':'4f1e2ae59caf7c2f4a058b76',
-                'sp_id':'4f1e2ae59caf7c2f4a058b76'
-            };
-
             talkRequestStub.onFirstCall().callsArgWith(3, null, fakeSession);
 
             assert.equal(document.cookie.indexOf('SP_ID'), -1);
@@ -228,16 +210,6 @@ describe('SPiD', function() {
             _setup.storage = 'localstorage';
             SPiD.init(_setup);
 
-            var fakeSession = {
-                'result': true,
-                'expiresIn': 7111,
-                'baseDomain': cookieDomain,
-                'userStatus': 'connected',
-                'userId': 1844813,
-                'id': '4f1e2ae59caf7c2f4a058b76',
-                'sp_id': '4f1e2ae59caf7c2f4a058b76'
-            };
-
             talkRequestStub.onFirstCall().callsArgWith(3, null, fakeSession);
 
             assert.equal(document.cookie.indexOf('SP_ID'), -1);
@@ -251,16 +223,6 @@ describe('SPiD', function() {
             var _setup = setup();
             _setup.storage = 'cookie';
             SPiD.init(_setup);
-
-            var fakeSession = {
-                'result': true,
-                'expiresIn': 7111,
-                'baseDomain': cookieDomain,
-                'userStatus': 'connected',
-                'userId': 1844813,
-                'id': '4f1e2ae59caf7c2f4a058b76',
-                'sp_id': '4f1e2ae59caf7c2f4a058b76'
-            };
 
             talkRequestStub.onFirstCall().callsArgWith(3, null, fakeSession);
 
@@ -277,16 +239,6 @@ describe('SPiD', function() {
             _setup.storage = 'localstorage';
             SPiD.init(_setup);
 
-            var fakeSession = {
-                'result': true,
-                'expiresIn': 7111,
-                'baseDomain': cookieDomain,
-                'userStatus': 'connected',
-                'userId': 1844813,
-                'id': '4f1e2ae59caf7c2f4a058b76',
-                'sp_id': '4f1e2ae59caf7c2f4a058b76'
-            };
-
             talkRequestStub.onFirstCall().callsArgWith(3, null, fakeSession);
 
             assert.equal(document.cookie.indexOf('SP_ID'), -1);
@@ -301,16 +253,6 @@ describe('SPiD', function() {
             _setup.setVarnishCookie = false;
             _setup.storage = 'cookie';
             SPiD.init(_setup);
-
-            var fakeSession = {
-                'result': true,
-                'expiresIn': 7111,
-                'baseDomain': cookieDomain,
-                'userStatus': 'connected',
-                'userId': 1844813,
-                'id': '4f1e2ae59caf7c2f4a058b76',
-                'sp_id': '4f1e2ae59caf7c2f4a058b76'
-            };
 
             talkRequestStub.onFirstCall().callsArgWith(3, null, fakeSession);
 
