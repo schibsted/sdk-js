@@ -125,9 +125,9 @@ describe('SPiD', function() {
             clearVarnishCookie();
         });
 
-        it('SPiD.hasSession should call Talk with parameter server, path, params, callback', function() {
+        it('SPiD.hasSession should call Talk with parameter server, path, params, callback', function(done) {
             SPiD.init(setupProd);
-            SPiD.hasSession(function() {});
+            SPiD.hasSession(function() { done(); });
             assert.equal(talkRequestStub.getCall(0).args[0], 'https://session.login.schibsted.com/rpc/hasSession.js');
             assert.equal(talkRequestStub.getCall(0).args[1], null);
             assert.equal(talkRequestStub.getCall(0).args[2].autologin, 1);
@@ -135,21 +135,21 @@ describe('SPiD', function() {
             talkRequestStub.getCall(0).args[3](null, fakeSession);
         });
 
-        it('SPiD.hasSession should call Talk again if LoginException is returned', function() {
+        it('SPiD.hasSession should call Talk again if LoginException is returned', function(done) {
             SPiD.init(setupProd);
             talkRequestStub.onFirstCall().callsArgWith(3, {'code':401,'type':'LoginException','description':'Autologin required'}, {result: false});
             talkRequestStub.onSecondCall().callsArgWith(3, null, fakeSession);
-            SPiD.hasSession(function() {});
+            SPiD.hasSession(function() { done(); });
             assert.equal(talkRequestStub.secondCall.args[0], 'https://login.schibsted.com/ajax/hasSession.js');
             assert.equal(talkRequestStub.secondCall.args[1], null);
             assert.equal(talkRequestStub.secondCall.args[2].autologin, 1);
             assert.isFunction(talkRequestStub.secondCall.args[3]);
         });
 
-        it('SPiD.hasSession should try to set cookie (in this case) when successful', function() {
+        it('SPiD.hasSession should try to set cookie (in this case) when successful', function(done) {
             SPiD.init(setupProd);
             talkRequestStub.onFirstCall().callsArgWith(3, null, fakeSession);
-            SPiD.hasSession(function() {});
+            SPiD.hasSession(function() { done(); });
             assert.equal(fakeSession.userId, persistSetStub.firstCall.args[0].userId);
             assert.isTrue(persistSetStub.firstCall.args[0].result);
             assert.equal(7111, persistSetStub.firstCall.args[1]);

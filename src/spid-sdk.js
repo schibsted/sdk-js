@@ -52,14 +52,14 @@ function hasSession(callback) {
                 return data.expiresIn;
             }
         },
-        respond = function(err, data) {
+        respond = util.makeAsync(function(err, data) {
             if(!err && data.result) {
                 cookie.tryVarnishCookie(data);
             }
-            util.makeAsync(eventTrigger.session)(_session, data);
+            eventTrigger.session(_session, data);
             _session = data;
             cbs.invokeAll(key, err, data);
-        },
+        }),
         handleResponse = function(err, data) {
             if(shouldCacheData(err, data)) {
                 persist.set(data, getExpiresIn(data));
