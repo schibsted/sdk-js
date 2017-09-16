@@ -2,7 +2,7 @@
 var _callbacks = {};
 
 function ensureArray(key) {
-    if(!_callbacks[key]) {
+    if(!Array.isArray(_callbacks[key])) {
         _callbacks[key] = [];
     }
 }

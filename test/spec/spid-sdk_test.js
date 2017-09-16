@@ -308,6 +308,24 @@ describe('SPiD', function() {
                 done();
             });
         });
+
+        it('SPiD.hasSession should call all callbacks but only events once', function(done) {
+            SPiD.init(setupProd);
+            var cbSpy = sinon.spy();
+            var eventSpy = sinon.spy();
+            talkRequestStub.onFirstCall().callsArgWith(3, null, fakeSession);
+
+            SPiD.event.subscribe('SPiD.sessionChange', eventSpy);
+            SPiD.hasSession(cbSpy);
+            SPiD.hasSession(cbSpy);
+            SPiD.hasSession(cbSpy);
+
+            window.setTimeout(function() {
+                assert.isTrue(cbSpy.calledThrice);
+                assert.isTrue(eventSpy.calledOnce);
+                done();
+            }, 20);
+        });
     });
 
     describe('SPiD.acceptAgreement', function() {
@@ -440,6 +458,31 @@ describe('SPiD', function() {
                 done();
             });
         });
+
+        it('SPiD.hasProduct should call all callbacks but only events once', function(done) {
+            SPiD.init(setupProd);
+            var cbSpy = sinon.spy();
+            var eventSpy = sinon.spy();
+            talkRequestStub.onFirstCall().callsArgWith(3, null, {
+                'result':true,
+                'expiresIn':7111,
+                'baseDomain':cookieDomain,
+                'productId': 10010,
+                'userId':1844813,
+                'id':'4f1e2ae59caf7c2f4a058b76'
+            });
+
+            SPiD.event.subscribe('SPiD.hasProduct', eventSpy);
+            SPiD.hasProduct(10010, cbSpy);
+            SPiD.hasProduct(10010, cbSpy);
+            SPiD.hasProduct(10010, cbSpy);
+
+            window.setTimeout(function() {
+                assert.isTrue(cbSpy.calledThrice);
+                assert.isTrue(eventSpy.calledOnce);
+                done();
+            }, 20);
+        });
     });
 
     describe('SPiD.hasSubscription', function() {
@@ -514,6 +557,32 @@ describe('SPiD', function() {
                 assert.equal(talkRequestStub.firstCall.args[2].sp_id, '4f1e2ae59caf7c2f4a058b76');
                 done();
             });
+        });
+
+        it('SPiD.hasSubscription should call all callbacks but only events once', function(done) {
+            SPiD.init(setupProd);
+            var cbSpy = sinon.spy();
+            var eventSpy = sinon.spy();
+            talkRequestStub.onFirstCall().callsArgWith(3, null, {
+                'result':true,
+                'expiresIn':7111,
+                'baseDomain':cookieDomain,
+                'productId': 10010,
+                'subscriptionId': 10010,
+                'userId':1844813,
+                'id':'4f1e2ae59caf7c2f4a058b76'
+            });
+
+            SPiD.event.subscribe('SPiD.hasSubscription', eventSpy);
+            SPiD.hasSubscription(10010, cbSpy);
+            SPiD.hasSubscription(10010, cbSpy);
+            SPiD.hasSubscription(10010, cbSpy);
+
+            window.setTimeout(function() {
+                assert.isTrue(cbSpy.calledThrice);
+                assert.isTrue(eventSpy.calledOnce);
+                done();
+            }, 20);
         });
     });
 
