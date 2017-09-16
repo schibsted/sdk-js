@@ -101,7 +101,16 @@ describe('SPiD', function() {
     describe('SPiD.hasSession', function() {
         var talkRequestStub,
             persistSetStub,
-            persistGetStub;
+            persistGetStub,
+            fakeSession = {
+                'result':true,
+                'expiresIn':7111,
+                'baseDomain':cookieDomain,
+                'userStatus':'connected',
+                'userId':1844813,
+                'id':'4f1e2ae59caf7c2f4a058b76',
+                'sp_id':'4f1e2ae59caf7c2f4a058b76'
+            };
 
         beforeEach(function(){
             talkRequestStub = sinon.stub(require('../../src/spid-talk'), 'request');
@@ -116,38 +125,31 @@ describe('SPiD', function() {
             clearVarnishCookie();
         });
 
-        it('SPiD.hasSession should call Talk with parameter server, path, params, callback', function() {
+        it('SPiD.hasSession should call Talk with parameter server, path, params, callback', function(done) {
             SPiD.init(setupProd);
-            SPiD.hasSession(function() {});
-            assert.equal(talkRequestStub.getCall(0).args[0],'https://session.login.schibsted.com/rpc/hasSession.js');
-            assert.equal(talkRequestStub.getCall(0).args[1],null);
-            assert.equal(talkRequestStub.getCall(0).args[2].autologin,1);
+            SPiD.hasSession(function() { done(); });
+            assert.equal(talkRequestStub.getCall(0).args[0], 'https://session.login.schibsted.com/rpc/hasSession.js');
+            assert.equal(talkRequestStub.getCall(0).args[1], null);
+            assert.equal(talkRequestStub.getCall(0).args[2].autologin, 1);
             assert.isFunction(talkRequestStub.getCall(0).args[3]);
+            talkRequestStub.getCall(0).args[3](null, fakeSession);
         });
 
-        it('SPiD.hasSession should call Talk again if LoginException is returned', function() {
+        it('SPiD.hasSession should call Talk again if LoginException is returned', function(done) {
             SPiD.init(setupProd);
             talkRequestStub.onFirstCall().callsArgWith(3, {'code':401,'type':'LoginException','description':'Autologin required'}, {result: false});
-            SPiD.hasSession(function() {});
+            talkRequestStub.onSecondCall().callsArgWith(3, null, fakeSession);
+            SPiD.hasSession(function() { done(); });
             assert.equal(talkRequestStub.secondCall.args[0], 'https://login.schibsted.com/ajax/hasSession.js');
             assert.equal(talkRequestStub.secondCall.args[1], null);
             assert.equal(talkRequestStub.secondCall.args[2].autologin, 1);
             assert.isFunction(talkRequestStub.secondCall.args[3]);
         });
 
-        it('SPiD.hasSession should try to set cookie (in this case) when successful', function() {
+        it('SPiD.hasSession should try to set cookie (in this case) when successful', function(done) {
             SPiD.init(setupProd);
-            var fakeSession = {
-                'result':true,
-                'expiresIn':7111,
-                'baseDomain':cookieDomain,
-                'userStatus':'connected',
-                'userId':1844813,
-                'id':'4f1e2ae59caf7c2f4a058b76',
-                'sp_id':'4f1e2ae59caf7c2f4a058b76'
-            };
             talkRequestStub.onFirstCall().callsArgWith(3, null, fakeSession);
-            SPiD.hasSession(function() {});
+            SPiD.hasSession(function() { done(); });
             assert.equal(fakeSession.userId, persistSetStub.firstCall.args[0].userId);
             assert.isTrue(persistSetStub.firstCall.args[0].result);
             assert.equal(7111, persistSetStub.firstCall.args[1]);
@@ -179,16 +181,6 @@ describe('SPiD', function() {
             _setup.storage = 'localstorage';
             SPiD.init(_setup);
 
-            var fakeSession = {
-                'result':true,
-                'expiresIn':7111,
-                'baseDomain':cookieDomain,
-                'userStatus':'connected',
-                'userId':1844813,
-                'id':'4f1e2ae59caf7c2f4a058b76',
-                'sp_id':'4f1e2ae59caf7c2f4a058b76'
-            };
-
             talkRequestStub.onFirstCall().callsArgWith(3, null, fakeSession);
 
             assert.equal(document.cookie.indexOf('SP_ID'), -1);
@@ -204,16 +196,6 @@ describe('SPiD', function() {
             _setup.storage = 'cookie';
             SPiD.init(_setup);
 
-            var fakeSession = {
-                'result':true,
-                'expiresIn':7111,
-                'baseDomain':cookieDomain,
-                'userStatus':'connected',
-                'userId':1844813,
-                'id':'4f1e2ae59caf7c2f4a058b76',
-                'sp_id':'4f1e2ae59caf7c2f4a058b76'
-            };
-
             talkRequestStub.onFirstCall().callsArgWith(3, null, fakeSession);
 
             assert.equal(document.cookie.indexOf('SP_ID'), -1);
@@ -228,16 +210,6 @@ describe('SPiD', function() {
             _setup.storage = 'localstorage';
             SPiD.init(_setup);
 
-            var fakeSession = {
-                'result': true,
-                'expiresIn': 7111,
-                'baseDomain': cookieDomain,
-                'userStatus': 'connected',
-                'userId': 1844813,
-                'id': '4f1e2ae59caf7c2f4a058b76',
-                'sp_id': '4f1e2ae59caf7c2f4a058b76'
-            };
-
             talkRequestStub.onFirstCall().callsArgWith(3, null, fakeSession);
 
             assert.equal(document.cookie.indexOf('SP_ID'), -1);
@@ -251,16 +223,6 @@ describe('SPiD', function() {
             var _setup = setup();
             _setup.storage = 'cookie';
             SPiD.init(_setup);
-
-            var fakeSession = {
-                'result': true,
-                'expiresIn': 7111,
-                'baseDomain': cookieDomain,
-                'userStatus': 'connected',
-                'userId': 1844813,
-                'id': '4f1e2ae59caf7c2f4a058b76',
-                'sp_id': '4f1e2ae59caf7c2f4a058b76'
-            };
 
             talkRequestStub.onFirstCall().callsArgWith(3, null, fakeSession);
 
@@ -277,16 +239,6 @@ describe('SPiD', function() {
             _setup.storage = 'localstorage';
             SPiD.init(_setup);
 
-            var fakeSession = {
-                'result': true,
-                'expiresIn': 7111,
-                'baseDomain': cookieDomain,
-                'userStatus': 'connected',
-                'userId': 1844813,
-                'id': '4f1e2ae59caf7c2f4a058b76',
-                'sp_id': '4f1e2ae59caf7c2f4a058b76'
-            };
-
             talkRequestStub.onFirstCall().callsArgWith(3, null, fakeSession);
 
             assert.equal(document.cookie.indexOf('SP_ID'), -1);
@@ -301,16 +253,6 @@ describe('SPiD', function() {
             _setup.setVarnishCookie = false;
             _setup.storage = 'cookie';
             SPiD.init(_setup);
-
-            var fakeSession = {
-                'result': true,
-                'expiresIn': 7111,
-                'baseDomain': cookieDomain,
-                'userStatus': 'connected',
-                'userId': 1844813,
-                'id': '4f1e2ae59caf7c2f4a058b76',
-                'sp_id': '4f1e2ae59caf7c2f4a058b76'
-            };
 
             talkRequestStub.onFirstCall().callsArgWith(3, null, fakeSession);
 
@@ -365,6 +307,24 @@ describe('SPiD', function() {
                 assert.equal(persistSetStub.firstCall.args[1], _setup.cache.hasSession.ttlSeconds);
                 done();
             });
+        });
+
+        it('SPiD.hasSession should call all callbacks but only events once', function(done) {
+            SPiD.init(setupProd);
+            var cbSpy = sinon.spy();
+            var eventSpy = sinon.spy();
+            talkRequestStub.onFirstCall().callsArgWith(3, null, fakeSession);
+
+            SPiD.event.subscribe('SPiD.sessionChange', eventSpy);
+            SPiD.hasSession(cbSpy);
+            SPiD.hasSession(cbSpy);
+            SPiD.hasSession(cbSpy);
+
+            window.setTimeout(function() {
+                assert.isTrue(cbSpy.calledThrice);
+                assert.isTrue(eventSpy.calledOnce);
+                done();
+            }, 20);
         });
     });
 
@@ -498,6 +458,31 @@ describe('SPiD', function() {
                 done();
             });
         });
+
+        it('SPiD.hasProduct should call all callbacks but only events once', function(done) {
+            SPiD.init(setupProd);
+            var cbSpy = sinon.spy();
+            var eventSpy = sinon.spy();
+            talkRequestStub.onFirstCall().callsArgWith(3, null, {
+                'result':true,
+                'expiresIn':7111,
+                'baseDomain':cookieDomain,
+                'productId': 10010,
+                'userId':1844813,
+                'id':'4f1e2ae59caf7c2f4a058b76'
+            });
+
+            SPiD.event.subscribe('SPiD.hasProduct', eventSpy);
+            SPiD.hasProduct(10010, cbSpy);
+            SPiD.hasProduct(10010, cbSpy);
+            SPiD.hasProduct(10010, cbSpy);
+
+            window.setTimeout(function() {
+                assert.isTrue(cbSpy.calledThrice);
+                assert.isTrue(eventSpy.calledOnce);
+                done();
+            }, 20);
+        });
     });
 
     describe('SPiD.hasSubscription', function() {
@@ -550,7 +535,7 @@ describe('SPiD', function() {
             SPiD.hasSubscription(10011, function() {
                 assert.isTrue(hasSessionStub.called, 'hasSession() is called');
                 assert.isTrue(persistSetStub.called);
-                assert.equal(persistSetStub.firstCall.args[2], 'prd10011');
+                assert.equal(persistSetStub.firstCall.args[2], 'sub10011');
                 assert.equal(persistSetStub.firstCall.args[1], SPiD.options().refresh_timeout);
                 assert.equal(persistSetStub.firstCall.args[0].result, true);
                 assert.equal(persistSetStub.firstCall.args[0].productId, 10011);
@@ -562,7 +547,7 @@ describe('SPiD', function() {
             SPiD.hasSubscription(10012, function() {
                 assert.isTrue(hasSessionStub.called, 'hasSession() is called');
                 assert.isTrue(persistGetStub.called);
-                assert.equal(persistGetStub.getCall(0).args[0], 'prd10012');
+                assert.equal(persistGetStub.getCall(0).args[0], 'sub10012');
                 done();
             });
         });
@@ -572,6 +557,32 @@ describe('SPiD', function() {
                 assert.equal(talkRequestStub.firstCall.args[2].sp_id, '4f1e2ae59caf7c2f4a058b76');
                 done();
             });
+        });
+
+        it('SPiD.hasSubscription should call all callbacks but only events once', function(done) {
+            SPiD.init(setupProd);
+            var cbSpy = sinon.spy();
+            var eventSpy = sinon.spy();
+            talkRequestStub.onFirstCall().callsArgWith(3, null, {
+                'result':true,
+                'expiresIn':7111,
+                'baseDomain':cookieDomain,
+                'productId': 10010,
+                'subscriptionId': 10010,
+                'userId':1844813,
+                'id':'4f1e2ae59caf7c2f4a058b76'
+            });
+
+            SPiD.event.subscribe('SPiD.hasSubscription', eventSpy);
+            SPiD.hasSubscription(10010, cbSpy);
+            SPiD.hasSubscription(10010, cbSpy);
+            SPiD.hasSubscription(10010, cbSpy);
+
+            window.setTimeout(function() {
+                assert.isTrue(cbSpy.calledThrice);
+                assert.isTrue(eventSpy.calledOnce);
+                done();
+            }, 20);
         });
     });
 
