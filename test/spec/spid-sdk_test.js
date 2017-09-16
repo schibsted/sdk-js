@@ -101,7 +101,7 @@ describe('SPiD', function() {
     describe('SPiD.hasSession', function() {
         var talkRequestStub,
             persistSetStub,
-            persistGetStub
+            persistGetStub,
             fakeSession = {
                 'result':true,
                 'expiresIn':7111,
