@@ -1,6 +1,6 @@
 /*global require:false, module:false*/
 var
-    _version = '2.5.0',
+    _version = '2.6.0',
     config = require('./spid-config'),
     _initiated = false,
     _session = {},
